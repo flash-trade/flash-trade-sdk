@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "incremental": true,            /* Enable incremental compilation */
+    "target": "es5",                /* Specify ECMAScript target version: */
+    // "lib": ["es2019"],
+    "module": "commonjs",           /* 'none', 'commonjs', 'amd', 'system', etc */
+    "declaration": true,            /* Concatenate & emit output to single file.*/
+    "outDir": "dist",                /* Redirect output to the directory. */
+    "esModuleInterop": true,        /* Enables intero between CommonJS and ES */
+    "skipLibCheck": true,           /* Skip type checking of declaration files. */
+    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently */
+    "allowJs": true,
+    "checkJs": true,
+    "removeComments": true,
+
+    // "declarationMap": true,
+    // "noImplicitAny": false,
+    "resolveJsonModule": true,
+    // "sourceMap": true,
+    
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./src/**/*.test.js", "node_modules", "**/node_modules"]
+}

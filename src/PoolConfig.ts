@@ -1,0 +1,315 @@
+import { Address } from '@coral-xyz/anchor';
+import { Cluster, PublicKey } from '@solana/web3.js';
+import poolConfigs from './PoolConfig.json';
+import { Side, isVariant } from './types';
+
+
+export interface CustodyConfig {
+  custodyId: number;
+  custodyAccount: PublicKey;
+  tokenAccount: PublicKey;
+  symbol: string;
+  mintKey: PublicKey;
+  decimals: number;
+  usdPrecision : number;
+  tokenPrecision : number;
+  isStable: boolean;
+  isVirtual: boolean;
+  oracleAddress: PublicKey;
+  customOracleAddress: PublicKey;
+  pythTicker: string;
+  pythPriceId: string;
+}
+
+export interface MarketConfig {
+  marketId: number;
+  marketAccount: PublicKey;
+  pool: PublicKey;
+  targetCustody: PublicKey;
+  collateralCustody: PublicKey;
+  side: Side;
+  maxLev : number;
+  targetCustodyId: number;
+  collateralCustodyId: number;
+  targetMint: PublicKey;
+  collateralMint: PublicKey;
+}
+
+export type Token = {
+  symbol: string;
+  mintKey: PublicKey;
+  decimals: number;
+  usdPrecision : number;
+  tokenPrecision : number;
+  isStable: boolean;
+  isVirtual: boolean;
+  pythTicker: string;
+  pythPriceId: string;
+};
+
+export class PoolConfig {
+  constructor(
+    public programId: PublicKey,
+    public perpComposibilityProgramId: PublicKey,
+    public fbNftRewardProgramId: PublicKey,
+    public cluster: Cluster,
+    public poolName: string,
+    public poolAddress: PublicKey,
+    public lpTokenMint: PublicKey,
+    public flpTokenAccount: PublicKey,
+    public lpDecimals: number,
+    public lpTokenSymbol: string,
+    public perpetuals: PublicKey,
+    public transferAuthority: PublicKey,
+    public multisig: PublicKey,
+    public addressLookupTableAddresses: PublicKey[],
+    public backupOracle: PublicKey,
+    public nftCollectionAddress: PublicKey,
+
+    public tokens: Token[],
+
+    public custodies: CustodyConfig[],
+
+    public markets: MarketConfig[],
+  ) { }
+
+  public getAllTokenMints(): PublicKey[] {
+    return Array.from(
+      this.tokens.map((token) => new PublicKey(token.mintKey)),
+    );
+  }
+
+  public getMarketConfigByPk(marketAccountPk: PublicKey): MarketConfig {
+    const market = this.markets.find(f => f.marketAccount.equals(marketAccountPk));
+    if(!market) throw new Error(`No such market ${marketAccountPk.toBase58()} exists.`)
+    return market
+  }
+
+  public getMarketConfig(
+    targetCustody: PublicKey,
+    collateralCustody: PublicKey,
+    side: Side): MarketConfig | null {
+    const marketAccountPk = this.getMarketPk(targetCustody, collateralCustody, side)
+    const market = this.markets.find(f => f.marketAccount.equals(marketAccountPk));
+    if(!market) return null
+    // better to return NULL so that we can handle on UI , since difficult to validate each input
+    // if(!market) throw new Error(`No such market : ${marketAccountPk.toBase58()} target:${targetCustody.toBase58()} collateral:${collateralCustody.toBase58()} side:${side} exists.`)
+    return market
+  }
+
+  public getMarketPk(
+    targetCustody: PublicKey,
+    collateralCustody: PublicKey,
+    side: Side
+  ): PublicKey {
+    return PublicKey.findProgramAddressSync([
+      Buffer.from('market'),
+      targetCustody.toBuffer(),
+      collateralCustody.toBuffer(),
+      Buffer.from([isVariant(side, 'long') ? 1 : 2])
+    ], this.programId)[0]
+  }
+
+  public getPositionFromMarketPk(
+    owner: PublicKey,
+    marketAccount : PublicKey,
+  ): PublicKey {
+    return PublicKey.findProgramAddressSync([
+      Buffer.from("position"),
+      owner.toBuffer(),
+      marketAccount.toBuffer(),
+    ], this.programId)[0]
+  }
+
+  public getPositionFromCustodyPk(
+    owner: PublicKey,
+    targetCustody : PublicKey,
+    collateralCustody : PublicKey,
+    side: Side
+  ): PublicKey {
+    return PublicKey.findProgramAddressSync([
+      Buffer.from("position"),
+      owner.toBuffer(),
+       this.getMarketPk(targetCustody, collateralCustody, side).toBuffer(),
+    ], this.programId)[0]
+  }
+
+  public doesMarketExist(pubkey: PublicKey): boolean {
+    return 
+  }
+
+  public getAllMarketPks(): PublicKey[] {
+    return this.markets.map(m => m.marketAccount);
+  }
+
+  public getNonStableTokens(): PublicKey[] {
+    return Array.from(
+      this.tokens
+        .filter((token) => !token.isStable)
+        .map((token) => new PublicKey(token.mintKey)),
+    );
+  }
+
+  public getAllCustodies(): PublicKey[] {
+    return Array.from(
+      this.custodies.map((custody) => new PublicKey(custody.custodyAccount)),
+    );
+  }
+
+  public getNonStableCustodies(): PublicKey[] {
+    return Array.from(
+      this.custodies
+        .filter((custody) => !custody.isStable)
+        .map((custody) => new PublicKey(custody.custodyAccount)),
+    );
+  }
+
+
+  public getTokenFromSymbol = (symbol: string) : Token => {
+    return this.tokens.find(f => f.symbol.toUpperCase() === symbol.toUpperCase())!;
+  }
+
+  public getTokenFromMintString = (mint: string) : Token => {
+      return this.tokens.find(f => f.mintKey.toBase58() === mint)!;
+  }
+
+  public getTokenFromMintPk = (mint: PublicKey) : Token => {
+      return this.tokens.find(f => f.mintKey.equals(mint))!;
+  }
+
+
+  // static getAllPoolConfigs(cluster: Cluster): PoolConfig[] {
+  //   return poolConfigs.pools.map(p => this.fromIdsByName(p.poolName, cluster))
+  // }
+
+  static getCustodyConfig(custodyAccountPk: Address, poolName: string, cluster: Cluster) : CustodyConfig {
+    return this.fromIdsByName(poolName, cluster).custodies.find(f => f.custodyAccount.toBase58() === custodyAccountPk.toString())
+  }
+
+  public getCustodyIdFromCustodyAccount(custodyAccountPk: Address): number {
+    return this.custodies.find(f => f.custodyAccount.toBase58() === custodyAccountPk.toString()).custodyId;
+  }
+
+  public getCustodyAccountFromCustodyId(custodyId: number): PublicKey {
+    return this.custodies.find(f => f.custodyId === custodyId).custodyAccount;
+  }
+
+  static getTokensInPool(name: string, cluster: Cluster): Token[] {
+    const poolConfig = poolConfigs.pools.find((pool) => pool['poolName'] === name && cluster === pool['cluster']);
+    if (!poolConfig) throw new Error(`No pool config ${name} found in Ids!`);
+    const tokens :Token[] = poolConfig['tokens'].map(i => {
+      return {
+        ...i,
+        usdPrecision : i.usdPrecision,
+        tokenPrecision : i.tokenPrecision,
+        mintKey: new PublicKey(i.mintKey)
+      }
+    })
+    return tokens
+  }
+
+  static buildPoolconfigFromJson(poolConfig: typeof poolConfigs['pools'][0]): PoolConfig {
+    let tokens: Token[] ;
+    try {
+      tokens = poolConfig['tokens'].map(i => {
+        return {
+          ...i,
+          mintKey: new PublicKey(i.mintKey)
+        }
+      })
+      
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load tokens ")
+    }
+    let custodies: CustodyConfig[];
+    try {
+      custodies = poolConfig['custodies'].map((i, index) => {
+        return {
+          ...i,
+          custodyId: i.custodyId,
+          custodyAccount: new PublicKey(i.custodyAccount),
+          tokenAccount: new PublicKey(i.tokenAccount),
+          mintKey: new PublicKey(i.mintKey),
+          oracleAddress: new PublicKey(i.oracleAddress),
+          customOracleAddress: new PublicKey(i.customOracleAddress),
+          usdPrecision : i.usdPrecision,
+          tokenPrecision : i.tokenPrecision,
+        }
+      })
+      
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load custodies ")
+    }
+
+   
+    let addressLookupTableAddresses: PublicKey[]
+    try {
+      addressLookupTableAddresses  = poolConfig['addressLookupTableAddresses'].map(i => {
+        return new PublicKey(i)
+      });
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load addressLookupTableAddresses ")
+    }
+   
+    let markets: MarketConfig[]
+    try {
+      markets  = poolConfig['markets'].map(i => {
+        return {
+          ...i,
+          marketAccount: new PublicKey(i.marketAccount),
+          pool: new PublicKey(i.pool),
+          targetCustody: new PublicKey(i.targetCustody),
+          collateralCustody: new PublicKey(i.collateralCustody),
+          side: i.side === 'long' ? Side.Long : Side.Short,
+          maxLev : i.maxLev,
+          targetMint: new PublicKey(i.targetMint),
+          collateralMint: new PublicKey(i.collateralMint)
+        }
+      });
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load markets ")
+    }
+
+    return new PoolConfig(
+      new PublicKey(poolConfig.programId),
+      new PublicKey(poolConfig.perpComposibilityProgramId),
+      new PublicKey(poolConfig.fbNftRewardProgramId),
+      poolConfig.cluster as Cluster,
+      poolConfig.poolName,
+      new PublicKey(poolConfig.poolAddress),
+      new PublicKey(poolConfig.lpTokenMint),
+      new PublicKey(poolConfig.flpTokenAccount),
+      poolConfig.lpDecimals,
+      poolConfig.lpTokenSymbol,
+      new PublicKey(poolConfig.perpetuals),
+      new PublicKey(poolConfig.transferAuthority),
+      new PublicKey(poolConfig.multisig),
+      addressLookupTableAddresses,
+      new PublicKey(poolConfig.backupOracle),
+      new PublicKey(poolConfig.nftCollectionAddress),
+      tokens,
+      custodies,
+      markets
+    );
+  }
+
+  static fromIdsByName(name: string, cluster: Cluster): PoolConfig {
+    const poolConfig = poolConfigs.pools.find((pool) => pool['poolName'] === name && cluster === pool['cluster']);
+    if (!poolConfig) {
+      throw new Error(`No pool with ${name} found!`);
+    }
+
+    return PoolConfig.buildPoolconfigFromJson(poolConfig);
+  }
+
+  static fromIdsByPk(poolPk: PublicKey, cluster: Cluster): PoolConfig {
+    const poolConfig = poolConfigs.pools.find(
+      (pool) => pool['poolAddress'] === poolPk.toString() && cluster === pool['cluster'],
+    );
+    if (!poolConfig) {
+      throw new Error(`No pool with ${poolPk.toString()} found!`);
+    }
+
+    return PoolConfig.buildPoolconfigFromJson(poolConfig)
+  }
+}
