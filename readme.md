@@ -15,7 +15,7 @@ npm i flash-sdk / yarn add flash-sdk
 ### connect sdk locally 
 ```
   import { AnchorProvider } from "@coral-xyz/anchor";
-  import { ComputeBudgetProgram } from '@solana/web3.js'
+  import { ComputeBudgetProgram , PublicKey, TransactionInstruction  } from '@solana/web3.js'
 
   const provider : AnchorProvider = AnchorProvider.local(clusterUrl, {
     commitment: "confirmed",
@@ -24,7 +24,22 @@ npm i flash-sdk / yarn add flash-sdk
   });
   const perpClient = new PerpetualsClient(provider, programId);
 
+  // flp.1
   const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1','mainnet-beta')
+  // flp.2
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Virtual.1','mainnet-beta')
+  // flp.3
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Governance.1','mainnet-beta')
+  // flp.4
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Community.1','mainnet-beta')
+
+  const poolAddress = POOL_CONFIG.poolAddress.toBase58()
+  const backupOracleData: any = await (await fetch(`https://beast.flash.trade/api/backup-oracle?poolAddress=${poolAddress}`)).json()
+  const backUpOracleInstruction = new TransactionInstruction({
+      keys: backupOracleData.keys,
+      programId: new PublicKey(backupOracleData.programId),
+      data: Buffer.from(backupOracleData.data),
+  })
 
    <!-- load ALT -->
    await perpClient.loadAddressLookupTable(POOL_CONFIG) 
@@ -39,11 +54,10 @@ npm i flash-sdk / yarn add flash-sdk
           )
         const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
 
-    const txid =  perpClient.sendTransaction([setCULimitIx, ...addLiqInstructions ], {
+    const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...addLiqInstructions ], {
             addLiqAdditionalSigners,
             alts: perpClient.addressLookupTables,
       })
-
 
 
   <!-- remove Liquidity  -->
@@ -54,12 +68,11 @@ npm i flash-sdk / yarn add flash-sdk
             minTokenAmountOut, // new BN(0)
             POOL_CONFIG
        )
-      const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
-    const txid =  perpClient.sendTransaction([setCULimitIx, ...removeLiqInstructions ], {
+    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
+    const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...removeLiqInstructions ], {
             removeLiqAdditionalSigners,
             alts: perpClient.addressLookupTables,
       })
-
 
 
     <!-- to STAKE FLP.1 -->
@@ -72,19 +85,6 @@ npm i flash-sdk / yarn add flash-sdk
       })
 
 
-
-
-  <!-- to STAKE FLP.1 -->
-  const { instructions: depositStakeInstructions, additionalSigners: depositStakeAdditionalSigners } =
-              await perpClient.depositStake(.provider.wallet.publicKey, provider.wallet.publicKey, flpDepositAmount, POOL_CONFIG)
-
-    const txid =  perpClient.sendTransaction([...depositStakeInstructions ], {
-            depositStakeAdditionalSigners,
-            alts: perpClient.addressLookupTables,
-      })
-
-
-
   <!-- to UN-STAKE FLP.1 -->
 
    const { instructions: unstakeInstantInstructions, additionalSigners : unstakeInstantAdditionalSigners } = await perpClient.unstakeInstant('USDC',flpUnstakeAmount,POOL_CONFIG)
@@ -95,7 +95,6 @@ npm i flash-sdk / yarn add flash-sdk
           unstakeInstantAdditionalSigners,
           alts: perpClient.addressLookupTables,
     })
-
 
 
   <!-- collect fees -->
