@@ -68,16 +68,16 @@ export class PerpetualsClient {
   perpetuals: { publicKey: PublicKey; bump: number };
   addressLookupTables: AddressLookupTableAccount[] = [];
 
-  eventAuthority : { publicKey: PublicKey; bump: number };
+  eventAuthority: { publicKey: PublicKey; bump: number };
   eventAuthorityRewardDistribution: { publicKey: PublicKey; bump: number };
 
   private postSendTxCallback?: ({ txid }) => void;
   private prioritizationFee: number;
   private useExtOracleAccount: boolean;
   private txConfirmationCommitment: Commitment;
-  
+
   constructor(provider: AnchorProvider, programId: PublicKey, composabilityProgramId: PublicKey, fbNftRewardProgramId: PublicKey, rewardDistributionProgramId: PublicKey, opts: PerpClientOptions, useExtOracleAccount = false) {
-   
+
     this.provider = provider;
     setProvider(provider);
 
@@ -154,174 +154,174 @@ export class PerpetualsClient {
   };
 
 
- // test helper
- adjustTokenRatios = (ratios: TokenRatios[]) => {
-  if (ratios.length == 0) {
+  // test helper
+  adjustTokenRatios = (ratios: TokenRatios[]) => {
+    if (ratios.length == 0) {
+      return ratios;
+    }
+    let target = Math.floor(10000 / ratios.length);
+
+    for (let ratio of ratios) {
+      ratio.target = new BN(target);
+    }
+
+    if (10000 % ratios.length !== 0) {
+      ratios[ratios.length - 1].target = new BN(
+        target + (10000 % ratios.length)
+      );
+    }
+
     return ratios;
-  }
-  let target = Math.floor(10000 / ratios.length);
+  };
 
-  for (let ratio of ratios) {
-    ratio.target = new BN(target);
-  }
+  getPerpetuals = async () => {
+    return this.program.account.perpetuals.fetch(this.perpetuals.publicKey);
+  };
 
-  if (10000 % ratios.length !== 0) {
-    ratios[ratios.length - 1].target = new BN(
-      target + (10000 % ratios.length)
-    );
-  }
+  getPoolKey = (name: string) => {
+    return this.findProgramAddress("pool", name).publicKey;
+  };
 
-  return ratios;
-};
+  getPool = async (name: string) => {
+    return this.program.account.pool.fetch(this.getPoolKey(name));
+  };
 
-getPerpetuals = async () => {
-  return this.program.account.perpetuals.fetch(this.perpetuals.publicKey);
-};
+  getPools = async () => {
 
-getPoolKey = (name: string) => {
-  return this.findProgramAddress("pool", name).publicKey;
-};
+    let perpetuals = await this.getPerpetuals();
+    return this.program.account.pool.fetchMultiple(perpetuals.pools);
+  };
 
-getPool = async (name: string) => {
-  return this.program.account.pool.fetch(this.getPoolKey(name));
-};
+  getPoolLpTokenKey = (name: string) => {
+    return this.findProgramAddress("lp_token_mint", [this.getPoolKey(name)])
+      .publicKey;
+  };
 
-getPools = async () => {
+  getPoolCompoundingTokenKey = (name: string) => {
+    return this.findProgramAddress("compounding_token_mint", [this.getPoolKey(name)])
+      .publicKey;
+  };
 
-  let perpetuals = await this.getPerpetuals();
-  return this.program.account.pool.fetchMultiple(perpetuals.pools);
-};
-
-getPoolLpTokenKey = (name: string) => {
-  return this.findProgramAddress("lp_token_mint", [this.getPoolKey(name)])
-    .publicKey;
-};
-
-getPoolCompoundingTokenKey = (name: string) => {
-  return this.findProgramAddress("compounding_token_mint", [this.getPoolKey(name)])
-    .publicKey;
-};
-
-getCustodyKey = (poolName: string, tokenMint: PublicKey) => {
-  return this.findProgramAddress("custody", [
-    this.getPoolKey(poolName),
-    tokenMint,
-  ]).publicKey;
-};
-
-getCustodyTokenAccountKey = (poolName: string, tokenMint: PublicKey) => {
-  return this.findProgramAddress("custody_token_account", [
-    this.getPoolKey(poolName),
-    tokenMint,
-  ]).publicKey;
-};
-
-getTradingAccount = async (tradingAccount: PublicKey) => {
-  return this.program.account.trading.fetch(tradingAccount);
-};
-
-getMarketPk(
-  targetCustody: PublicKey,
-  collateralCustody: PublicKey,
-  side: Side
-): PublicKey {
-  // return PublicKey.findProgramAddressSync([
-  //   Buffer.from('market'),
-  //   targetCustody.toBuffer(),
-  //   collateralCustody.toBuffer(),
-  //   Buffer.from([isVariant(side, 'long') ? 1 : 0])
-  // ],  this.program.programId)[0]
-
-  return this.findProgramAddress("market", [
-    targetCustody,
-    collateralCustody,
-    side === 'long' ? [1] : [2], // short
-  ]).publicKey;
-}
-
-getPositionKey(
-  owner: PublicKey,
-  targetCustody : PublicKey,
-  collateralCustody : PublicKey,
-  side: Side
-): PublicKey {
-  return  this.findProgramAddress("position", [
-      owner,
-      this.getMarketPk(targetCustody, collateralCustody, side ),
+  getCustodyKey = (poolName: string, tokenMint: PublicKey) => {
+    return this.findProgramAddress("custody", [
+      this.getPoolKey(poolName),
+      tokenMint,
     ]).publicKey;
-}
+  };
 
-getPosition = async (postionKey: PublicKey) => {
-  return this.program.account.position.fetch(postionKey);
-};
+  getCustodyTokenAccountKey = (poolName: string, tokenMint: PublicKey) => {
+    return this.findProgramAddress("custody_token_account", [
+      this.getPoolKey(poolName),
+      tokenMint,
+    ]).publicKey;
+  };
 
-getUserPosition = async (
-  owner: PublicKey,
-  targetCustody : PublicKey,
-  collateralCustody : PublicKey,
-  side: Side
-) => {
-  return this.program.account.position.fetch(
-    this.getPositionKey(owner, targetCustody, collateralCustody, side)
-  );
-};
+  getTradingAccount = async (tradingAccount: PublicKey) => {
+    return this.program.account.trading.fetch(tradingAccount);
+  };
 
-// also used in UI for fetching positions 
-getUserPositions = async (
-  wallet: PublicKey,
-  poolConfig: PoolConfig
-) => {
+  getMarketPk(
+    targetCustody: PublicKey,
+    collateralCustody: PublicKey,
+    side: Side
+  ): PublicKey {
+    // return PublicKey.findProgramAddressSync([
+    //   Buffer.from('market'),
+    //   targetCustody.toBuffer(),
+    //   collateralCustody.toBuffer(),
+    //   Buffer.from([isVariant(side, 'long') ? 1 : 0])
+    // ],  this.program.programId)[0]
 
-  const marketAccountsPks = poolConfig.getAllMarketPks();
+    return this.findProgramAddress("market", [
+      targetCustody,
+      collateralCustody,
+      side === 'long' ? [1] : [2], // short
+    ]).publicKey;
+  }
 
-  const positionKeys = marketAccountsPks.map(f => this.findProgramAddress("position", [
-    wallet,
-    f
-  ])).map(p => p.publicKey);
+  getPositionKey(
+    owner: PublicKey,
+    targetCustody: PublicKey,
+    collateralCustody: PublicKey,
+    side: Side
+  ): PublicKey {
+    return this.findProgramAddress("position", [
+      owner,
+      this.getMarketPk(targetCustody, collateralCustody, side),
+    ]).publicKey;
+  }
 
-  let positionsDatas = (await this.provider.connection.getMultipleAccountsInfo(positionKeys)) ?? [];
+  getPosition = async (postionKey: PublicKey) => {
+    return this.program.account.position.fetch(postionKey);
+  };
 
-  return positionsDatas
-    .map((p, i) => ({ pubkey: positionKeys[i], data: p }))
-    .filter(f => f.data !== null)
-    .map(k => ({ pubkey: k.pubkey, ...this.program.account.position.coder.accounts.decode<Position>('position', k.data!.data) }))
-};
+  getUserPosition = async (
+    owner: PublicKey,
+    targetCustody: PublicKey,
+    collateralCustody: PublicKey,
+    side: Side
+  ) => {
+    return this.program.account.position.fetch(
+      this.getPositionKey(owner, targetCustody, collateralCustody, side)
+    );
+  };
 
-getPoolTokenPositions = async (poolName: string, tokenMint: PublicKey, collateralMint: PublicKey) => {
-  let poolKey = this.getPoolKey(poolName);
-  let custodyKey = this.getCustodyKey(poolName, tokenMint);
-  let collateralCustodyKey = this.getCustodyKey(poolName, collateralMint);
+  // also used in UI for fetching positions 
+  getUserPositions = async (
+    wallet: PublicKey,
+    poolConfig: PoolConfig
+  ) => {
 
-  let data = encode(
-    Buffer.concat([poolKey.toBuffer(), custodyKey.toBuffer(), collateralCustodyKey.toBuffer()])
-  );
+    const marketAccountsPks = poolConfig.getAllMarketPks();
 
-  const positions = await this.program.account.position.all([
-    {memcmp: {offset: 72, bytes: data}},
-  ])
-  
-  return positions;
-};
+    const positionKeys = marketAccountsPks.map(f => this.findProgramAddress("position", [
+      wallet,
+      f
+    ])).map(p => p.publicKey);
 
-getAllPositions = async () => {
-  return this.program.account.position.all();
-};
+    let positionsDatas = (await this.provider.connection.getMultipleAccountsInfo(positionKeys)) ?? [];
 
-getAccountDiscriminator = (name: string) => {
-  return Buffer.from(sha256.digest(`account:${name}`)).slice(0, 8);
-};
+    return positionsDatas
+      .map((p, i) => ({ pubkey: positionKeys[i], data: p }))
+      .filter(f => f.data !== null)
+      .map(k => ({ pubkey: k.pubkey, ...this.program.account.position.coder.accounts.decode<Position>('position', k.data!.data) }))
+  };
+
+  getPoolTokenPositions = async (poolName: string, tokenMint: PublicKey, collateralMint: PublicKey) => {
+    let poolKey = this.getPoolKey(poolName);
+    let custodyKey = this.getCustodyKey(poolName, tokenMint);
+    let collateralCustodyKey = this.getCustodyKey(poolName, collateralMint);
+
+    let data = encode(
+      Buffer.concat([poolKey.toBuffer(), custodyKey.toBuffer(), collateralCustodyKey.toBuffer()])
+    );
+
+    const positions = await this.program.account.position.all([
+      { memcmp: { offset: 72, bytes: data } },
+    ])
+
+    return positions;
+  };
+
+  getAllPositions = async () => {
+    return this.program.account.position.all();
+  };
+
+  getAccountDiscriminator = (name: string) => {
+    return Buffer.from(sha256.digest(`account:${name}`)).slice(0, 8);
+  };
 
 
-log = (...message: string[]) => {
-  let date = new Date();
-  let date_str = date.toDateString();
-  let time = date.toLocaleTimeString();
-  console.log(`[${date_str} ${time}] ${message}`);
-};
+  log = (...message: string[]) => {
+    let date = new Date();
+    let date_str = date.toDateString();
+    let time = date.toLocaleTimeString();
+    console.log(`[${date_str} ${time}] ${message}`);
+  };
 
-prettyPrint = (object: object) => {
-  console.log(JSON.stringify(object, null, 2));
-};
+  prettyPrint = (object: object) => {
+    console.log(JSON.stringify(object, null, 2));
+  };
 
 
   ///////
@@ -329,15 +329,15 @@ prettyPrint = (object: object) => {
 
   liquidate = async (
     positionAccount: PublicKey,
-    poolConfig : PoolConfig,
+    poolConfig: PoolConfig,
     tokenMint: PublicKey,
     collateralMint: PublicKey,
-    marketPk : PublicKey,
+    marketPk: PublicKey,
   ) => {
 
     const targetCustodyConfig = poolConfig.custodies.find(f => f.mintKey.equals(tokenMint))
     const collateralCustodyConfig = poolConfig.custodies.find(f => f.mintKey.equals(collateralMint))
-   
+
     return await this.program.methods
       .liquidate({})
       .accounts({
@@ -360,7 +360,7 @@ prettyPrint = (object: object) => {
 
   ///////
   /// UI/SDK INSTRUCTIONS HELPERS
-  
+
   // - handle SOL wrapping to WSOL and create a ATA - DONE
   // - Balance checks - DONE
   // - ATA check - else create  - DONE 
@@ -500,7 +500,7 @@ prettyPrint = (object: object) => {
       owner: publicKey,
       feePayer: publicKey,
       fundingAccount: inputSymbol == 'SOL' ? wrappedSolAccount.publicKey : userInputTokenAccount, // user token account for custody token account
-      
+
       transferAuthority: poolConfig.transferAuthority,
       perpetuals: poolConfig.perpetuals,
       pool: poolConfig.poolAddress,
@@ -519,8 +519,8 @@ prettyPrint = (object: object) => {
       program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
     })
-    .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
-    .instruction();
+      .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+      .instruction();
 
     instructions.push(instruction);
 
@@ -530,7 +530,7 @@ prettyPrint = (object: object) => {
     };
   }
 
- 
+
   addCompoundingLiquidity = async (
     amountIn: BN,
     minCompoundingAmountOut: BN,
@@ -683,14 +683,14 @@ prettyPrint = (object: object) => {
           perpetuals: poolConfig.perpetuals,
           pool: poolConfig.poolAddress,
           inCustody: inCustodyConfig.custodyAccount,
-          inCustodyOracleAccount: this.useExtOracleAccount ? inCustodyConfig.extOracleAccount: inCustodyConfig.intOracleAccount,
+          inCustodyOracleAccount: this.useExtOracleAccount ? inCustodyConfig.extOracleAccount : inCustodyConfig.intOracleAccount,
           inCustodyTokenAccount: inCustodyConfig.tokenAccount,
 
           rewardCustody: rewardCustody.custodyAccount,
-          rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount: rewardCustody.intOracleAccount,
+          rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount : rewardCustody.intOracleAccount,
           lpTokenMint: lpTokenMint,
           compoundingTokenMint: compoundingTokenMint,
-          
+
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
@@ -720,7 +720,7 @@ prettyPrint = (object: object) => {
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
-    let userReceivingTokenAccount : PublicKey;
+    let userReceivingTokenAccount: PublicKey;
     let wrappedSolAccount: Keypair | undefined;
     let preInstructions: TransactionInstruction[] = [];
     let instructions: TransactionInstruction[] = [];
@@ -776,7 +776,7 @@ prettyPrint = (object: object) => {
           )
         );
       }
-    } 
+    }
 
     let custodyAccountMetas = [];
     let custodyOracleAccountMetas = [];
@@ -834,14 +834,14 @@ prettyPrint = (object: object) => {
           perpetuals: poolConfig.perpetuals,
           pool: poolConfig.poolAddress,
           outCustody: outCustodyConfig.custodyAccount,
-          outCustodyOracleAccount: this.useExtOracleAccount ? outCustodyConfig.extOracleAccount: outCustodyConfig.intOracleAccount,
+          outCustodyOracleAccount: this.useExtOracleAccount ? outCustodyConfig.extOracleAccount : outCustodyConfig.intOracleAccount,
           outCustodyTokenAccount: outCustodyConfig.tokenAccount,
 
           rewardCustody: rewardCustody.custodyAccount,
-          rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount: rewardCustody.intOracleAccount,
+          rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount : rewardCustody.intOracleAccount,
           lpTokenMint: lpTokenMint,
           compoundingTokenMint: compoundingTokenMint,
-          
+
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
@@ -856,7 +856,7 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions: [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
   }
@@ -874,7 +874,7 @@ prettyPrint = (object: object) => {
     closeLpATA = false,
     createUserATA = true, //create new ATA for USER in the end 
     closeUsersWSOLATA = false // to get back WSOL=>SOL
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
 
     const recieveTokenCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(recieveTokenSymbol).mintKey))!;
     if (!recieveTokenCustodyConfig) {
@@ -882,14 +882,14 @@ prettyPrint = (object: object) => {
     }
     let publicKey = this.provider.wallet.publicKey;
 
-    let userReceivingTokenAccount : PublicKey;
+    let userReceivingTokenAccount: PublicKey;
     let wrappedSolAccount: Keypair | undefined;
     let preInstructions: TransactionInstruction[] = [];
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
 
-    try { 
+    try {
       let stakedLpTokenAccount = await getAssociatedTokenAddress(
         poolConfig.stakedLpTokenMint,
         publicKey
@@ -972,22 +972,7 @@ prettyPrint = (object: object) => {
             )
           );
         }
-      } // else
-
-
-      // // breakpoint fix:
-      // let poolAumInstruction = await this.program.methods
-      //   .updatePoolAum()
-      //   .accounts({
-      //     payer: publicKey,
-      //     perpetuals: poolConfig.perpetuals,
-      //     pool: poolConfig.poolAddress,
-      //     ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
-      //   })
-      //   .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...custodyCustomOracles])
-      //   .instruction();
-
-      // preInstructions.push(poolAumInstruction)
+      }
 
       console.log("liquidityAmountIn", liquidityAmountIn.toString());
 
@@ -1007,7 +992,7 @@ prettyPrint = (object: object) => {
           custodyOracleAccount: this.useExtOracleAccount ? recieveTokenCustodyConfig.extOracleAccount : recieveTokenCustodyConfig.intOracleAccount,
           custodyTokenAccount: recieveTokenCustodyConfig.tokenAccount,
           lpTokenMint: poolConfig.stakedLpTokenMint,
-          eventAuthority : this.eventAuthority.publicKey,
+          eventAuthority: this.eventAuthority.publicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
           program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
@@ -1025,14 +1010,14 @@ prettyPrint = (object: object) => {
         const closeWsolATAIns = createCloseAccountInstruction(userReceivingTokenAccount, publicKey, publicKey);
         postInstructions.push(closeWsolATAIns);
       }
-      
+
     } catch (err) {
       console.log("perpClient removeLiquidity error:: ", err);
       throw err;
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
   }
@@ -1040,7 +1025,7 @@ prettyPrint = (object: object) => {
   addReferral = async (
     nftTradingAccount: PublicKey,
     nftReferralAccount: PublicKey,
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     let preInstructions: TransactionInstruction[] = [];
@@ -1050,19 +1035,19 @@ prettyPrint = (object: object) => {
 
     try {
       let addReferralInstruction = await this.program.methods
-          .createReferral({
-          
-          })
-          .accounts({
-            owner: publicKey,
-            feePayer: publicKey,
-            referralAccount: nftReferralAccount,
-            tradingAccount: nftTradingAccount,
-            systemProgram: SystemProgram.programId,
+        .createReferral({
 
-          })
-          .instruction();
-        instructions.push(addReferralInstruction)
+        })
+        .accounts({
+          owner: publicKey,
+          feePayer: publicKey,
+          referralAccount: nftReferralAccount,
+          tradingAccount: nftTradingAccount,
+          systemProgram: SystemProgram.programId,
+
+        })
+        .instruction();
+      instructions.push(addReferralInstruction)
 
     } catch (err) {
       console.log("perpClient addReferral error:: ", err);
@@ -1070,69 +1055,7 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
-      additionalSigners
-    };
-
-  }
-
-  createNftTradingAccount = async (
-    nftMint: PublicKey,
-    owner : PublicKey,
-    poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-      let nftTradingAccount = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("trading"),
-          nftMint.toBuffer(),
-        ],
-        this.programId
-      )[0];
-
-
-
-      const metadataAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("metadata"), METAPLEX_PROGRAM_ID.toBuffer(), nftMint.toBuffer()],
-        METAPLEX_PROGRAM_ID
-      )[0];
-
-      let nftTokenAccount = await getAssociatedTokenAddress(
-        nftMint,
-        owner
-      );
-
-      let createNftTradingAccountInstruction = await this.program.methods
-          .createTradingAccount({
-            collectionIndex: 0
-          })
-          .accounts({
-            owner: publicKey,
-            feePayer: publicKey,
-            perpetuals: poolConfig.perpetuals,
-            nftMint: nftMint,
-            nftTokenAccount: nftTokenAccount,
-            tradingAccount: nftTradingAccount,
-            metadataAccount: metadataAccount,
-            systemProgram: SystemProgram.programId
-          })
-          .instruction();
-        instructions.push(createNftTradingAccountInstruction)
-
-    } catch (err) {
-      console.log("perpClient createNftAccount error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
@@ -1143,7 +1066,7 @@ prettyPrint = (object: object) => {
     updateReferer: boolean,
     updateBooster: boolean,
     flpStakeAccounts: PublicKey[]
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     let preInstructions: TransactionInstruction[] = [];
@@ -1183,20 +1106,20 @@ prettyPrint = (object: object) => {
       }
 
       let updateNftTradingAccountInstruction = await this.program.methods
-          .updateTradingAccount({
-            updateReferer: updateReferer,
-            updateBooster: updateBooster
-          })
-          .accounts({
-            owner: publicKey,
-            feePayer: publicKey,
-            nftTokenAccount: nftTokenAccount,
-            referralAccount: nftReferralAccount,
-            tradingAccount: nftTradingAccount
-          })
-          // .remainingAccounts([...flpStakeAccountMetas]) //pass flpStakeAccounts
-          .instruction();
-        instructions.push(updateNftTradingAccountInstruction)
+        .updateTradingAccount({
+          updateReferer: updateReferer,
+          updateBooster: updateBooster
+        })
+        .accounts({
+          owner: publicKey,
+          feePayer: publicKey,
+          nftTokenAccount: nftTokenAccount,
+          referralAccount: nftReferralAccount,
+          tradingAccount: nftTradingAccount
+        })
+        // .remainingAccounts([...flpStakeAccountMetas]) //pass flpStakeAccounts
+        .instruction();
+      instructions.push(updateNftTradingAccountInstruction)
 
     } catch (err) {
       console.log("perpClient updateNftAccount error:: ", err);
@@ -1204,18 +1127,18 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
   }
 
   levelUp = async (
-    poolConfig :PoolConfig,
+    poolConfig: PoolConfig,
     // collectionIndex: number,
     nftMint: PublicKey,
-    authorizationRulesAccount : PublicKey,
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+    authorizationRulesAccount: PublicKey,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     let preInstructions: TransactionInstruction[] = [];
@@ -1238,25 +1161,25 @@ prettyPrint = (object: object) => {
       )[0];
 
       let levelUpInstruction = await this.program.methods
-          .levelUp({
-            // collectionIndex: collectionIndex
-          })
-          .accounts({
-            owner: publicKey,
-            perpetuals: this.perpetuals.publicKey,
-            pool: poolConfig.poolAddress,
-            metadataAccount: metadataAccount,
-            nftMint : nftMint, 
-            metadataProgram: METAPLEX_PROGRAM_ID,
-            tradingAccount: nftTradingAccount,
-            transferAuthority: this.authority.publicKey,
-            authorizationRulesAccount : authorizationRulesAccount,
-            authorizationRulesProgram : new PublicKey('auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg'),
-            systemProgram: SystemProgram.programId,
-            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
-          })
-          .instruction();
-        instructions.push(levelUpInstruction)
+        .levelUp({
+          // collectionIndex: collectionIndex
+        })
+        .accounts({
+          owner: publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          pool: poolConfig.poolAddress,
+          metadataAccount: metadataAccount,
+          nftMint: nftMint,
+          metadataProgram: METAPLEX_PROGRAM_ID,
+          tradingAccount: nftTradingAccount,
+          transferAuthority: this.authority.publicKey,
+          authorizationRulesAccount: authorizationRulesAccount,
+          authorizationRulesProgram: new PublicKey('auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg'),
+          systemProgram: SystemProgram.programId,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        })
+        .instruction();
+      instructions.push(levelUpInstruction)
 
     } catch (err) {
       console.log("perpClient levelUp error:: ", err);
@@ -1264,156 +1187,25 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
-      additionalSigners
-    };
-
-  }
-  
-  // admin Instruction
-  initStake = async (
-    stakingFeeShareBps: BN,
-    rewardSymbol: string,
-    poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-      
-      const lpTokenMint = poolConfig.stakedLpTokenMint;
-      const stakedLpTokenAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("staked_lp_token_account"), poolConfig.poolAddress.toBuffer(), lpTokenMint.toBuffer()],
-        this.programId
-      )[0];
-
-      const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
-
-      let initStakeInstruction = await this.program.methods
-          .initStaking({
-            stakingFeeShareBps: stakingFeeShareBps
-          })
-          .accounts({
-            admin: publicKey,
-            multisig: this.multisig.publicKey,
-            transferAuthority: poolConfig.transferAuthority,
-            perpetuals: this.perpetuals.publicKey,
-            pool: poolConfig.poolAddress,
-            custody: rewardCustodyConfig.custodyAccount,
-            lpTokenMint: lpTokenMint,
-            stakedLpTokenAccount: stakedLpTokenAccount,
-
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            rent: SYSVAR_RENT_PUBKEY
-
-          })
-          .instruction();
-        instructions.push(initStakeInstruction)
-
-    } catch (err) {
-      console.log("perpClient InitStaking error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
   }
 
-  // admin Instruction
-  initCompounding = async (
-    feeShareBps: BN,
-    metadataTitle: string,
-    metadataSymbol: string,
-    metadataUri: string,
-    rewardSymbol: string,
-    poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-
-      const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
-
-      const compoundingTokenMint = this.getPoolCompoundingTokenKey(poolConfig.poolName)
-      const compoundingVault = PublicKey.findProgramAddressSync(
-        [Buffer.from("compounding_token_account"), poolConfig.poolAddress.toBuffer(), poolConfig.stakedLpTokenMint.toBuffer()],
-        this.programId
-      )[0]
-
-
-      const metadataAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("metadata"), METAPLEX_PROGRAM_ID.toBuffer(), compoundingTokenMint.toBuffer()],
-        METAPLEX_PROGRAM_ID
-      )[0]
-
-      let initCompoundingInstruction = await this.program.methods
-          .initCompounding({
-            feeShareBps: feeShareBps,
-            metadataTitle: metadataTitle,
-            metadataSymbol: metadataSymbol,
-            metadataUri: metadataUri
-          })
-          .accounts({
-            admin: publicKey,
-            multisig: this.multisig.publicKey,
-            transferAuthority: poolConfig.transferAuthority,
-            perpetuals: this.perpetuals.publicKey,
-            pool: poolConfig.poolAddress,
-            custody: rewardCustodyConfig.custodyAccount,
-            lpTokenMint: poolConfig.stakedLpTokenMint,
-            compoundingVault: compoundingVault,
-            compoundingTokenMint: compoundingTokenMint,
-            metadataAccount: metadataAccount,
-
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-
-            metadataProgram: METAPLEX_PROGRAM_ID,
-            rent: SYSVAR_RENT_PUBKEY
-
-          })
-          .instruction();
-        instructions.push(initCompoundingInstruction)
-
-    } catch (err) {
-      console.log("perpClient initCompounding error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
-      additionalSigners
-    };
-
-  }
-
-  
   depositStake = async (
     owner: PublicKey,
     feePayer: PublicKey,
     depositAmount: BN,
     poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let preInstructions: TransactionInstruction[] = [];
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
 
     try {
-      
+
       const lpTokenMint = poolConfig.stakedLpTokenMint;
       const poolStakedLpVault = PublicKey.findProgramAddressSync(
         [Buffer.from("staked_lp_token_account"), poolConfig.poolAddress.toBuffer(), lpTokenMint.toBuffer()],
@@ -1435,26 +1227,26 @@ prettyPrint = (object: object) => {
       // }
 
       let depositStakeInstruction = await this.program.methods
-          .depositStake({
-            depositAmount: depositAmount
-          })
-          .accounts({
-            owner,
-            feePayer,
-            fundingLpTokenAccount: userLpTokenAccount,
-            transferAuthority: poolConfig.transferAuthority,
-            perpetuals: this.perpetuals.publicKey,
-            pool: poolConfig.poolAddress,
-            flpStakeAccount: flpStakeAccount,
-            poolStakedLpVault: poolStakedLpVault,
+        .depositStake({
+          depositAmount: depositAmount
+        })
+        .accounts({
+          owner,
+          feePayer,
+          fundingLpTokenAccount: userLpTokenAccount,
+          transferAuthority: poolConfig.transferAuthority,
+          perpetuals: this.perpetuals.publicKey,
+          pool: poolConfig.poolAddress,
+          flpStakeAccount: flpStakeAccount,
+          poolStakedLpVault: poolStakedLpVault,
 
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.programId
-          })
-          .instruction();
-        instructions.push(depositStakeInstruction)
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.programId
+        })
+        .instruction();
+      instructions.push(depositStakeInstruction)
 
     } catch (err) {
       console.log("perpClient depositStaking error:: ", err);
@@ -1462,7 +1254,7 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
@@ -1470,27 +1262,27 @@ prettyPrint = (object: object) => {
 
   refreshStakeWithAllFlpStakeAccounts = async (poolConfig: PoolConfig,) => {
     const flpStakeAccounts = ((await this.program.account.flpStake.all()))
-    console.log("total no of flpStakeAccounts: ",flpStakeAccounts.length)
+    console.log("total no of flpStakeAccounts: ", flpStakeAccounts.length)
     const maxFlpStakeAccountLength = 32 - (4 + poolConfig.custodies.length);
     const pendingActivationAccounts: PublicKey[] = [];
 
     for (const flpStakeAccount of flpStakeAccounts) {
       const account: FlpStake = flpStakeAccount.account;
       // if(account.stakeStats.pendingActivation.gt(BN_ZERO)) {
-        pendingActivationAccounts.push(flpStakeAccount.publicKey);
+      pendingActivationAccounts.push(flpStakeAccount.publicKey);
       // }
     }
 
     const refreshStakeInstructions: TransactionInstruction[] = [];
 
-    console.log("total no of pendingActivationAccounts: ",pendingActivationAccounts.length)
-    
+    console.log("total no of pendingActivationAccounts: ", pendingActivationAccounts.length)
+
     for (let i = 0; i < pendingActivationAccounts.length; i += maxFlpStakeAccountLength) {
       const batch = pendingActivationAccounts.slice(i, i + maxFlpStakeAccountLength);
-      const  instruction  = await this.refreshStake('USDC', poolConfig, batch);
+      const instruction = await this.refreshStake('USDC', poolConfig, batch);
       refreshStakeInstructions.push(instruction);
     }
-   
+
     return refreshStakeInstructions;
   }
 
@@ -1501,7 +1293,7 @@ prettyPrint = (object: object) => {
   ): Promise<TransactionInstruction> => {
 
     try {
-      
+
       const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
       const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
 
@@ -1512,7 +1304,7 @@ prettyPrint = (object: object) => {
       )[0];
 
       let custodyAccountMetas = [];
-   
+
       for (const custody of poolConfig.custodies) {
         custodyAccountMetas.push({
           pubkey: custody.custodyAccount,
@@ -1535,19 +1327,19 @@ prettyPrint = (object: object) => {
           isWritable: true,
         });
       }
-      
+
       let refreshStakeInstruction = await this.program.methods
-          .refreshStake({})
-          .accounts({
-            perpetuals: this.perpetuals.publicKey,
-            pool: pool,
-            rewardCustody: rewardCustodyConfig.custodyAccount,
-            feeDistributionTokenAccount: feeDistributionTokenAccount,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.program.programId,
-          })
-          .remainingAccounts([...custodyAccountMetas, ...flpStakeAccountMetas])
-          .instruction();
+        .refreshStake({})
+        .accounts({
+          perpetuals: this.perpetuals.publicKey,
+          pool: pool,
+          rewardCustody: rewardCustodyConfig.custodyAccount,
+          feeDistributionTokenAccount: feeDistributionTokenAccount,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.program.programId,
+        })
+        .remainingAccounts([...custodyAccountMetas, ...flpStakeAccountMetas])
+        .instruction();
 
       return refreshStakeInstruction;
 
@@ -1562,7 +1354,7 @@ prettyPrint = (object: object) => {
     rewardSymbol: string,
     unstakeAmount: BN,
     poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     let preInstructions: TransactionInstruction[] = [];
@@ -1571,18 +1363,10 @@ prettyPrint = (object: object) => {
     const additionalSigners: Signer[] = [];
 
     try {
-
-
       const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
       const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
 
       const pool = poolConfig.poolAddress
-      const feeDistributionTokenAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("custody_token_account"), pool.toBuffer(), rewardCustodyMint.toBuffer()],
-        this.programId
-      )[0];
-      
-      // const lpTokenMint = poolConfig.stakedLpTokenMint;
 
       const flpStakeAccount = PublicKey.findProgramAddressSync(
         [Buffer.from("stake"), publicKey.toBuffer(), pool.toBuffer()],
@@ -1590,20 +1374,20 @@ prettyPrint = (object: object) => {
       )[0];
 
       let unstakeInstantInstruction = await this.program.methods
-          .unstakeInstant({
-            unstakeAmount: unstakeAmount
-          })
-          .accounts({
-            owner: publicKey,
-            perpetuals: this.perpetuals.publicKey,
-            pool: pool,
-            flpStakeAccount: flpStakeAccount,
-            rewardCustody: rewardCustodyConfig.custodyAccount,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.program.programId,
-          })
-          .instruction();
-        instructions.push(unstakeInstantInstruction)
+        .unstakeInstant({
+          unstakeAmount: unstakeAmount
+        })
+        .accounts({
+          owner: publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          pool: pool,
+          flpStakeAccount: flpStakeAccount,
+          rewardCustody: rewardCustodyConfig.custodyAccount,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.program.programId,
+        })
+        .instruction();
+      instructions.push(unstakeInstantInstruction)
 
     } catch (err) {
       console.log("perpClient unstakeInstant error:: ", err);
@@ -1611,71 +1395,16 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
-
-  }
-
-  setFeeShareBps = async (
-    poolConfig: PoolConfig,
-    flpStakeAccountPks: PublicKey[]
-  ): Promise<TransactionInstruction> => {
-
-    try {
-      let publicKey = this.provider.wallet.publicKey;
-
-      const pool = poolConfig.poolAddress
-
-      let custodyAccountMetas = [];
-      for (const custody of poolConfig.custodies) {
-        custodyAccountMetas.push({
-          pubkey: custody.custodyAccount,
-          isSigner: false,
-          isWritable: false,
-        });
-      }
-
-      const maxFlpStakeAccountPkLength = 32 - 4 + custodyAccountMetas.length; // 4 default accounts, custody accs, max # of accounts per ins is 32
-
-      if (flpStakeAccountPks.length > maxFlpStakeAccountPkLength) {
-        throw new Error(`Max of ${maxFlpStakeAccountPkLength} flpStakeAccountPks can be updated at a time.`)
-      }
-
-      let flpStakeAccountMetas = [];
-      for (const flpStakeAccountPk of flpStakeAccountPks) {
-        flpStakeAccountMetas.push({
-          pubkey: flpStakeAccountPk,
-          isSigner: false,
-          isWritable: true,
-        });
-      }
-
-      let refreshStakeInstruction = await this.program.methods
-        .setFeeShare({
-          feeShareBps: new BN(7000)
-        })
-        .accounts({
-          admin: publicKey,
-          multisig: this.multisig.publicKey,
-          pool: pool,
-        })
-        .remainingAccounts([...flpStakeAccountMetas])
-        .instruction();
-
-      return refreshStakeInstruction;
-
-    } catch (err) {
-      console.log("perpClient refreshStaking error:: ", err);
-      throw err;
-    }
 
   }
 
   unstakeRequest = async (
     unstakeAmount: BN,
     poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     let preInstructions: TransactionInstruction[] = [];
@@ -1684,7 +1413,7 @@ prettyPrint = (object: object) => {
     const additionalSigners: Signer[] = [];
 
     try {
-      
+
       const pool = poolConfig.poolAddress
 
       const flpStakeAccount = PublicKey.findProgramAddressSync(
@@ -1693,22 +1422,22 @@ prettyPrint = (object: object) => {
       )[0];
 
       let unstakeRequestInstruction = await this.program.methods
-          .unstakeRequest({
-            unstakeAmount: unstakeAmount
-          })
-          .accounts({
-            owner: publicKey,
-            perpetuals: this.perpetuals.publicKey,
-            pool: pool,
-            flpStakeAccount: flpStakeAccount,
+        .unstakeRequest({
+          unstakeAmount: unstakeAmount
+        })
+        .accounts({
+          owner: publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          pool: pool,
+          flpStakeAccount: flpStakeAccount,
 
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.programId
-          })
-          .instruction();
-        instructions.push(unstakeRequestInstruction)
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.programId
+        })
+        .instruction();
+      instructions.push(unstakeRequestInstruction)
 
     } catch (err) {
       console.log("perpClient unstakeRequest error:: ", err);
@@ -1716,77 +1445,11 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
   }
-
-  // deactiveStake = async (
-  //   rewardSymbol: string,
-  //   poolName: string,
-  //   poolConfig: PoolConfig
-  // ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-  //   let publicKey = this.provider.wallet.publicKey;
-
-  //   let preInstructions: TransactionInstruction[] = [];
-  //   let instructions: TransactionInstruction[] = [];
-  //   let postInstructions: TransactionInstruction[] = [];
-  //   const additionalSigners: Signer[] = [];
-
-  //   try {
-      
-  //     const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
-  //     const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
-
-  //     const pool = this.getPoolKey(poolName)
-  //     const feeDistributionTokenAccount = PublicKey.findProgramAddressSync(
-  //       [Buffer.from("custody_token_account"), pool.toBuffer(), rewardCustodyMint.toBuffer()],
-  //       this.programId
-  //     )[0];
-
-  //     let custodyAccountMetas = [];
-  //     let flpStakeAccountMetas = []; //todo: get all flpStakeAccounts that need to be activated
-
-  //     // const flpStakeAccountKey = new PublicKey('C3jFMGLyzTXnURjPDp4NdyAMtZpZsYiUEbJ55wEGSF5j')
-  //     // flpStakeAccountMetas.push({
-  //     //   pubkey: flpStakeAccountKey,
-  //     //   isSigner: false,
-  //     //   isWritable: true,
-  //     // });
-
-  //     for (const custody of poolConfig.custodies) {
-  //       custodyAccountMetas.push({
-  //         pubkey: custody.custodyAccount,
-  //         isSigner: false,
-  //         isWritable: false,
-  //       });
-  //     }
-      
-  //     let deactivateStakeInstruction = await this.program.methods
-  //         .deactivateStake({})
-  //         .accounts({
-  //           perpetuals: this.perpetuals.publicKey,
-  //           pool: pool,
-  //           rewardCustody: rewardCustodyConfig.custodyAccount,
-  //           feeDistributionTokenAccount: feeDistributionTokenAccount,
-
-  //         })
-  //         .remainingAccounts([...custodyAccountMetas, ...flpStakeAccountMetas])
-  //         .instruction();
-  //       instructions.push(deactivateStakeInstruction)
-
-  //   } catch (err) {
-  //     console.log("perpClient deactivateStaking error:: ", err);
-  //     throw err;
-  //   }
-
-  //   return {
-  //     instructions : [...preInstructions, ...instructions ,...postInstructions],
-  //     additionalSigners
-  //   };
-
-  // }
 
 
   withdrawStake = async (
@@ -1794,7 +1457,7 @@ prettyPrint = (object: object) => {
     pendingActivation = true,
     deactivated = true,
     createUserLPTA = true, //create new ATA for USER in the end 
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     let preInstructions: TransactionInstruction[] = [];
@@ -1832,25 +1495,25 @@ prettyPrint = (object: object) => {
       }
 
       let withdrawStakeInstruction = await this.program.methods
-          .withdrawStake({
-            pendingActivation: pendingActivation,
-            deactivated: deactivated
-          })
-          .accounts({
-            owner: publicKey,
-            receivingLpTokenAccount: userLpTokenAccount,
-            transferAuthority: poolConfig.transferAuthority,
-            perpetuals: this.perpetuals.publicKey,
-            pool: pool,
-            flpStakeAccount: flpStakeAccount,
-            poolStakedLpVault: poolStakedLpVault,
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.program.programId,
-          })
-          .instruction();
-        instructions.push(withdrawStakeInstruction)
+        .withdrawStake({
+          pendingActivation: pendingActivation,
+          deactivated: deactivated
+        })
+        .accounts({
+          owner: publicKey,
+          receivingLpTokenAccount: userLpTokenAccount,
+          transferAuthority: poolConfig.transferAuthority,
+          perpetuals: this.perpetuals.publicKey,
+          pool: pool,
+          flpStakeAccount: flpStakeAccount,
+          poolStakedLpVault: poolStakedLpVault,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.program.programId,
+        })
+        .instruction();
+      instructions.push(withdrawStakeInstruction)
 
     } catch (err) {
       console.log("perpClient withdrawStake error:: ", err);
@@ -1858,7 +1521,7 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
@@ -1870,7 +1533,7 @@ prettyPrint = (object: object) => {
     nftTradingAccount?: PublicKey,
     nftBoostingAccount?: PublicKey, //pass this even if the trading account and the boosting account are same
     createUserATA = true, //create new ATA for USER in the end 
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
     const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
@@ -1924,26 +1587,26 @@ prettyPrint = (object: object) => {
       }
 
       let withdrawStakeInstruction = await this.program.methods
-          .collectStakeFees({})
-          .accounts({
-            owner: publicKey,
-            receivingTokenAccount: receivingTokenAccount,
-            transferAuthority: poolConfig.transferAuthority,
-            perpetuals: this.perpetuals.publicKey,
-            pool: pool,
-            feeCustody: rewardCustodyConfig.custodyAccount,
-            flpStakeAccount: flpStakeAccount,
-            feeCustodyTokenAccount: rewardCustodyConfig.tokenAccount,
+        .collectStakeFees({})
+        .accounts({
+          owner: publicKey,
+          receivingTokenAccount: receivingTokenAccount,
+          transferAuthority: poolConfig.transferAuthority,
+          perpetuals: this.perpetuals.publicKey,
+          pool: pool,
+          feeCustody: rewardCustodyConfig.custodyAccount,
+          flpStakeAccount: flpStakeAccount,
+          feeCustodyTokenAccount: rewardCustodyConfig.tokenAccount,
 
-            program: this.program.programId,
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
-            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
-          })
-          .remainingAccounts([...tradingAccount, ...boostingAccount])
-          .instruction();
-        instructions.push(withdrawStakeInstruction)
+          program: this.program.programId,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          eventAuthority: this.eventAuthority.publicKey,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        })
+        .remainingAccounts([...tradingAccount, ...boostingAccount])
+        .instruction();
+      instructions.push(withdrawStakeInstruction)
 
     } catch (err) {
       console.log("perpClient withdrawStake error:: ", err);
@@ -1951,129 +1614,7 @@ prettyPrint = (object: object) => {
     }
 
     return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
-      additionalSigners
-    };
-
-  }
-
-  initRewardVault = async (
-    nftCount: BN,
-    rewardSymbol: string,
-    collectionMint: PublicKey,
-    poolConfig: PoolConfig,
-  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
-
-    let instructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-
-      const fbNftProgramData = PublicKey.findProgramAddressSync(
-        [this.programFbnftReward.programId.toBuffer()],
-        new PublicKey("BPFLoaderUpgradeab1e11111111111111111111111")
-      )[0];
-
-      const rewardVault = PublicKey.findProgramAddressSync(
-        [Buffer.from("reward_vault")],
-        this.programFbnftReward.programId
-      )[0];
-
-      const rewardTokenAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("reward_token_account")],
-        this.programFbnftReward.programId
-      )[0];
-
-      const nftTransferAuthority = PublicKey.findProgramAddressSync(
-        [Buffer.from("transfer_authority")],
-        this.programFbnftReward.programId
-      )[0];
-
-      let initRewardVault = await this.programFbnftReward.methods
-          .initRewardVault({
-            nftCount: nftCount
-          })
-          .accounts({
-            admin: publicKey,
-            transferAuthority: nftTransferAuthority,
-            rewardVault: rewardVault,
-            rewardMint: rewardCustodyMint,
-            rewardTokenAccount: rewardTokenAccount,
-            collectionMint: collectionMint,
-            
-            programData: fbNftProgramData,
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            rent: SYSVAR_RENT_PUBKEY
-          })
-          .instruction();
-        instructions.push(initRewardVault)
-
-    } catch (err) {
-      console.log("perpClient InitRewardVault error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions: [...instructions],
-      additionalSigners
-    };
-  }
-
-  distributeReward = async (
-    rewardAmount: BN,
-    rewardSymbol: string,
-    poolConfig: PoolConfig,
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
-
-    let instructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-
-      let fundingAccount = await getAssociatedTokenAddress(
-        rewardCustodyMint,
-        publicKey
-      );
-
-      const rewardVault = PublicKey.findProgramAddressSync(
-        [Buffer.from("reward_vault")],
-        this.programFbnftReward.programId
-      )[0];
-
-      const rewardTokenAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("reward_token_account")],
-        this.programFbnftReward.programId
-      )[0];
-
-      let distributeReward = await this.programFbnftReward.methods
-          .distributeRewards({
-            rewardAmount: rewardAmount
-          })
-          .accounts({
-            admin: publicKey,
-            fundingAccount: fundingAccount,
-            rewardVault: rewardVault,
-            rewardTokenAccount: rewardTokenAccount,
-
-            tokenProgram: TOKEN_PROGRAM_ID,
-          })
-          .instruction();
-        instructions.push(distributeReward)
-
-    } catch (err) {
-      console.log("perpClient distributeReward error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...instructions ],
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
       additionalSigners
     };
 
