@@ -538,6 +538,92 @@ export type PerpComposability = {
           }
         }
       ]
+    },
+    {
+      "name": "collectAndDistributeFee",
+      "accounts": [
+        {
+          "name": "perpProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "flpStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fbnftRewardsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rewardVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "types": [
@@ -643,6 +729,13 @@ export type PerpComposability = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "CollectAndDistributeFeeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -1205,6 +1298,92 @@ export const IDL: PerpComposability = {
           }
         }
       ]
+    },
+    {
+      "name": "collectAndDistributeFee",
+      "accounts": [
+        {
+          "name": "perpProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "flpStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fbnftRewardsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rewardVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "types": [
@@ -1310,6 +1489,13 @@ export const IDL: PerpComposability = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "CollectAndDistributeFeeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {

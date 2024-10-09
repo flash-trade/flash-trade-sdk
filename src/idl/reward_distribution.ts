@@ -1,6 +1,6 @@
-export type FbnftRewards = {
+export type RewardDistribution = {
   "version": "0.1.0",
-  "name": "fbnft_rewards",
+  "name": "reward_distribution",
   "instructions": [
     {
       "name": "initRewardVault",
@@ -31,11 +31,6 @@ export type FbnftRewards = {
           "isSigner": false
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "programData",
           "isMut": false,
           "isSigner": false
@@ -56,22 +51,36 @@ export type FbnftRewards = {
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "updateCounter",
+      "accounts": [
         {
-          "name": "params",
-          "type": {
-            "defined": "InitRewardVaultParams"
-          }
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rewardVault",
+          "isMut": true,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "distributeRewards",
       "accounts": [
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "fundingAccount",
@@ -89,7 +98,32 @@ export type FbnftRewards = {
           "isSigner": false
         },
         {
+          "name": "rewardRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
           "isMut": false,
           "isSigner": false
         }
@@ -107,37 +141,17 @@ export type FbnftRewards = {
       "name": "collectReward",
       "accounts": [
         {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nftMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftTokenAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "receivingAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardRecord",
           "isMut": true,
           "isSigner": false
         },
@@ -152,17 +166,27 @@ export type FbnftRewards = {
           "isSigner": false
         },
         {
+          "name": "rewardRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "transferAuthority",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "systemProgram",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
           "isMut": false,
           "isSigner": false
         }
@@ -181,10 +205,6 @@ export type FbnftRewards = {
             "type": "publicKey"
           },
           {
-            "name": "collection",
-            "type": "publicKey"
-          },
-          {
             "name": "rewardMint",
             "type": "publicKey"
           },
@@ -197,11 +217,11 @@ export type FbnftRewards = {
             "type": "publicKey"
           },
           {
-            "name": "lpTokenAccount",
-            "type": "publicKey"
+            "name": "winnersCount",
+            "type": "u64"
           },
           {
-            "name": "nftCount",
+            "name": "raffleCounter",
             "type": "u64"
           },
           {
@@ -211,10 +231,6 @@ export type FbnftRewards = {
           {
             "name": "paidAmount",
             "type": "u128"
-          },
-          {
-            "name": "rewardsPerNft",
-            "type": "u64"
           },
           {
             "name": "bump",
@@ -237,30 +253,22 @@ export type FbnftRewards = {
         "kind": "struct",
         "fields": [
           {
-            "name": "mint",
+            "name": "owner",
             "type": "publicKey"
           },
           {
-            "name": "rewardDebt",
+            "name": "reward",
             "type": "u64"
+          },
+          {
+            "name": "paid",
+            "type": "bool"
           }
         ]
       }
     }
   ],
   "types": [
-    {
-      "name": "InitRewardVaultParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nftCount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
     {
       "name": "DistributeRewardsParams",
       "type": {
@@ -274,23 +282,53 @@ export type FbnftRewards = {
       }
     }
   ],
-  "errors": [
+  "events": [
     {
-      "code": 6000,
-      "name": "InvalidCollection",
-      "msg": "Unsuppported NFT collection"
+      "name": "DistributeRewardsLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "raffleCount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        }
+      ]
     },
     {
-      "code": 6001,
-      "name": "InvalidCount",
-      "msg": "Invalid NFT Count"
+      "name": "CollectRewardLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "raffleCount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ]
 };
 
-export const IDL: FbnftRewards = {
+export const IDL: RewardDistribution = {
   "version": "0.1.0",
-  "name": "fbnft_rewards",
+  "name": "reward_distribution",
   "instructions": [
     {
       "name": "initRewardVault",
@@ -321,11 +359,6 @@ export const IDL: FbnftRewards = {
           "isSigner": false
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "programData",
           "isMut": false,
           "isSigner": false
@@ -346,22 +379,36 @@ export const IDL: FbnftRewards = {
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "updateCounter",
+      "accounts": [
         {
-          "name": "params",
-          "type": {
-            "defined": "InitRewardVaultParams"
-          }
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rewardVault",
+          "isMut": true,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "distributeRewards",
       "accounts": [
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "fundingAccount",
@@ -379,7 +426,32 @@ export const IDL: FbnftRewards = {
           "isSigner": false
         },
         {
+          "name": "rewardRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
           "isMut": false,
           "isSigner": false
         }
@@ -397,37 +469,17 @@ export const IDL: FbnftRewards = {
       "name": "collectReward",
       "accounts": [
         {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nftMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftTokenAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "receivingAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardRecord",
           "isMut": true,
           "isSigner": false
         },
@@ -442,17 +494,27 @@ export const IDL: FbnftRewards = {
           "isSigner": false
         },
         {
+          "name": "rewardRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "transferAuthority",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "systemProgram",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
           "isMut": false,
           "isSigner": false
         }
@@ -471,10 +533,6 @@ export const IDL: FbnftRewards = {
             "type": "publicKey"
           },
           {
-            "name": "collection",
-            "type": "publicKey"
-          },
-          {
             "name": "rewardMint",
             "type": "publicKey"
           },
@@ -487,11 +545,11 @@ export const IDL: FbnftRewards = {
             "type": "publicKey"
           },
           {
-            "name": "lpTokenAccount",
-            "type": "publicKey"
+            "name": "winnersCount",
+            "type": "u64"
           },
           {
-            "name": "nftCount",
+            "name": "raffleCounter",
             "type": "u64"
           },
           {
@@ -501,10 +559,6 @@ export const IDL: FbnftRewards = {
           {
             "name": "paidAmount",
             "type": "u128"
-          },
-          {
-            "name": "rewardsPerNft",
-            "type": "u64"
           },
           {
             "name": "bump",
@@ -527,30 +581,22 @@ export const IDL: FbnftRewards = {
         "kind": "struct",
         "fields": [
           {
-            "name": "mint",
+            "name": "owner",
             "type": "publicKey"
           },
           {
-            "name": "rewardDebt",
+            "name": "reward",
             "type": "u64"
+          },
+          {
+            "name": "paid",
+            "type": "bool"
           }
         ]
       }
     }
   ],
   "types": [
-    {
-      "name": "InitRewardVaultParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nftCount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
     {
       "name": "DistributeRewardsParams",
       "type": {
@@ -564,16 +610,46 @@ export const IDL: FbnftRewards = {
       }
     }
   ],
-  "errors": [
+  "events": [
     {
-      "code": 6000,
-      "name": "InvalidCollection",
-      "msg": "Unsuppported NFT collection"
+      "name": "DistributeRewardsLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "raffleCount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        }
+      ]
     },
     {
-      "code": 6001,
-      "name": "InvalidCount",
-      "msg": "Invalid NFT Count"
+      "name": "CollectRewardLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "raffleCount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ]
 };

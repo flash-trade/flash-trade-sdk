@@ -1,6 +1,6 @@
 
 import { BN } from "@coral-xyz/anchor";
-import {  Pool, TokenRatios, StakeStats, Permissions } from "./types";
+import {  Pool, TokenRatios, StakeStats, CompoundingStats, Permissions } from "./types";
 import { PublicKey } from "@solana/web3.js";
 
 export class PoolAccount implements Pool {
@@ -10,9 +10,9 @@ export class PoolAccount implements Pool {
     name: string;
     permissions: Permissions;
     inceptionTime: BN;
-    flpMint: PublicKey;
+    lpMint: PublicKey;
     oracleAuthority: PublicKey;
-    flpTokenAccount: PublicKey; // set in init_staking
+    stakedLpVault: PublicKey; // set in init_staking
     rewardCustody: PublicKey; // set in init_staking
     custodies:  PublicKey[];
     ratios: TokenRatios[];
@@ -22,9 +22,16 @@ export class PoolAccount implements Pool {
     totalStaked: StakeStats;
     stakingFeeShareBps: BN;
     bump: number;
-    flpMintBump: number;
-    flpTokenAccountBump: number;
+    lpMintBump: number;
+    stakedLpVaultBump: number;
     vpVolumeFactor: number;
+    padding: number[];
+    stakingFeeBoostBps: BN[];
+    compoundingMint: PublicKey;
+    compoundingLpVault: PublicKey;
+    compoundingStats: CompoundingStats;
+    compoundingMintBump: number;
+    compoundingLpVaultBump: number;
 
     constructor(publicKey: PublicKey, parseData: Pool) {
         this.publicKey = publicKey;

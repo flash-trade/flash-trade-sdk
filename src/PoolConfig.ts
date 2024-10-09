@@ -15,8 +15,8 @@ export interface CustodyConfig {
   tokenPrecision : number;
   isStable: boolean;
   isVirtual: boolean;
-  oracleAddress: PublicKey;
-  customOracleAddress: PublicKey;
+  intOracleAccount: PublicKey;
+  extOracleAccount: PublicKey;
   pythTicker: string;
   pythPriceId: string;
 }
@@ -55,16 +55,25 @@ export class PoolConfig {
     public cluster: Cluster,
     public poolName: string,
     public poolAddress: PublicKey,
-    public lpTokenMint: PublicKey,
-    public flpTokenAccount: PublicKey,
+    public stakedLpTokenMint: PublicKey,
+    public compoundingTokenMint: PublicKey,
+    public stakedLpVault: PublicKey,
     public lpDecimals: number,
-    public lpTokenSymbol: string,
+    public compoundingLpTokenSymbol: string,
+    public stakedLpTokenSymbol: string,
     public perpetuals: PublicKey,
     public transferAuthority: PublicKey,
     public multisig: PublicKey,
     public addressLookupTableAddresses: PublicKey[],
     public backupOracle: PublicKey,
     public nftCollectionAddress: PublicKey,
+    public rewardDistributionProgram: {
+      programId: PublicKey,
+      transferAuthority: PublicKey,
+      rewardVault: PublicKey,
+      rewardMint: PublicKey,
+      rewardTokenAccount: PublicKey,
+    },
 
     public tokens: Token[],
 
@@ -230,8 +239,8 @@ export class PoolConfig {
           custodyAccount: new PublicKey(i.custodyAccount),
           tokenAccount: new PublicKey(i.tokenAccount),
           mintKey: new PublicKey(i.mintKey),
-          oracleAddress: new PublicKey(i.oracleAddress),
-          customOracleAddress: new PublicKey(i.customOracleAddress),
+          intOracleAccount: new PublicKey(i.intOracleAddress),
+          extOracleAccount: new PublicKey(i.extOracleAddress),
           usdPrecision : i.usdPrecision,
           tokenPrecision : i.tokenPrecision,
         }
@@ -277,16 +286,25 @@ export class PoolConfig {
       poolConfig.cluster as Cluster,
       poolConfig.poolName,
       new PublicKey(poolConfig.poolAddress),
-      new PublicKey(poolConfig.lpTokenMint),
-      new PublicKey(poolConfig.flpTokenAccount),
+      new PublicKey(poolConfig.stakedLpTokenMint),
+      new PublicKey(poolConfig.compoundingTokenMint),
+      new PublicKey(poolConfig.stakedLpVault),
       poolConfig.lpDecimals,
-      poolConfig.lpTokenSymbol,
+      poolConfig.compoundingLpTokenSymbol,
+      poolConfig.stakedLpTokenSymbol,
       new PublicKey(poolConfig.perpetuals),
       new PublicKey(poolConfig.transferAuthority),
       new PublicKey(poolConfig.multisig),
       addressLookupTableAddresses,
       new PublicKey(poolConfig.backupOracle),
       new PublicKey(poolConfig.nftCollectionAddress),
+      {
+        programId: new PublicKey(poolConfig.rewardDistributionProgram.programId),
+        rewardMint: new PublicKey(poolConfig.rewardDistributionProgram.rewardMint),
+        rewardTokenAccount: new PublicKey(poolConfig.rewardDistributionProgram.rewardTokenAccount),
+        rewardVault:new PublicKey(poolConfig.rewardDistributionProgram.rewardVault),
+        transferAuthority: new PublicKey(poolConfig.rewardDistributionProgram.transferAuthority),
+      },
       tokens,
       custodies,
       markets

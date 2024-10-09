@@ -41,12 +41,21 @@ npm i flash-sdk / yarn add flash-sdk
       data: Buffer.from(backupOracleData.data),
   })
 
+  <!-- to get any token config from symbol-->
+  const USDC_TOKEN = POOL_CONFIG.tokens.find((t) => t.symbol == 'USDC')!
+  const BTC_TOKEN = POOL_CONFIG.tokens.find((t) => t.symbol == 'BTC')!
+  
+
+  <!-- to get any token config from mint -->
+  const tokenMint = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v') 
+  const USDC_TOKEN = POOL_CONFIG.tokens.find((t) => t.mintKey.equals(tokenMint))!
+
    <!-- load ALT -->
    await perpClient.loadAddressLookupTable(POOL_CONFIG) 
 
-   <!-- Add Liquidity  -->
+   <!-- Add Liquidity  (USDC -> sFLP.1 ) -->
     const payTokenSymbol = 'USDC'; // 'SOL' , 'BTC', 'ETH'  
-    const { instructions : addLiqInstructions, additionalSigners : addLiqAdditionalSigners } = await perpClient.addLiquidity(
+    const { instructions : addLiqInstructions, additionalSigners : addLiqAdditionalSigners } = await perpClient.addLiquidityAndStake(
               payTokenSymbol,
               tokenAmountIn,
               minLpAmountOut, // new BN(0)
@@ -59,8 +68,41 @@ npm i flash-sdk / yarn add flash-sdk
             alts: perpClient.addressLookupTables,
       })
 
+    <!--addCompoundingLiquidity (USDC -> FLP.1 )  -->
+     const payTokenSymbol = 'USDC'; // 'SOL' , 'BTC', 'ETH'  
+    const { instructions : addCompLiqInstructions, additionalSigners : addCompLiqAdditionalSigners } = await perpClient.addCompoundingLiquidity(
+              tokenAmountIn,
+              payTokenSymbol,
+              minLpAmountOut, // new BN(0)
+              USDC_TOKEN.mintKey,
+              POOL_CONFIG
+          )
+        const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
 
-  <!-- remove Liquidity  -->
+    const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...addCompLiqInstructions ], {
+            addCompLiqAdditionalSigners,
+            alts: perpClient.addressLookupTables,
+      })
+
+
+
+  <!-- remove Liquidity (FLP -> USDC)  -->
+    const recieveTokenSymbol = 'USDC'; // 'SOL' , 'BTC', 'ETH'  
+    const { instructions : removeCompLiqInstructions, additionalSigners : removeCompLiqAdditionalSigners } = await  await perpClient.removeCompoundingLiquidity(
+            lpAmountIn,
+            minTokenAmountOut, // new BN(0)
+            recieveTokenSymbol,
+             USDC_TOKEN.mintKey,
+              POOL_CONFIG,
+              true
+       )
+    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
+    const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...removeCompLiqInstructions ], {
+            removeCompLiqAdditionalSigners,
+            alts: perpClient.addressLookupTables,
+      })
+
+      <!-- remove Liquidity (sFLP -> USDC) -->
     const recieveTokenSymbol = 'USDC'; // 'SOL' , 'BTC', 'ETH'  
     const { instructions : removeLiqInstructions, additionalSigners : removeLiqAdditionalSigners } = await  await perpClient.removeLiquidity(
             recieveTokenSymbol,
@@ -75,7 +117,7 @@ npm i flash-sdk / yarn add flash-sdk
       })
 
 
-    <!-- to STAKE FLP.1 -->
+    <!-- to STAKE sFLP.1 -->
     const { instructions: depositStakeInstructions, additionalSigners: depositStakeAdditionalSigners } =
               await perpClient.depositStake(.provider.wallet.publicKey, provider.wallet.publicKey, flpDepositAmount, POOL_CONFIG)
 
@@ -85,7 +127,7 @@ npm i flash-sdk / yarn add flash-sdk
       })
 
 
-  <!-- to UN-STAKE FLP.1 -->
+  <!-- to UN-STAKE sFLP.1 -->
 
    const { instructions: unstakeInstantInstructions, additionalSigners : unstakeInstantAdditionalSigners } = await perpClient.unstakeInstant('USDC',flpUnstakeAmount,POOL_CONFIG)
 

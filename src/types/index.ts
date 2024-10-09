@@ -34,6 +34,7 @@ export type BackupOracle = Types["BackupOracle"];
 export type MarketPermissions = Types["MarketPermissions"];
 export type ContractOraclePrice = Types["OraclePrice"];
 export type StakeStats = Types["StakeStats"];
+export type CompoundingStats = Types["CompoundingStats"];
 export type VoltageStats = Types["VoltageStats"];
 
 
@@ -66,7 +67,6 @@ export type RemoveLiquidityLog = Events["RemoveLiquidityLog"];
 export type SwapLog = Events["SwapLog"];
 export type ForceClosePositionLog = Events["ForceClosePositionLog"];
 
-
 export type AddCollateralLogV2 = Events["AddCollateralLogV2"];
 export type ClosePositionLogV2 = Events["ClosePositionLogV2"];
 export type DecreaseSizeLogV2 = Events["DecreaseSizeLogV2"];
@@ -75,6 +75,30 @@ export type IncreaseSizeLogV2 = Events["IncreaseSizeLogV2"];
 export type OpenPositionLogV2 = Events["OpenPositionLogV2"];
 export type RemoveCollateralLogV2 = Events["RemoveCollateralLogV2"];
 export type ForceClosePositionLogV2 = Events["ForceClosePositionLogV2"];
+
+export type AddCollateralLogV3 = Events["AddCollateralLogV3"];
+export type ClosePositionLogV3 = Events["ClosePositionLogV3"];
+export type DecreaseSizeLogV3 = Events["DecreaseSizeLogV3"];
+export type LiquidateLogV3 = Events["LiquidateLogV3"];
+export type IncreaseSizeLogV3 = Events["IncreaseSizeLogV3"];
+export type OpenPositionLogV3 = Events["OpenPositionLogV3"];
+export type RemoveCollateralLogV3 = Events["RemoveCollateralLogV3"];
+export type ForceClosePositionLogV3 = Events["ForceClosePositionLogV3"];
+
+
+export type AddLiquidityLogV2 = Events["AddLiquidityLogV2"];
+export type RemoveLiquidityLogV2 = Events["RemoveLiquidityLogV2"];
+export type AddCompoundingLiquidityLog = Events["AddCompoundingLiquidityLog"];
+export type AddLiquidityAndStakeLog = Events["AddLiquidityAndStakeLog"];
+export type DepositStakeLog = Events["DepositStakeLog"];
+export type MigrateStakeLog = Events["MigrateStakeLog"];
+export type RefreshStakeLog = Events["RefreshStakeLog"];
+export type CompoundingFeesLog = Events["CompoundingFeesLog"];
+export type RemoveCompoundingLiquidityLog = Events["RemoveCompoundingLiquidityLog"];
+export type SwapFeeInternalLog = Events["SwapFeeInternalLog"];
+export type UnstakeInstantLog = Events["UnstakeInstantLog"];
+export type UnstakeRequestLog = Events["UnstakeRequestLog"];
+export type WithdrawStakeLog = Events["WithdrawStakeLog"];
 
 
 //  taken from drift 

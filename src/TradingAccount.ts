@@ -13,10 +13,13 @@ export class TradingAccount implements Trading {
     isInitialized: boolean;
     level: number;
     bump: number;
+
     voltagePoints: BN;
 
     stats: VoltageStats;
     snapshot: VoltageStats;
+    timestamp: BN;
+    counter: BN;
     padding: BN[];
 
 

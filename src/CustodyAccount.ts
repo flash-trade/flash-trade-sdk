@@ -35,6 +35,7 @@ export class CustodyAccount implements Custody {
 
       bump: number;
       tokenAccountBump: number;
+      sizeFactorForSpread : number;
 
     constructor( publicKey : PublicKey, parseData : Custody) {
       this.publicKey = publicKey;
