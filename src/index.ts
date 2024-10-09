@@ -14,7 +14,6 @@ export {IDL}  from './idl/perpetuals';
 export * from './utils/rpc';
 export * from './utils/anchorCpiEvents';
 export * from './utils/alt';
-export * from './backupOracle';
 
 // export { default as PoolConfigJson } from "./PoolConfig.json";
 
