@@ -1,8 +1,8 @@
 import { PublicKey, RpcResponseAndContext, SimulatedTransactionResponse, Transaction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
-import { decode } from "punycode";
 import { IDL } from "./idl/perpetuals";
 import { IdlCoder } from "./IdlCoder";
 import { PerpetualsClient } from "./PerpetualsClient";
+import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
 
 export class ViewHelper {
     private perpetualsClient: PerpetualsClient;

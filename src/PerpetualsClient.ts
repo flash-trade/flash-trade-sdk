@@ -1983,7 +1983,6 @@ export class PerpetualsClient {
 
     const result = await this.viewHelper.simulateTransaction(transaction)
 
-    // console.log('result :>> ', result)
     const index = IDL.instructions.findIndex((f) => f.name === 'getCompoundingTokenPrice')
     const res: any = this.viewHelper.decodeLogs(result, index, 'getCompoundingTokenPrice')
 

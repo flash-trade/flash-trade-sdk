@@ -7,7 +7,9 @@ npm : https://www.npmjs.com/package/flash-sdk
 
 ## Install
 ```
-npm i flash-sdk / yarn add flash-sdk 
+npm i flash-sdk 
+
+yarn add flash-sdk 
 ```
 
 ## Using the SDK
@@ -148,6 +150,9 @@ npm i flash-sdk / yarn add flash-sdk
               alts: perpClient.addressLookupTables,
         })
   
-  
+
+  <!-- call any view function like so -->
+    const compoundingLPTokenPrice = await perpClient.getCompoundingLPTokenPrice(POOL_CONFIG.poolAddress, POOL_CONFIG)
+
 ```
 #### For generating docs run ```yarn run doc ```
