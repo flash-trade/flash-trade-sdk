@@ -327,6 +327,50 @@ export class PerpetualsClient {
   ///////
   // instructions
 
+  // To get Flp and sFlp token price
+  getCompoundingTokenData = async (
+    poolConfig: PoolConfig,
+  ) => {
+    let custodyAccountMetas = [];
+    let custodyOracleAccountMetas = [];
+    let markets = []
+    for (const custody of poolConfig.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+      custodyOracleAccountMetas.push({
+        pubkey: this.useExtOracleAccount ? custody.extOracleAccount: custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+    for (const market of poolConfig.markets) {
+      markets.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+    return await this.program.methods
+      .getCompoundingTokenData({})
+      .accounts({
+        perpetuals: this.perpetuals.publicKey,
+        pool: poolConfig.poolAddress,
+        lpTokenMint: poolConfig.stakedLpTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      })
+      .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+      .view()
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  };
+
+
   liquidate = async (
     positionAccount: PublicKey,
     poolConfig: PoolConfig,
@@ -1391,56 +1435,6 @@ export class PerpetualsClient {
 
     } catch (err) {
       console.log("perpClient unstakeInstant error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions: [...preInstructions, ...instructions, ...postInstructions],
-      additionalSigners
-    };
-
-  }
-
-  unstakeRequest = async (
-    unstakeAmount: BN,
-    poolConfig: PoolConfig
-  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-
-      const pool = poolConfig.poolAddress
-
-      const flpStakeAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("stake"), publicKey.toBuffer(), pool.toBuffer()],
-        this.programId
-      )[0];
-
-      let unstakeRequestInstruction = await this.program.methods
-        .unstakeRequest({
-          unstakeAmount: unstakeAmount
-        })
-        .accounts({
-          owner: publicKey,
-          perpetuals: this.perpetuals.publicKey,
-          pool: pool,
-          flpStakeAccount: flpStakeAccount,
-
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
-        })
-        .instruction();
-      instructions.push(unstakeRequestInstruction)
-
-    } catch (err) {
-      console.log("perpClient unstakeRequest error:: ", err);
       throw err;
     }
 
