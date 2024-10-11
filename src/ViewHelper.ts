@@ -60,6 +60,4 @@ export class ViewHelper {
         const transaction2 = new VersionedTransaction(messageV0);
         return this.perpetualsClient.provider.connection.simulateTransaction(transaction2, { sigVerify: false, replaceRecentBlockhash: true });
     }
-
-    // ... (other methods would be here)
 }
