@@ -22,3 +22,4 @@ export const BN_ONE = new BN(1);
 export const DAY_SECONDS = new BN(3600)
 
 export const METAPLEX_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s")
+export const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT ?? 'https://api.prod.flash.trade'

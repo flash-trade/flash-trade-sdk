@@ -15,6 +15,11 @@ import {
   Signer,
   AddressLookupTableAccount,
   SYSVAR_INSTRUCTIONS_PUBKEY,
+  RpcResponseAndContext,
+  SimulatedTransactionResponse,
+  Transaction,
+  TransactionMessage,
+  VersionedTransaction,
 } from "@solana/web3.js";
 import {
   getAssociatedTokenAddress,
@@ -26,6 +31,7 @@ import {
   getMinimumBalanceForRentExemptAccount,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
+import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
 
 import { sha256 } from "js-sha256";
 import { encode } from "bs58";
@@ -44,6 +50,9 @@ import { SendTransactionOpts, sendTransaction } from "./utils/rpc";
 import { PoolConfig } from "./PoolConfig";
 import { checkIfAccountExists } from "./utils";
 import { METAPLEX_PROGRAM_ID } from "./constants";
+import { IdlCoder } from "./IdlCoder";
+import { ViewHelper } from "./ViewHelper";
+import { createBackupOracleInstruction } from "./createBackupOracleInstruction";
 
 export type PerpClientOptions = {
   postSendTxCallback?: ({ txid }: { txid: string }) => void;
@@ -75,6 +84,7 @@ export class PerpetualsClient {
   private prioritizationFee: number;
   private useExtOracleAccount: boolean;
   private txConfirmationCommitment: Commitment;
+  private viewHelper: ViewHelper;
 
   constructor(provider: AnchorProvider, programId: PublicKey, composabilityProgramId: PublicKey, fbNftRewardProgramId: PublicKey, rewardDistributionProgramId: PublicKey, opts: PerpClientOptions, useExtOracleAccount = false) {
 
@@ -98,6 +108,8 @@ export class PerpetualsClient {
     this.useExtOracleAccount = useExtOracleAccount;
     this.postSendTxCallback = opts?.postSendTxCallback;
     this.txConfirmationCommitment = opts?.txConfirmationCommitment ?? 'processed'
+
+    this.viewHelper = new ViewHelper(this);
 
     BN.prototype.toJSON = function () {
       return this.toString(10);
@@ -1726,6 +1738,406 @@ export class PerpetualsClient {
     );
   }
 
+  getStakedLpTokenPrice = async (poolKey: PublicKey, POOL_CONFIG: PoolConfig): Promise<string> => {
+    const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+
+    const custodies = POOL_CONFIG.custodies
+    let custodyMetas = []
+    let marketMetas = []
+
+    for (const token of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: token.custodyAccount,
+      })
+    }
+    for (const custody of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: custody.intOracleAccount,
+      })
+    }
+
+    for (const market of POOL_CONFIG.markets) {
+      marketMetas.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    let transaction = await this.program.methods
+      .getLpTokenPrice({})
+      .accounts({
+        perpetuals: POOL_CONFIG.perpetuals,
+        pool: poolKey,
+        lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .transaction()
+
+    const backUpOracleInstruction = await backUpOracleInstructionPromise
+    // console.log('>> getLpTokenPrice backUpOracleInstruction:', backUpOracleInstruction)
+
+    transaction.instructions.unshift(...backUpOracleInstruction)
+
+    const result = await this.viewHelper.simulateTransaction(transaction)
+    // console.log('result :>> ', result)
+    const index = IDL.instructions.findIndex((f) => f.name === 'getLpTokenPrice')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'getLpTokenPrice')
+
+    return res.toString()
+  }
+
+  getAddLiquidityAmountAndFee = async (
+    amount: BN,
+    poolKey: PublicKey,
+    depositCustodyKey: PublicKey,
+    POOL_CONFIG: PoolConfig
+  ): Promise<{
+    amount: BN
+    fee: BN
+  }> => {
+    const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+
+    const custodies = POOL_CONFIG.custodies
+    let custodyMetas = []
+    let marketMetas = []
+
+    for (const token of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: token.custodyAccount,
+      })
+    }
+    for (const custody of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: custody.intOracleAccount,
+      })
+    }
+
+    for (const market of POOL_CONFIG.markets) {
+      marketMetas.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    const depositCustodyConfig = custodies.find((i) => i.custodyAccount.equals(depositCustodyKey))!
+
+    let transaction = await this.program.methods
+      .getAddLiquidityAmountAndFee({
+        amountIn: amount,
+      })
+      .accounts({
+        perpetuals: POOL_CONFIG.perpetuals,
+        pool: poolKey,
+        custody: depositCustodyKey,
+        custodyOracleAccount: depositCustodyConfig.intOracleAccount,
+        lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .transaction()
+
+    const backUpOracleInstruction = await backUpOracleInstructionPromise
+    // console.log('>> getAddLiquidityAmountAndFee backUpOracleInstruction:', backUpOracleInstruction)
+    transaction.instructions.unshift(...backUpOracleInstruction)
+
+    const result = await this.viewHelper.simulateTransaction(transaction)
+    const index = IDL.instructions.findIndex((f) => f.name === 'getAddLiquidityAmountAndFee')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'getAddLiquidityAmountAndFee')
+
+    return {
+      amount: res.amount,
+      fee: res.fee,
+    }
+  }
+
+  getRemoveLiquidityAmountAndFee = async (
+    amount: BN,
+    poolKey: PublicKey,
+    removeTokenCustodyKey: PublicKey,
+    POOL_CONFIG: PoolConfig
+  ): Promise<{
+    amount: BN
+    fee: BN
+  }> => {
+    const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+
+    const custodies = POOL_CONFIG.custodies
+    let custodyMetas = []
+    let marketMetas = []
+
+    for (const token of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: token.custodyAccount,
+      })
+    }
+    for (const custody of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: custody.intOracleAccount,
+      })
+    }
+
+    for (const market of POOL_CONFIG.markets) {
+      marketMetas.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    const removeCustodyConfig = custodies.find((i) => i.custodyAccount.equals(removeTokenCustodyKey))!
+
+    let transaction = await this.program.methods
+      .getRemoveLiquidityAmountAndFee({
+        lpAmountIn: amount,
+      })
+      .accounts({
+        perpetuals: POOL_CONFIG.perpetuals,
+        pool: poolKey,
+        custody: removeTokenCustodyKey,
+        custodyOracleAccount: removeCustodyConfig.intOracleAccount,
+        lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .transaction()
+
+    const backUpOracleInstruction = await backUpOracleInstructionPromise
+
+    transaction.instructions.unshift(...backUpOracleInstruction)
+
+    const result = await this.viewHelper.simulateTransaction(transaction)
+    const index = IDL.instructions.findIndex((f) => f.name === 'getRemoveLiquidityAmountAndFee')
+    if (result.value.err) {
+      return {
+        amount: new BN(0),
+        fee: new BN(0),
+      }
+    }
+    const res: any = this.viewHelper.decodeLogs(result, index, 'getRemoveLiquidityAmountAndFee')
+
+    return {
+      amount: res.amount,
+      fee: res.fee,
+    }
+  }
+
+  getCompoundingLPTokenPrice = async (poolKey: PublicKey, POOL_CONFIG: PoolConfig): Promise<string> => {
+    const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+
+    const custodies = POOL_CONFIG.custodies
+    let custodyMetas = []
+    let marketMetas = []
+
+    for (const token of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: token.custodyAccount,
+      })
+    }
+    for (const custody of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: custody.intOracleAccount,
+      })
+    }
+
+    for (const market of POOL_CONFIG.markets) {
+      marketMetas.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    const backUpOracleInstruction = await backUpOracleInstructionPromise
+
+    let transaction = await this.program.methods
+      .getCompoundingTokenPrice({})
+      .accounts({
+        perpetuals: POOL_CONFIG.perpetuals,
+        pool: poolKey,
+        lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .transaction()
+
+    transaction.instructions.unshift(...backUpOracleInstruction)
+
+    const result = await this.viewHelper.simulateTransaction(transaction)
+
+    const index = IDL.instructions.findIndex((f) => f.name === 'getCompoundingTokenPrice')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'getCompoundingTokenPrice')
+
+    return res.toString()
+  }
+
+  getSFLPAddLiquidityAmountAndFee = async (
+    amount: BN,
+    poolKey: PublicKey,
+    depositCustodyKey: PublicKey,
+    POOL_CONFIG: PoolConfig
+  ): Promise<{
+    amount: BN
+    fee: BN
+  }> => {
+    const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+
+    const custodies = POOL_CONFIG.custodies
+    let custodyMetas = []
+    let marketMetas = []
+
+    for (const token of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: token.custodyAccount,
+      })
+    }
+    for (const custody of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: custody.intOracleAccount,
+      })
+    }
+
+    for (const market of POOL_CONFIG.markets) {
+      marketMetas.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    const depositCustodyConfig = custodies.find((i) => i.custodyAccount.equals(depositCustodyKey))!
+    const rewardCustody = POOL_CONFIG.custodies.find((f) => f.symbol == 'USDC')!
+
+    const backUpOracleInstruction = await backUpOracleInstructionPromise
+
+    let transaction = await this.program.methods
+      .getAddCompoundingLiquidityAmountAndFee({
+        amountIn: amount,
+      })
+      .accounts({
+        perpetuals: POOL_CONFIG.perpetuals,
+        pool: poolKey,
+        inCustody: depositCustodyKey,
+        inCustodyOracleAccount: depositCustodyConfig.intOracleAccount,
+        rewardCustody: rewardCustody.custodyAccount,
+        rewardCustodyOracleAccount: rewardCustody.intOracleAccount,
+        lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
+        compoundingTokenMint: POOL_CONFIG.compoundingTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .transaction()
+
+    transaction.instructions.unshift(...backUpOracleInstruction)
+
+    const result = await this.viewHelper.simulateTransaction(transaction)
+    const index = IDL.instructions.findIndex((f) => f.name === 'getAddCompoundingLiquidityAmountAndFee')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'getAddCompoundingLiquidityAmountAndFee')
+
+    return {
+      amount: res.amount,
+      fee: res.fee,
+    }
+  }
+
+  getSFLPRemoveLiquidityAmountAndFee = async (
+    amount: BN,
+    poolKey: PublicKey,
+    removeTokenCustodyKey: PublicKey,
+    POOL_CONFIG: PoolConfig
+  ): Promise<{
+    amount: BN
+    fee: BN
+  }> => {
+    const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+
+    const custodies = POOL_CONFIG.custodies
+    let custodyMetas = []
+    let marketMetas = []
+
+    for (const token of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: token.custodyAccount,
+      })
+    }
+    for (const custody of custodies) {
+      custodyMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: custody.intOracleAccount,
+      })
+    }
+
+    for (const market of POOL_CONFIG.markets) {
+      marketMetas.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    const removeCustodyConfig = custodies.find((i) => i.custodyAccount.equals(removeTokenCustodyKey))!
+    const rewardCustody = POOL_CONFIG.custodies.find((f) => f.symbol == 'USDC')!
+    const backUpOracleInstruction = await backUpOracleInstructionPromise
+
+    let transaction = await this.program.methods
+      .getRemoveCompoundingLiquidityAmountAndFee({
+        compoundingAmountIn: amount,
+      })
+      .accounts({
+        perpetuals: POOL_CONFIG.perpetuals,
+        pool: poolKey,
+        outCustody: removeTokenCustodyKey,
+        outCustodyOracleAccount: removeCustodyConfig.intOracleAccount,
+        rewardCustody: rewardCustody.custodyAccount,
+        rewardCustodyOracleAccount: rewardCustody.intOracleAccount,
+        compoundingTokenMint: POOL_CONFIG.compoundingTokenMint,
+        lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .transaction()
+    transaction.instructions.unshift(...backUpOracleInstruction)
+
+    const result = await this.viewHelper.simulateTransaction(transaction)
+    const index = IDL.instructions.findIndex((f) => f.name === 'getRemoveCompoundingLiquidityAmountAndFee')
+    if (result.value.err) {
+      return {
+        amount: new BN(0),
+        fee: new BN(0),
+      }
+    }
+    const res: any = this.viewHelper.decodeLogs(result, index, 'getRemoveCompoundingLiquidityAmountAndFee')
+
+    return {
+      amount: res.amount,
+      fee: res.fee,
+    }
+  }
 }
 
 
