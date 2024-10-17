@@ -35,7 +35,7 @@ import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
 
 import { sha256 } from "js-sha256";
 import { encode } from "bs58";
-import { Position, Side, TokenRatios, FlpStake, } from "./types";
+import { Position, Side, TokenRatios, FlpStake, ContractOraclePrice, Privilege, OpenPositionParams, } from "./types";
 import { Perpetuals } from "./idl/perpetuals";
 import { PerpComposability } from "./idl/perp_composability";
 import { FbnftRewards } from "./idl/fbnft_rewards";
@@ -53,6 +53,7 @@ import { METAPLEX_PROGRAM_ID } from "./constants";
 import { IdlCoder } from "./IdlCoder";
 import { ViewHelper } from "./ViewHelper";
 import { createBackupOracleInstruction } from "./createBackupOracleInstruction";
+import { getNftAccounts } from "./utils/getNftAccounts";
 
 export type PerpClientOptions = {
   postSendTxCallback?: ({ txid }: { txid: string }) => void;
@@ -373,10 +374,1333 @@ export class PerpetualsClient {
   ///////
   /// UI/SDK INSTRUCTIONS HELPERS
 
-  // - handle SOL wrapping to WSOL and create a ATA - DONE
-  // - Balance checks - DONE
-  // - ATA check - else create  - DONE 
-  // - for close Accounts - NOT NEEDED
+
+  // TRADE 
+
+  openPosition = async (
+    targetSymbol: string,
+    collateralSymbol: string,
+    priceWithSlippage: ContractOraclePrice,
+    collateralWithfee: BN,
+    size: BN,
+    side: Side,
+    poolConfig: PoolConfig,
+    nftTradingAccount: PublicKey,
+    nftReferralAccount: PublicKey,
+    nftRebateTokenAccount: PublicKey,
+    privilege: Privilege,
+    skipBalanceChecks = false
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let publicKey = this.provider.wallet.publicKey;
+    const targetCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
+    const collateralCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+
+    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+    
+    let userCollateralTokenAccount = await getAssociatedTokenAddress(
+      poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+      publicKey
+    );
+    
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    // Create WSOL Token account and not ATA and close it in end 
+    if (collateralSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+      const lamports = collateralWithfee.add(new BN(accCreationLamports)); // for account creation
+
+      // CHECK BASIC SOL BALANCE
+      let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
+      if (unWrappedSolBalance.lt(lamports)) {
+        throw "Insufficient SOL Funds"
+      }
+
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports.toNumber(), //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+
+    }  else {
+      // for other tokens check if ATA and balance 
+      if (!(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
+        throw "Insufficient Funds , token Account doesn't exist"
+      }
+      if (!skipBalanceChecks) {
+        const tokenAccountBalance = new BN((await this.provider.connection.getTokenAccountBalance(userCollateralTokenAccount)).value.amount);
+        if (tokenAccountBalance.lt(collateralWithfee)) {
+          throw `Insufficient Funds need more ${collateralWithfee.sub(tokenAccountBalance)} tokens`
+        }
+      }
+    }//else
+
+    // replace with getPositionKey()
+    let positionAccount = poolConfig.getPositionFromMarketPk(publicKey, marketAccount)
+
+    const params: OpenPositionParams = {
+      priceWithSlippage: priceWithSlippage,
+      collateralAmount: collateralWithfee,
+      sizeAmount : size,
+      privilege : privilege
+    };
+
+    let instruction = await this.program.methods
+      .openPosition(params)
+      .accounts({
+        owner: publicKey,
+        feePayer: publicKey,
+        fundingAccount: collateralSymbol == 'SOL' ? wrappedSolAccount.publicKey : userCollateralTokenAccount,
+        perpetuals: poolConfig.perpetuals,
+        pool: poolConfig.poolAddress,
+        position: positionAccount,
+        market: marketAccount,
+        targetCustody: targetCustodyConfig.custodyAccount,
+        targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+        collateralCustody: collateralCustodyConfig.custodyAccount,
+        collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+        collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        eventAuthority: this.eventAuthority.publicKey,
+        program: this.programId,
+        transferAuthority: this.authority.publicKey,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      })
+      .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege)])
+      .instruction()
+
+    instructions.push(instruction);
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  openPositionWithSwap = async (
+    targetSymbol: string,
+    collateralSymbol : string,
+    inputSymbol: string,
+    amountIn: BN, // with fee
+    minAmountOut: BN,
+    priceWithSlippage: ContractOraclePrice,
+    size: BN,
+    side: Side,
+    swapPoolConfig: PoolConfig,
+    positionPoolConfig: PoolConfig,
+    nftTradingAccount: PublicKey,
+    nftReferralAccount: PublicKey,
+    nftRebateTokenAccount: PublicKey,
+    privilege: Privilege,
+    skipBalanceChecks = false
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+
+
+    let publicKey = this.provider.wallet.publicKey;
+    const targetCustodyConfig = positionPoolConfig.custodies.find(i => i.mintKey.equals(positionPoolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
+    const collateralCustodyConfig = positionPoolConfig.custodies.find(i => i.mintKey.equals(positionPoolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const swapOutCustodyConfig = swapPoolConfig.custodies.find(i => i.mintKey.equals(swapPoolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const swapInCustodyConfig = swapPoolConfig.custodies.find(i => i.mintKey.equals(swapPoolConfig.getTokenFromSymbol(inputSymbol).mintKey))!;
+
+    if(swapInCustodyConfig.mintKey.equals(collateralCustodyConfig.mintKey)){
+      throw "Don't use Swap, just call Open position"
+    }
+
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    let userInputTokenAccount : PublicKey;
+
+
+    // Create WSOL Token account and not ATA and close it in end 
+    if (inputSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+      const lamports = amountIn.add(new BN(accCreationLamports)); // for account creation
+
+      // CHECK BASIC SOL BALANCE
+      let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
+      if (unWrappedSolBalance.lt(lamports)) {
+        throw "Insufficient SOL Funds"
+      }
+
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports.toNumber(), //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+
+    }  else {
+      // for other tokens check if ATA and balance 
+      userInputTokenAccount =  getAssociatedTokenAddressSync(
+        swapPoolConfig.getTokenFromSymbol(inputSymbol).mintKey,
+        publicKey,
+        true
+      );
+      if (!(await checkIfAccountExists(userInputTokenAccount, this.provider.connection))) {
+        throw "Insufficient Funds , Token Account doesn't exist"
+      }
+      if (!skipBalanceChecks) {
+        const tokenAccountBalance = new BN((await this.provider.connection.getTokenAccountBalance(userInputTokenAccount)).value.amount);
+        if (tokenAccountBalance.lt(amountIn)) {
+          throw `Insufficient Funds need more ${amountIn.sub(tokenAccountBalance)} tokens`
+        }
+      }
+    }//else
+
+    let userOutputTokenAccount =  getAssociatedTokenAddressSync(
+      swapPoolConfig.getTokenFromSymbol(swapOutCustodyConfig.symbol).mintKey,
+      publicKey,
+      true
+    );
+
+    if ( !(await checkIfAccountExists(userOutputTokenAccount, this.provider.connection))) {
+      preInstructions.push(
+        createAssociatedTokenAccountInstruction(
+          publicKey,
+          userOutputTokenAccount,
+          publicKey,
+          swapPoolConfig.getTokenFromSymbol(swapOutCustodyConfig.symbol).mintKey
+        )
+      );
+    }
+    const marketAccount = positionPoolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+    const positionAccount = positionPoolConfig.getPositionFromMarketPk(publicKey, marketAccount);
+
+    let custodyAccountMetas = [];
+    let custodyOracleAccountMetas = [];
+    for (const custody of swapPoolConfig.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+
+      custodyOracleAccountMetas.push({
+        pubkey: this.useExtOracleAccount ? custody.extOracleAccount: custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+ 
+
+    let instruction = await this.programPerpComposability.methods
+    .swapAndOpen({
+        amountIn,
+        minAmountOut,
+        openPriceWithSlippage: priceWithSlippage,
+        openSizeAmount: size,
+        privilege
+      })
+      .accounts({
+        perpProgram: this.programId,
+        owner: publicKey,
+        fundingAccount: inputSymbol == 'SOL' ? wrappedSolAccount.publicKey : userInputTokenAccount,
+        receivingAccount : userOutputTokenAccount,
+
+        transferAuthority: swapPoolConfig.transferAuthority,
+        perpetuals: swapPoolConfig.perpetuals,
+        swapPool: swapPoolConfig.poolAddress,
+
+        receivingCustody: swapInCustodyConfig.custodyAccount,
+        receivingCustodyOracleAccount: this.useExtOracleAccount ? swapInCustodyConfig.extOracleAccount : swapInCustodyConfig.intOracleAccount,
+        receivingCustodyTokenAccount: swapInCustodyConfig.tokenAccount,
+
+        dispensingCustody: swapOutCustodyConfig.custodyAccount,
+        dispensingCustodyOracleAccount: this.useExtOracleAccount ? swapOutCustodyConfig.extOracleAccount : swapOutCustodyConfig.intOracleAccount,
+        dispensingCustodyTokenAccount: swapOutCustodyConfig.tokenAccount,
+
+        positionPool: positionPoolConfig.poolAddress,
+        position: positionAccount,
+        market: marketAccount,
+        targetCustody: targetCustodyConfig.custodyAccount,
+        targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+
+        collateralCustody: collateralCustodyConfig.custodyAccount,
+        collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+        collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+
+        eventAuthority: this.eventAuthority.publicKey,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege), ...custodyAccountMetas, ...custodyOracleAccountMetas])
+      .instruction()
+
+    instructions.push(instruction);
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  closePosition = async (
+    marketSymbol: string,
+    collateralSymbol: string,
+    priceWithSlippage: ContractOraclePrice,
+    side: Side,
+    poolConfig: PoolConfig,
+    nftTradingAccount: PublicKey,
+    nftReferralAccount: PublicKey,
+    nftRebateTokenAccount: PublicKey,
+    privilege: Privilege,
+    createUserATA = true, //create new ATA for USER in the end 
+    closeUsersWSOLATA = false // to get back WSOL=>SOL
+  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+
+
+    let publicKey = this.provider.wallet.publicKey;
+
+    let userReceivingTokenAccount : PublicKey;
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+    try {
+
+      if (collateralSymbol == 'SOL') {
+        wrappedSolAccount = new Keypair();
+        const lamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+
+        preInstructions = [
+          SystemProgram.createAccount({
+            fromPubkey: publicKey,
+            newAccountPubkey: wrappedSolAccount.publicKey,
+            lamports: lamports, //will this break for large amounts ??
+            space: 165,
+            programId: TOKEN_PROGRAM_ID,
+          }),
+          createInitializeAccount3Instruction(
+            wrappedSolAccount.publicKey,
+            NATIVE_MINT,
+            publicKey,
+          ),
+        ];
+        postInstructions = [
+          createCloseAccountInstruction(
+            wrappedSolAccount.publicKey,
+            publicKey,
+            publicKey,
+          ),
+        ];
+        additionalSigners.push(wrappedSolAccount);
+      } else {
+        // OTHER TOKENS including WSOL,USDC,..
+        userReceivingTokenAccount = await getAssociatedTokenAddress(
+          poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+          publicKey
+        );
+
+        if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
+          preInstructions.push(
+            createAssociatedTokenAccountInstruction(
+              publicKey,
+              userReceivingTokenAccount,
+              publicKey,
+              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+            )
+          );
+        }
+      } // else
+      
+
+      const collateralCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+      const targetCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(marketSymbol).mintKey))!;
+      const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+
+      const positionAccount = poolConfig.getPositionFromMarketPk(publicKey, marketAccount);
+
+
+      let instruction = await this.program.methods
+        .closePosition({
+          priceWithSlippage: priceWithSlippage,
+          privilege: privilege
+        })
+        .accounts({
+          feePayer: publicKey,
+          owner: publicKey,
+          receivingAccount: collateralSymbol == 'SOL' ? wrappedSolAccount.publicKey : userReceivingTokenAccount,
+          transferAuthority: poolConfig.transferAuthority,
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          position: positionAccount,
+          market: marketAccount,
+          targetCustody: targetCustodyConfig.custodyAccount,
+          targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+          collateralCustody: collateralCustodyConfig.custodyAccount,
+          collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+          collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount, 
+          eventAuthority : this.eventAuthority.publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          program: this.programId,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        })
+        .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege)])
+        .instruction();
+      instructions.push(instruction)
+
+      if (collateralSymbol == 'WSOL' && closeUsersWSOLATA) {
+        const closeWsolATAIns = createCloseAccountInstruction(userReceivingTokenAccount, publicKey, publicKey);
+        postInstructions.push(closeWsolATAIns);
+      }
+    } catch (error) {
+      console.error("perpclient closePosition error:", error);
+    }
+
+    return {
+      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      additionalSigners
+    };
+  }
+
+  closePositionWithSwap = async (
+    targetSymbol: string,
+    outputSymbol: string,
+    collateralSymbol : string,
+    minAmountOut: BN, 
+    priceAfterSlippage: ContractOraclePrice,
+    side: Side,
+    swapPoolConfig: PoolConfig,
+    positionPoolConfig: PoolConfig,
+    nftTradingAccount: PublicKey,
+    nftReferralAccount: PublicKey,
+    nftRebateTokenAccount: PublicKey,
+    privilege : Privilege,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let publicKey = this.provider.wallet.publicKey;
+    const targetCustodyConfig = positionPoolConfig.custodies.find(i => i.mintKey.equals(positionPoolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
+    const collateralCustodyConfig = positionPoolConfig.custodies.find(i => i.mintKey.equals(positionPoolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const swapInCustodyConfig = swapPoolConfig.custodies.find(i => i.mintKey.equals(swapPoolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const swapOutCustodyConfig = swapPoolConfig.custodies.find(i => i.mintKey.equals(swapPoolConfig.getTokenFromSymbol(outputSymbol).mintKey))!;
+
+    if(swapOutCustodyConfig.mintKey.equals(collateralCustodyConfig.mintKey)){
+      throw "Dont use swap, just call close position"
+    }
+
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    let userReceivingTokenAccount : PublicKey;
+
+
+    // Create WSOL Token account and not ATA and close it in end 
+    if (outputSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      const lamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+      
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports, //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+
+    }  else {
+     
+      // OTHER TOKENS including WSOL,USDC,..
+      userReceivingTokenAccount = await getAssociatedTokenAddress(
+        swapPoolConfig.getTokenFromSymbol(outputSymbol).mintKey,
+        publicKey
+      );
+
+      if (!(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            userReceivingTokenAccount,
+            publicKey,
+            swapPoolConfig.getTokenFromSymbol(outputSymbol).mintKey
+          )
+        );
+      }
+     
+    }//else
+
+
+    let userCollateralTokenAccount =  getAssociatedTokenAddressSync(
+      positionPoolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+      publicKey,
+      true
+    );
+    if ( !(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
+      preInstructions.push(
+        createAssociatedTokenAccountInstruction(
+          publicKey,
+          userCollateralTokenAccount,
+          publicKey,
+          positionPoolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+        )
+      );
+    }
+   
+
+    const marketAccount = positionPoolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+    const positionAccount = positionPoolConfig.getPositionFromMarketPk(publicKey, marketAccount);
+
+    let custodyAccountMetas = [];
+    let custodyOracleAccountMetas = [];
+    for (const custody of swapPoolConfig.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+
+      custodyOracleAccountMetas.push({
+        pubkey: this.useExtOracleAccount ? custody.extOracleAccount: custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+
+    let instruction = await this.programPerpComposability.methods
+      // @ts-ignore
+      .closeAndSwap({
+        minAmountOut,
+        closePriceWithSlippage: priceAfterSlippage,
+        privilege,
+      })
+      .accounts({
+        perpProgram: this.programId, 
+        owner: publicKey,
+        // swapInput
+        fundingAccount: userCollateralTokenAccount, 
+        // swapOutput
+        receivingAccount : outputSymbol == 'SOL' ? wrappedSolAccount.publicKey : userReceivingTokenAccount,
+
+        transferAuthority: swapPoolConfig.transferAuthority,
+        perpetuals: swapPoolConfig.perpetuals,
+        swapPool: swapPoolConfig.poolAddress,
+
+        // swapIn Custody
+        receivingCustody: swapInCustodyConfig.custodyAccount,
+        receivingCustodyOracleAccount: this.useExtOracleAccount ? swapInCustodyConfig.extOracleAccount: swapInCustodyConfig.intOracleAccount,
+        receivingCustodyTokenAccount: swapInCustodyConfig.tokenAccount,
+
+        // swapOut Custody
+        dispensingCustody: swapOutCustodyConfig.custodyAccount,
+        dispensingCustodyOracleAccount: this.useExtOracleAccount ? swapOutCustodyConfig.extOracleAccount: swapOutCustodyConfig.intOracleAccount,
+        dispensingCustodyTokenAccount: swapOutCustodyConfig.tokenAccount,
+
+        positionPool: positionPoolConfig.poolAddress,
+        position: positionAccount,
+        market: marketAccount,
+        targetCustody: targetCustodyConfig.custodyAccount,
+        targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount: targetCustodyConfig.intOracleAccount,
+
+        collateralCustody: collateralCustodyConfig.custodyAccount,
+        collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount: collateralCustodyConfig.intOracleAccount,
+        collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+
+        eventAuthority: this.eventAuthority.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      })
+      .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege), ...custodyAccountMetas, ...custodyOracleAccountMetas])
+      .instruction()
+
+    instructions.push(instruction);
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  addCollateral = async (
+    collateralWithFee: BN,
+    targetSymbol: string,
+    collateralSymbol: string,
+    side: Side,
+    positionPubKey: PublicKey,
+    poolConfig: PoolConfig,
+    skipBalanceChecks = false
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    const collateralCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const targetCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
+
+    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+
+    if (!collateralCustodyConfig || !targetCustodyConfig) {
+      throw "payTokenCustody not found";
+    }
+
+    let userPayingTokenAccount = getAssociatedTokenAddressSync(
+      collateralCustodyConfig.mintKey,
+      publicKey,
+      true
+    );
+
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    // Create WSOL Token account and not ATA and close it in end 
+    if (collateralSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+      const lamports = collateralWithFee.add(new BN(accCreationLamports)); // for account creation
+
+      // CHECK BASIC SOL BALANCE
+      let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
+      if (unWrappedSolBalance.lt(lamports)) {
+        throw "Insufficient SOL Funds"
+      }
+
+      const solBal = await this.provider.connection.getBalance(publicKey)
+
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports.toNumber(), //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+
+    }  else {
+      // for other tokens check if ATA and balance 
+      if (!(await checkIfAccountExists(userPayingTokenAccount, this.provider.connection))) {
+        throw "Insufficient Funds , token Account doesn't exist"
+      }
+      if (!skipBalanceChecks) {
+        const tokenAccountBalance = new BN((await this.provider.connection.getTokenAccountBalance(userPayingTokenAccount)).value.amount);
+        if (tokenAccountBalance.lt(collateralWithFee)) {
+          throw `Insufficient Funds need more ${collateralWithFee.sub(tokenAccountBalance)} tokens`
+        }
+      }
+    }//else
+
+    let instruction = await this.program.methods.addCollateral({
+      collateralDelta: collateralWithFee
+    }).accounts({
+      owner: publicKey,
+      position: positionPubKey,
+      market: marketAccount,
+      fundingAccount: collateralSymbol == 'SOL' ? wrappedSolAccount.publicKey :  userPayingTokenAccount, // user token account for custody token account
+      perpetuals: poolConfig.perpetuals,
+      pool: poolConfig.poolAddress,
+      targetCustody: targetCustodyConfig.custodyAccount,
+      targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+      collateralCustody: collateralCustodyConfig.custodyAccount,
+      collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+      collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount, 
+      eventAuthority: this.eventAuthority.publicKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      program: this.programId,
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+    })
+    .instruction();
+
+    instructions.push(instruction);
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  addCollateralWithSwap = async (
+    targetSymbol: string,
+    inputSymbol: string,
+    collateralSymbol: string,
+    amountIn: BN, // with fee
+    minAmountOut: BN, 
+    side: Side,
+    positionPubKey: PublicKey,
+    poolConfigSwap: PoolConfig,
+    poolConfigPosition: PoolConfig,
+    skipBalanceChecks = false
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    const collateralCustodyConfig = poolConfigPosition.custodies.find(i => i.mintKey.equals(poolConfigPosition.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const targetCustodyConfig = poolConfigPosition.custodies.find(i => i.mintKey.equals(poolConfigPosition.getTokenFromSymbol(targetSymbol).mintKey))!;
+    const outputCustodyConfig = poolConfigSwap.custodies.find(i => i.mintKey.equals(poolConfigSwap.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const inputCustodyConfig = poolConfigSwap.custodies.find(i => i.mintKey.equals(poolConfigSwap.getTokenFromSymbol(inputSymbol).mintKey))!;
+
+    if (!collateralCustodyConfig || !targetCustodyConfig || !inputCustodyConfig) {
+      throw "payTokenCustody not found";
+    }
+
+    if(inputCustodyConfig.mintKey.equals(collateralCustodyConfig.mintKey)){
+      throw "Use Simple Swap"
+    }
+
+  
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    let userInputTokenAccount : PublicKey;
+
+    // Create WSOL Token account and not ATA and close it in end 
+    if (inputSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+      const lamports = amountIn.add(new BN(accCreationLamports)); // for account creation
+
+      // CHECK BASIC SOL BALANCE
+      let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
+      if (unWrappedSolBalance.lt(lamports)) {
+        throw "Insufficient SOL Funds"
+      }
+
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports.toNumber(), //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+
+    }  else {
+       userInputTokenAccount = getAssociatedTokenAddressSync(
+        inputCustodyConfig.mintKey,
+        publicKey,
+        true
+      );
+      // for other tokens check if ATA and balance 
+      if (!(await checkIfAccountExists(userInputTokenAccount, this.provider.connection))) {
+        throw "Insufficient Funds , token Account doesn't exist"
+      }
+      if (!skipBalanceChecks) {
+        const tokenAccountBalance = new BN((await this.provider.connection.getTokenAccountBalance(userInputTokenAccount)).value.amount);
+        if (tokenAccountBalance.lt(amountIn)) {
+          throw `Insufficient Funds need more ${amountIn.sub(tokenAccountBalance)} tokens`
+        }
+      }
+    }//else
+
+    let userCollateralTokenAccount =  getAssociatedTokenAddressSync(
+      collateralCustodyConfig.mintKey,
+      publicKey,
+      true
+    );
+    if ( !(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
+      preInstructions.push(
+        createAssociatedTokenAccountInstruction(
+          publicKey,
+          userCollateralTokenAccount,
+          publicKey,
+          collateralCustodyConfig.mintKey
+        )
+      );
+    }
+
+    let custodyAccountMetas = [];
+    let custodyOracleAccountMetas = [];
+
+    for (const custody of poolConfigSwap.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+
+      custodyOracleAccountMetas.push({
+        pubkey: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+    
+
+    const marketAccount = poolConfigPosition.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+
+    let instruction = await this.programPerpComposability.methods.swapAndAddCollateral({
+      amountIn: amountIn,
+      minAmountOut : minAmountOut,
+    }).accounts({
+      perpProgram: this.programId, 
+      owner: publicKey,
+      
+      fundingAccount: inputSymbol == 'SOL' ? wrappedSolAccount.publicKey :  userInputTokenAccount, // user token account for custody token account
+      receivingAccount : userCollateralTokenAccount,
+      
+      transferAuthority: poolConfigSwap.transferAuthority,
+      perpetuals: poolConfigSwap.perpetuals,
+      swapPool: poolConfigSwap.poolAddress,
+
+      receivingCustody: inputCustodyConfig.custodyAccount,
+      receivingCustodyOracleAccount: this.useExtOracleAccount ? inputCustodyConfig.extOracleAccount : inputCustodyConfig.intOracleAccount,
+      receivingCustodyTokenAccount: inputCustodyConfig.tokenAccount,
+
+      dispensingCustody: outputCustodyConfig.custodyAccount,
+      dispensingCustodyOracleAccount: this.useExtOracleAccount ? outputCustodyConfig.extOracleAccount : outputCustodyConfig.intOracleAccount,
+      dispensingCustodyTokenAccount: outputCustodyConfig.tokenAccount,
+
+      positionPool: poolConfigPosition.poolAddress,
+
+      position: positionPubKey,
+      market: marketAccount,
+      targetCustody: targetCustodyConfig.custodyAccount,
+      targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+
+      collateralCustody: collateralCustodyConfig.custodyAccount,
+      collateralOracleAccount:  this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+      collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+
+      eventAuthority: this.eventAuthority.publicKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+    })
+    .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas])
+    .instruction();
+
+    instructions.push(instruction);
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  removeCollateral = async (
+    collateralWithFee: BN,
+    marketSymbol: string,
+    collateralSymbol: string,
+    side: Side,
+    positionPubKey: PublicKey,
+    poolConfig: PoolConfig,
+    createUserATA = true, //create new ATA for USER in the end 
+    closeUsersWSOLATA = false // to get back WSOL=>SOL
+  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}>  => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    const collateralCustodyConfig = poolConfig.custodies.find((i) =>
+      i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey)
+    )!
+    const targetCustodyConfig = poolConfig.custodies.find((i) =>
+      i.mintKey.equals(poolConfig.getTokenFromSymbol(marketSymbol).mintKey)
+    )!
+
+    
+    if (!collateralCustodyConfig || !targetCustodyConfig) {
+      throw "collateralCustodyConfig/marketCustodyConfig  not found";
+    }
+
+    let userReceivingTokenAccount : PublicKey;
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+    try {
+
+
+    if (collateralSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      userReceivingTokenAccount = wrappedSolAccount.publicKey;
+      const lamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports, //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+    } else {
+      // OTHER TOKENS including WSOL,USDC,..
+      userReceivingTokenAccount = await getAssociatedTokenAddress(
+        poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+        publicKey
+      );
+
+      if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            userReceivingTokenAccount,
+            publicKey,
+            poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+          )
+        );
+      }
+    } // else
+
+    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+
+
+    let instruction = await this.program.methods
+    .removeCollateral({
+        collateralDelta: collateralWithFee,
+    })
+    .accounts({
+        owner: publicKey,
+        receivingAccount: collateralSymbol == 'SOL' ? wrappedSolAccount.publicKey : userReceivingTokenAccount, // user token account for custody token account
+        transferAuthority: poolConfig.transferAuthority,
+        perpetuals: poolConfig.perpetuals,
+        pool: poolConfig.poolAddress,
+        position: positionPubKey,
+        market: marketAccount,
+        targetCustody: targetCustodyConfig.custodyAccount,
+        targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+
+        collateralCustody: collateralCustodyConfig.custodyAccount,
+        collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+        collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount,
+        eventAuthority : this.eventAuthority.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        program: this.programId,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+    })
+    .instruction()
+
+    instructions.push(instruction)
+
+      if (collateralSymbol == 'WSOL' && closeUsersWSOLATA) {
+        const closeWsolATAIns = createCloseAccountInstruction(userReceivingTokenAccount, publicKey, publicKey);
+        postInstructions.push(closeWsolATAIns);
+      }
+
+    } catch (error) {
+      console.error("perpclient removeCollateral error:", error);
+    }
+
+      return {
+        instructions : [...preInstructions, ...instructions ,...postInstructions],
+        additionalSigners
+      };
+  }
+
+  removeCollateralWithSwap = async (
+    targetSymbol: string,
+    collateralSymbol : string,
+    outputSymbol: string,
+    minAmountOut: BN, 
+    collateralDelta: BN,
+    side: Side,
+    poolConfigSwap: PoolConfig,
+    poolConfigPosition: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+
+    let publicKey = this.provider.wallet.publicKey;
+    const targetCustodyConfig = poolConfigPosition.custodies.find(i => i.mintKey.equals(poolConfigPosition.getTokenFromSymbol(targetSymbol).mintKey))!;
+    const collateralCustodyConfig = poolConfigPosition.custodies.find(i => i.mintKey.equals(poolConfigPosition.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const inputCusotdyConfig = poolConfigSwap.custodies.find(i => i.mintKey.equals(poolConfigSwap.getTokenFromSymbol(collateralSymbol).mintKey))!;
+    const outputCustodyConfig = poolConfigSwap.custodies.find(i => i.mintKey.equals(poolConfigSwap.getTokenFromSymbol(outputSymbol).mintKey))!;
+
+    if(outputCustodyConfig.mintKey.equals(collateralCustodyConfig.mintKey)){
+      throw "Dont use swap, just call remove collateral"
+    }
+
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    let userReceivingTokenAccount : PublicKey;
+
+
+    // Create WSOL Token account and not ATA and close it in end 
+    if (outputSymbol == 'SOL') {
+      wrappedSolAccount = new Keypair();
+      const lamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+      
+      preInstructions = [
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: wrappedSolAccount.publicKey,
+          lamports: lamports, //will this break for large amounts ??
+          space: 165,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeAccount3Instruction(
+          wrappedSolAccount.publicKey,
+          NATIVE_MINT,
+          publicKey,
+        ),
+      ];
+      postInstructions = [
+        createCloseAccountInstruction(
+          wrappedSolAccount.publicKey,
+          publicKey,
+          publicKey,
+        ),
+      ];
+      additionalSigners.push(wrappedSolAccount);
+
+    }  else {
+     
+      // OTHER TOKENS including WSOL,USDC,..
+      userReceivingTokenAccount = await getAssociatedTokenAddress(
+        poolConfigSwap.getTokenFromSymbol(outputSymbol).mintKey,
+        publicKey
+      );
+
+      if (!(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            userReceivingTokenAccount,
+            publicKey,
+            poolConfigSwap.getTokenFromSymbol(outputSymbol).mintKey
+          )
+        );
+      }
+     
+    }//else
+
+
+    let userCollateralTokenAccount =  getAssociatedTokenAddressSync(
+      poolConfigPosition.getTokenFromSymbol(collateralSymbol).mintKey,
+      publicKey,
+      true
+    );
+    if ( !(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
+      preInstructions.push(
+        createAssociatedTokenAccountInstruction(
+          publicKey,
+          userCollateralTokenAccount,
+          publicKey,
+          poolConfigPosition.getTokenFromSymbol(collateralSymbol).mintKey
+        )
+      );
+    }
+   
+
+    const marketAccount = poolConfigPosition.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+    const positionAccount = poolConfigPosition.getPositionFromMarketPk(publicKey, marketAccount);
+
+    let custodyAccountMetas = [];
+    let custodyOracleAccountMetas = [];
+    for (const custody of poolConfigSwap.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+
+      custodyOracleAccountMetas.push({
+        pubkey: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+
+
+    let instruction = await this.programPerpComposability.methods
+      .removeCollateralAndSwap({
+        minAmountOut,
+        collateralDelta: collateralDelta,
+      })
+      .accounts({
+        perpProgram: this.programId, 
+        owner: publicKey,
+        // swapInput
+        fundingAccount: userCollateralTokenAccount, 
+        // swapOutput
+        receivingAccount : outputSymbol == 'SOL' ? wrappedSolAccount.publicKey : userReceivingTokenAccount,
+
+        transferAuthority: poolConfigSwap.transferAuthority,
+        perpetuals: poolConfigSwap.perpetuals,
+        swapPool: poolConfigSwap.poolAddress,
+
+        // swapIn Custody
+        receivingCustody: inputCusotdyConfig.custodyAccount,
+        receivingCustodyOracleAccount: this.useExtOracleAccount ? inputCusotdyConfig.extOracleAccount : inputCusotdyConfig.intOracleAccount,
+        receivingCustodyTokenAccount: inputCusotdyConfig.tokenAccount,
+
+        // swapOut Custody
+        dispensingCustody: outputCustodyConfig.custodyAccount,
+        dispensingCustodyOracleAccount: this.useExtOracleAccount ? outputCustodyConfig.extOracleAccount : outputCustodyConfig.intOracleAccount,
+        dispensingCustodyTokenAccount: outputCustodyConfig.tokenAccount,
+
+        positionPool: poolConfigPosition.poolAddress,
+        position: positionAccount,
+        market: marketAccount,
+        targetCustody: targetCustodyConfig.custodyAccount,
+        targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+
+        collateralCustody: collateralCustodyConfig.custodyAccount,
+        collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+        collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+
+        eventAuthority: this.eventAuthority.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      })
+      .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas])
+      .instruction()
+
+    instructions.push(instruction);
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  increaseSize = async (
+    targetSymbol: string,
+    collateralSymbol: string,
+    positionPubKey: PublicKey,
+    side: Side,
+    poolConfig: PoolConfig,
+    priceWithSlippage: ContractOraclePrice,
+    sizeDelta: BN,
+    nftTradingAccount: PublicKey,
+    nftReferralAccount: PublicKey,
+    nftRebateTokenAccount: PublicKey,
+    privilege: Privilege,
+    ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}>  => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    const collateralCustodyConfig = poolConfig.custodies.find((i) =>
+      i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey)
+    )!
+    const targetCustodyConfig = poolConfig.custodies.find((i) =>
+      i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey)
+    )!
+
+    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+
+    if (!collateralCustodyConfig || !targetCustodyConfig) {
+      throw "collateralCustodyConfig/marketCustodyConfig  not found";
+    }
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+
+    let instruction = await this.program.methods
+    .increaseSize( {
+      priceWithSlippage: priceWithSlippage,
+      sizeDelta: sizeDelta,
+      privilege : privilege
+     } )
+    .accounts({
+      owner: publicKey,
+      transferAuthority: poolConfig.transferAuthority,
+      perpetuals: poolConfig.perpetuals,
+      pool: poolConfig.poolAddress,
+      position: positionPubKey,
+      market: marketAccount,
+      targetCustody: targetCustodyConfig.custodyAccount,
+      targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+      collateralCustody: collateralCustodyConfig.custodyAccount,
+      collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+      collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      eventAuthority : this.eventAuthority.publicKey,
+      program: this.programId,
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+    })
+    .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege)])
+    .instruction()
+  
+    instructions.push(instruction)
+
+    return {
+      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      additionalSigners
+    };
+  }
+
+  decreaseSize = async (
+    targetSymbol: string,
+    collateralSymbol: string,
+    side: Side,
+    positionPubKey: PublicKey,
+    poolConfig: PoolConfig,
+    priceWithSlippage: ContractOraclePrice,
+    sizeDelta: BN,
+    nftTradingAccount: PublicKey,
+    nftReferralAccount: PublicKey,
+    nftRebateTokenAccount: PublicKey,
+    privilege: Privilege,
+    ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}>  => {
+
+    let publicKey = this.provider.wallet.publicKey;
+
+    const collateralCustodyConfig = poolConfig.custodies.find((i) =>
+      i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey)
+    )!
+    const targetCustodyConfig = poolConfig.custodies.find((i) =>
+      i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey)
+    )!
+
+    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
+
+    if (!collateralCustodyConfig || !targetCustodyConfig) {
+      throw "collateralCustodyConfig/marketCustodyConfig  not found";
+    }
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = []
+
+   
+    
+    let instruction = await this.program.methods
+    .decreaseSize( {
+      priceWithSlippage: priceWithSlippage,
+      sizeDelta: sizeDelta,
+      privilege : privilege
+    } )
+    .accounts({
+      owner: publicKey,
+      transferAuthority: poolConfig.transferAuthority,
+      perpetuals: poolConfig.perpetuals,
+      pool: poolConfig.poolAddress,
+      position: positionPubKey,
+      market: marketAccount,
+      targetCustody: targetCustodyConfig.custodyAccount,
+      targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
+
+      collateralCustody: collateralCustodyConfig.custodyAccount,
+      collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
+      collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      eventAuthority : this.eventAuthority.publicKey,
+      program: this.programId,
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+    })
+    .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege)])
+    .instruction()
+  
+    instructions.push(instruction)
+
+    return {
+      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      additionalSigners
+    };
+    
+  }
+
+
+
+  //  EARN  / LP 
+
   addLiquidityAndStake = async (
     inputSymbol: string,
     amountIn: BN, // with fee
@@ -414,12 +1738,9 @@ export class PerpetualsClient {
 
     // Create WSOL Token account and not ATA and close it in end 
     if (inputSymbol == 'SOL') {
-      console.log("inputSymbol === SOL", inputSymbol);
       wrappedSolAccount = new Keypair();
       const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
-      console.log("accCreationLamports:", accCreationLamports)
       const lamports = amountIn.add(new BN(accCreationLamports)); // for account creation
-      console.log("lamports:", lamports.toNumber())
 
       // CHECK BASIC SOL BALANCE
       let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
@@ -633,10 +1954,8 @@ export class PerpetualsClient {
 
     // FOR SOL :  Create WSOL Token account and not ATA and close it in end 
     if (inTokenSymbol == 'SOL') {
-      console.log("inTokenSymbol === SOL", inTokenSymbol);
       wrappedSolAccount = new Keypair();
       const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
-      console.log("accCreationLamports:", accCreationLamports)
       const lamports = amountIn.add(new BN(accCreationLamports)); // for account creation
 
       // CHECK BASIC SOL BALANCE
@@ -713,7 +2032,7 @@ export class PerpetualsClient {
       instructions.push(addCompoundingLiquidity)
 
     } catch (err) {
-      console.log("perpClient addCompoundingLiquidity error:: ", err);
+      console.error("perpClient addCompoundingLiquidity error:: ", err);
     }
 
     return {
@@ -864,7 +2183,7 @@ export class PerpetualsClient {
       instructions.push(removeCompoundingLiquidity)
 
     } catch (err) {
-      console.log("perpClient removeCompoundingLiquidity error:: ", err);
+      console.error("perpClient removeCompoundingLiquidity error:: ", err);
     }
 
     return {
@@ -873,11 +2192,7 @@ export class PerpetualsClient {
     };
   }
 
-  // - handle SOL wrapping to WSOL and create a ATA - NOT NEEDED
-  // - Balance checks - DONE
-  // - ATA check - else create  - DONE 
-  // - for LP close Accounts - DONE
-  // - if out token WSOL -> unwrap to SOL - DONE
+ 
   removeLiquidity = async (
     recieveTokenSymbol: string,
     liquidityAmountIn: BN,
@@ -986,7 +2301,6 @@ export class PerpetualsClient {
         }
       }
 
-      console.log("liquidityAmountIn", liquidityAmountIn.toString());
 
       let removeLiquidityTx = await this.program.methods
         .removeLiquidity({
@@ -1024,7 +2338,7 @@ export class PerpetualsClient {
       }
 
     } catch (err) {
-      console.log("perpClient removeLiquidity error:: ", err);
+      console.error("perpClient removeLiquidity error:: ", err);
       throw err;
     }
 
@@ -1062,7 +2376,7 @@ export class PerpetualsClient {
       instructions.push(addReferralInstruction)
 
     } catch (err) {
-      console.log("perpClient addReferral error:: ", err);
+      console.error("perpClient addReferral error:: ", err);
       throw err;
     }
 
@@ -1134,7 +2448,7 @@ export class PerpetualsClient {
       instructions.push(updateNftTradingAccountInstruction)
 
     } catch (err) {
-      console.log("perpClient updateNftAccount error:: ", err);
+      console.error("perpClient updateNftAccount error:: ", err);
       throw err;
     }
 
@@ -1194,7 +2508,7 @@ export class PerpetualsClient {
       instructions.push(levelUpInstruction)
 
     } catch (err) {
-      console.log("perpClient levelUp error:: ", err);
+      console.error("perpClient levelUp error:: ", err);
       throw err;
     }
 
@@ -1261,7 +2575,7 @@ export class PerpetualsClient {
       instructions.push(depositStakeInstruction)
 
     } catch (err) {
-      console.log("perpClient depositStaking error:: ", err);
+      console.error("perpClient depositStaking error:: ", err);
       throw err;
     }
 
@@ -1274,12 +2588,11 @@ export class PerpetualsClient {
 
   refreshStakeWithAllFlpStakeAccounts = async (poolConfig: PoolConfig,) => {
     const flpStakeAccounts = ((await this.program.account.flpStake.all()))
-    console.log("total no of flpStakeAccounts: ", flpStakeAccounts.length)
     const maxFlpStakeAccountLength = 32 - (4 + poolConfig.custodies.length);
     const pendingActivationAccounts: PublicKey[] = [];
 
     for (const flpStakeAccount of flpStakeAccounts) {
-      const account: FlpStake = flpStakeAccount.account;
+      // const account: FlpStake = flpStakeAccount.account;
       // if(account.stakeStats.pendingActivation.gt(BN_ZERO)) {
       pendingActivationAccounts.push(flpStakeAccount.publicKey);
       // }
@@ -1287,7 +2600,6 @@ export class PerpetualsClient {
 
     const refreshStakeInstructions: TransactionInstruction[] = [];
 
-    console.log("total no of pendingActivationAccounts: ", pendingActivationAccounts.length)
 
     for (let i = 0; i < pendingActivationAccounts.length; i += maxFlpStakeAccountLength) {
       const batch = pendingActivationAccounts.slice(i, i + maxFlpStakeAccountLength);
@@ -1356,7 +2668,7 @@ export class PerpetualsClient {
       return refreshStakeInstruction;
 
     } catch (err) {
-      console.log("perpClient refreshStaking error:: ", err);
+      console.error("perpClient refreshStaking error:: ", err);
       throw err;
     }
 
@@ -1402,7 +2714,7 @@ export class PerpetualsClient {
       instructions.push(unstakeInstantInstruction)
 
     } catch (err) {
-      console.log("perpClient unstakeInstant error:: ", err);
+      console.error("perpClient unstakeInstant error:: ", err);
       throw err;
     }
 
@@ -1452,7 +2764,7 @@ export class PerpetualsClient {
       instructions.push(unstakeRequestInstruction)
 
     } catch (err) {
-      console.log("perpClient unstakeRequest error:: ", err);
+      console.error("perpClient unstakeRequest error:: ", err);
       throw err;
     }
 
@@ -1528,7 +2840,7 @@ export class PerpetualsClient {
       instructions.push(withdrawStakeInstruction)
 
     } catch (err) {
-      console.log("perpClient withdrawStake error:: ", err);
+      console.error("perpClient withdrawStake error:: ", err);
       throw err;
     }
 
@@ -1621,7 +2933,7 @@ export class PerpetualsClient {
       instructions.push(withdrawStakeInstruction)
 
     } catch (err) {
-      console.log("perpClient withdrawStake error:: ", err);
+      console.error("perpClient withdrawStake error:: ", err);
       throw err;
     }
 
@@ -1780,12 +3092,10 @@ export class PerpetualsClient {
       .transaction()
 
     const backUpOracleInstruction = await backUpOracleInstructionPromise
-    // console.log('>> getLpTokenPrice backUpOracleInstruction:', backUpOracleInstruction)
 
     transaction.instructions.unshift(...backUpOracleInstruction)
 
     const result = await this.viewHelper.simulateTransaction(transaction)
-    // console.log('result :>> ', result)
     const index = IDL.instructions.findIndex((f) => f.name === 'getLpTokenPrice')
     const res: any = this.viewHelper.decodeLogs(result, index, 'getLpTokenPrice')
 
@@ -1848,7 +3158,6 @@ export class PerpetualsClient {
       .transaction()
 
     const backUpOracleInstruction = await backUpOracleInstructionPromise
-    // console.log('>> getAddLiquidityAmountAndFee backUpOracleInstruction:', backUpOracleInstruction)
     transaction.instructions.unshift(...backUpOracleInstruction)
 
     const result = await this.viewHelper.simulateTransaction(transaction)
