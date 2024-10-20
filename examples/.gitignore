@@ -1,0 +1,4 @@
+node_modules
+localPublicKey.json
+.env
+dist/
