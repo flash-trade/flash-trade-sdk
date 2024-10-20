@@ -5,7 +5,8 @@ import { readFileSync } from "fs";
 import { confirmTransactionV3 } from "./rpcUtils";
 import { PriceData, PythHttpClient, getPythProgramKeyForCluster } from '@pythnetwork/client'
 import { BN } from "bn.js";
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 // NOTE : SET your RPC URL AND KEYPAIR PATH HERE
 const url =  process.env["RPC_URL"] ?? 'https://xxxxx';

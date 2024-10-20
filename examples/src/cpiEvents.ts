@@ -7,6 +7,8 @@ import {
 } from "@solana/web3.js";
 
 import { getCpiEventsFromTransaction, sendTransaction, IDL } from "flash-sdk";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const url = process.env["RPC_URL"] ?? 'https://api.devnet.solana.com';
 console.log("url:",url)

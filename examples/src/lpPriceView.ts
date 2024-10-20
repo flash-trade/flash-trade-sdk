@@ -5,7 +5,8 @@ import { AddressLookupTableAccount, Cluster, ComputeBudgetProgram, PublicKey, Rp
 import { BN_ZERO, IDL, IdlCoder, PerpetualsClient, PoolConfig, } from "flash-sdk";
 import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
 import fetch from 'node-fetch'; 
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 // NOTE : SET your RPC URL AND KEYPAIR PATH HERE
 const url = process.env["RPC_URL"] ?? 'https://xxxxx';

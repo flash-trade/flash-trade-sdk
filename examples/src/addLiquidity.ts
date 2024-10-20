@@ -1,6 +1,8 @@
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { ComputeBudgetProgram, PublicKey } from "@solana/web3.js";
 import { BN_ZERO, PerpetualsClient, PoolConfig, confirmTransaction, uiDecimalsToNative } from "flash-sdk";
+import dotenv from 'dotenv';
+dotenv.config();
 
 let client: PerpetualsClient;
 
