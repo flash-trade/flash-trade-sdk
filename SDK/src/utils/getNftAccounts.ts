@@ -11,6 +11,11 @@ export const getNftAccounts = (
         return [];
     }
 
+    if (nftTradingAccount.equals(PublicKey.default) || nftReferralAccount.equals(PublicKey.default) || nftRebateTokenAccount.equals(PublicKey.default) ) {
+        console.log("skipping refferals")
+        return [];
+    }
+
     const isNFTPrivilege = isVariant(privilege, 'nft');
     
     return [
