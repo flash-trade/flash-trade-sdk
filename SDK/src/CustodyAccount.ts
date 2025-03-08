@@ -36,6 +36,11 @@ export class CustodyAccount implements Custody {
       bump: number;
       tokenAccountBump: number;
       sizeFactorForSpread : number;
+      null: number;
+      reservedAmount: BN;
+      minReserveUsd: BN;
+      limitPriceBufferBps: BN;
+      padding: number[]
 
     constructor( publicKey : PublicKey, parseData : Custody) {
       this.publicKey = publicKey;
@@ -53,37 +58,7 @@ export class CustodyAccount implements Custody {
             Object.assign(this,{...custody})
       }
 
-      // getCollectivePosition(side: Side):PositionAccount {
-      //   let stats : PositionStats; 
-      //   if ( isVariant(side,'long')) {
-      //     stats = this.longPositions;
-      //   } else {
-      //     stats = this.shortPositions;
-      //   };
-      //   if (stats.openPositions.gt(BN_ZERO)) {
-            
-      //       const obj: Position =  {
-      //         side,
-      //         price: stats.averagePrice.div(stats.totalQuantity),
-      //         sizeUsd: stats.sizeUsd,
-      //         collateralUsd: stats.collateralUsd,
-      //         unrealizedLossUsd: stats.cumulativeInterestUsd,
-      //         cumulativeInterestSnapshot: stats.cumulativeInterestSnapshot,
-      //         lockedAmount: stats.lockedAmount,
-      //         ...DEFAULT_POSITION
-      //       } as Position;
-      //       return new PositionAccount(
-      //         PublicKey.default,
-      //         obj
-      //       )
-      //   } else {
-      //     return new PositionAccount(
-      //       PublicKey.default,
-      //       DEFAULT_POSITION
-      //     )
-      //   }
-      // }
-
+      
       
       
 

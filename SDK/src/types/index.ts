@@ -36,17 +36,24 @@ export type ContractOraclePrice = Types["OraclePrice"];
 export type StakeStats = Types["StakeStats"];
 export type CompoundingStats = Types["CompoundingStats"];
 export type VoltageStats = Types["VoltageStats"];
-
+export type LimitOrder = Types["LimitOrder"];
+export type TriggerOrder = Types["TriggerOrder"];
 
 export type Assets = Types["Assets"];
 export type FeesStats = Types["FeesStats"];
 export type PositionStats = Types["PositionStats"];
 export type BorrowRateState = Types["BorrowRateState"];
 
+// export type CustomOracle = Types["CustomOracle"]
+
 export type Custody = Accounts["custody"];
 export type Market = Accounts["market"];
 export type Pool = Accounts["pool"];
 export type Position = Accounts["position"];
+export type Order = Accounts["order"];
+
+
+
 export type PerpetualsAccount = Accounts["perpetuals"];
 export type Referral = Accounts["referral"];
 export type Trading = Accounts["trading"];
@@ -86,6 +93,13 @@ export type RemoveCollateralLogV3 = Events["RemoveCollateralLogV3"];
 export type ForceClosePositionLogV3 = Events["ForceClosePositionLogV3"];
 
 
+export type IncreaseSizeLogV4 = Events["IncreaseSizeLogV4"];
+export type OpenPositionLogV4 = Events["OpenPositionLogV4"];
+export type ExecuteLimitOrderLogV2 = Events["ExecuteLimitOrderLogV2"]
+export type ExecuteLimitWithSwapLogV2 = Events["ExecuteLimitWithSwapLogV2"]
+export type SwapAndOpenLogV2 = Events["SwapAndOpenLogV2"]
+
+
 export type AddLiquidityLogV2 = Events["AddLiquidityLogV2"];
 export type RemoveLiquidityLogV2 = Events["RemoveLiquidityLogV2"];
 export type AddCompoundingLiquidityLog = Events["AddCompoundingLiquidityLog"];
@@ -99,6 +113,25 @@ export type SwapFeeInternalLog = Events["SwapFeeInternalLog"];
 export type UnstakeInstantLog = Events["UnstakeInstantLog"];
 export type UnstakeRequestLog = Events["UnstakeRequestLog"];
 export type WithdrawStakeLog = Events["WithdrawStakeLog"];
+
+export type EditLimitOrderLog = Events["EditLimitOrderLog"]
+export type EditTriggerOrderLog = Events["EditTriggerOrderLog"]
+export type ExecuteLimitOrderLog = Events["ExecuteLimitOrderLog"]
+
+export type ExecuteTriggerOrderLog = Events["ExecuteTriggerOrderLog"]
+export type PlaceLimitOrderLog = Events["PlaceLimitOrderLog"]
+export type PlaceTriggerOrderLog = Events["PlaceTriggerOrderLog"]
+export type CancelLimitOrderLog = Events["CancelLimitOrderLog"]
+export type CancelTriggerOrderLog = Events["CancelTriggerOrderLog"]
+export type ExecuteLimitWithSwapLog = Events["ExecuteLimitWithSwapLog"]
+
+export type ExecuteTriggerWithSwapLog = Events["ExecuteTriggerWithSwapLog"]
+
+export type SwapAndOpenLog = Events["SwapAndOpenLog"]
+export type CloseAndSwapLog = Events["CloseAndSwapLog"]
+export type SwapAndAddCollateralLog = Events["SwapAndAddCollateralLog"]
+export type RemoveCollateralAndSwapLog = Events["RemoveCollateralAndSwapLog"]
+
 
 
 //  taken from drift 
@@ -214,6 +247,16 @@ export interface EntryPriceAndFee {
     feeUsdAfterDiscount : BN,
     feeAmountAfterDiscount : BN,
     liquidationPrice: OraclePrice
+}
+
+export interface EntryPriceAndFeeV2 {
+    entryOraclePrice: OraclePrice
+    feeUsd: BN,
+    feeAmount: BN,
+    feeUsdAfterDiscount : BN,
+    feeAmountAfterDiscount : BN,
+    liquidationPrice: OraclePrice
+    vbFeeUsd: BN,
 }
 
 export interface RemoveCollateralData {

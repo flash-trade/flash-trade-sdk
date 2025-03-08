@@ -243,6 +243,50 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "addInternalOracle",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "intOracleAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "AddInternalOracleParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "addCollection",
       "accounts": [
         {
@@ -566,7 +610,7 @@ export type Perpetuals = {
       "accounts": [
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -582,6 +626,11 @@ export type Perpetuals = {
         {
           "name": "custody",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -703,6 +752,16 @@ export type Perpetuals = {
         {
           "name": "market",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -838,6 +897,45 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawSolFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "updateCustody",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpdateCustodyParams"
           }
         }
       ],
@@ -1400,6 +1498,355 @@ export type Perpetuals = {
         }
       ],
       "returns": "u64"
+    },
+    {
+      "name": "swapAndAddCollateral",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapAndAddCollateralParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "swapAndOpen",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapAndOpenParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "closeAndSwap",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CloseAndSwapParams"
+          }
+        }
+      ]
     },
     {
       "name": "addLiquidityAndStake",
@@ -2135,6 +2582,104 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "migrateFlp",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "compoundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "flpStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolStakedLpVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolCompoundingLpVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "compoundingTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MigrateFlpParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "migrateStake",
       "accounts": [
         {
@@ -2226,6 +2771,42 @@ export type Perpetuals = {
           }
         }
       ]
+    },
+    {
+      "name": "migrateTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "compoundFees",
@@ -2793,6 +3374,124 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "removeCollateralAndSwap",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "RemoveCollateralAndSwapParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "removeCollateral",
       "accounts": [
         {
@@ -3063,6 +3762,39 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "cancelTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CancelTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "closePosition",
       "accounts": [
         {
@@ -3254,6 +3986,780 @@ export type Perpetuals = {
         }
       ],
       "returns": "u64"
+    },
+    {
+      "name": "executeLimitWithSwap",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteLimitWithSwapParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeLimitOrder",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteLimitOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeLimitOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "PlaceLimitOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "editLimitOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "EditLimitOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "EditTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "PlaceTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerWithSwap",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteTriggerWithSwapParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerOrder",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteTriggerOrderParams"
+          }
+        }
+      ]
     },
     {
       "name": "levelUp",
@@ -3942,6 +5448,11 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "collateralCustody",
           "isMut": false,
           "isSigner": false
@@ -4197,47 +5708,6 @@ export type Perpetuals = {
       "returns": "u64"
     },
     {
-      "name": "resetCompounding",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "compoundingLpTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "transferAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "compoundingLpTokenMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "renameFlp",
       "accounts": [
         {
@@ -4408,6 +5878,31 @@ export type Perpetuals = {
           {
             "name": "sizeFactorForSpread",
             "type": "u8"
+          },
+          {
+            "name": "null",
+            "type": "u8"
+          },
+          {
+            "name": "reservedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "minReserveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceBufferBps",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           }
         ]
       }
@@ -4594,6 +6089,96 @@ export type Perpetuals = {
           {
             "name": "publishTime",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "order",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "limitOrders",
+            "type": {
+              "array": [
+                {
+                  "defined": "LimitOrder"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "takeProfitOrders",
+            "type": {
+              "array": [
+                {
+                  "defined": "TriggerOrder"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "stopLossOrders",
+            "type": {
+              "array": [
+                {
+                  "defined": "TriggerOrder"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "isInitialised",
+            "type": "bool"
+          },
+          {
+            "name": "openOrders",
+            "type": "u8"
+          },
+          {
+            "name": "openSl",
+            "type": "u8"
+          },
+          {
+            "name": "openTp",
+            "type": "u8"
+          },
+          {
+            "name": "inactiveSl",
+            "type": "u8"
+          },
+          {
+            "name": "inactiveTp",
+            "type": "u8"
+          },
+          {
+            "name": "activeOrders",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                8
+              ]
+            }
           }
         ]
       }
@@ -5096,6 +6681,13 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "AddInternalOracleParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "AddLiquidityAndStakeParams",
       "type": {
         "kind": "struct",
@@ -5198,6 +6790,46 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "CancelTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CloseAndSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceWithSlippage",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "minSwapAmountOut",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "ClosePositionParams",
       "type": {
         "kind": "struct",
@@ -5282,6 +6914,138 @@ export type Perpetuals = {
           {
             "name": "depositAmount",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "limitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "triggerPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "deltaSizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteLimitWithSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          },
+          {
+            "name": "orderId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteTriggerWithSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          },
+          {
+            "name": "orderId",
+            "type": "u8"
           }
         ]
       }
@@ -5581,6 +7345,18 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "MigrateFlpParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "compoundingTokenAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "MigrateStakeParams",
       "type": {
         "kind": "struct",
@@ -5621,6 +7397,70 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "PlaceLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "reserveAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlaceTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "triggerPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "deltaSizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "RefreshStakeParams",
       "type": {
         "kind": "struct",
@@ -5634,6 +7474,22 @@ export type Perpetuals = {
         "fields": [
           {
             "name": "amountIn",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RemoveCollateralAndSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "collateralDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minSwapAmountOut",
             "type": "u64"
           }
         ]
@@ -5803,6 +7659,14 @@ export type Perpetuals = {
           {
             "name": "sizeFactorForSpread",
             "type": "u8"
+          },
+          {
+            "name": "minReserveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceBufferBps",
+            "type": "u64"
           }
         ]
       }
@@ -5901,6 +7765,10 @@ export type Perpetuals = {
             "type": {
               "defined": "MarketPermissions"
             }
+          },
+          {
+            "name": "correlation",
+            "type": "bool"
           }
         ]
       }
@@ -6037,6 +7905,54 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "SwapAndAddCollateralParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minCollateralAmountOut",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapAndOpenParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minCollateralAmountOut",
+            "type": "u64"
+          },
+          {
+            "name": "priceWithSlippage",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "SwapFeeInternalParams",
       "type": {
         "kind": "struct",
@@ -6100,6 +8016,22 @@ export type Perpetuals = {
         "fields": [
           {
             "name": "unstakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minReserveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceBufferBps",
             "type": "u64"
           }
         ]
@@ -6228,7 +8160,7 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "removeCollateral",
+            "name": "volatility",
             "type": "u64"
           }
         ]
@@ -6557,7 +8489,11 @@ export type Perpetuals = {
           },
           {
             "name": "maxPriceAgeSec",
-            "type": "u64"
+            "type": "u32"
+          },
+          {
+            "name": "maxBackupAgeSec",
+            "type": "u32"
           }
         ]
       }
@@ -6602,6 +8538,70 @@ export type Perpetuals = {
                 "defined": "BackupOracle"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "LimitOrder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "reserveAmount",
+            "type": "u64"
+          },
+          {
+            "name": "reserveCustodyId",
+            "type": "u8"
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TriggerOrder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "triggerPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "triggerSize",
+            "type": "u64"
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
           }
         ]
       }
@@ -7056,7 +9056,13 @@ export type Perpetuals = {
             "name": "SetTestTime"
           },
           {
+            "name": "UpdateCustody"
+          },
+          {
             "name": "UpdateTokenRatios"
+          },
+          {
+            "name": "AddInternalOracle"
           }
         ]
       }
@@ -7441,6 +9447,171 @@ export type Perpetuals = {
         },
         {
           "name": "tokenInPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "priceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CloseAndSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "duration",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "exitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "profitUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lossUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
           "type": "i32",
           "index": false
         }
@@ -7987,6 +10158,936 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "EditLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "takeProfitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "takeProfitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "takeProfitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "takeProfitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "EditTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "priceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitOrderLogV2",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitWithSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitWithSwapLogV2",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "duration",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "exitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "profitUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lossUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "triggerPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "triggerPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteTriggerWithSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "duration",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "exitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "profitUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lossUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "triggerPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "triggerPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "ForceClosePositionLog",
       "fields": [
         {
@@ -8367,6 +11468,106 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "IncreaseSizeLogV4",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "deltaSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "deltaSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "LiquidateLog",
       "fields": [
         {
@@ -8547,6 +11748,51 @@ export type Perpetuals = {
         {
           "name": "oracleAccountPriceExponent",
           "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MigrateFlpLog",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lpAmountOut",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rewardLpAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rewardPerLpStaked",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lpPriceUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "compoundingPriceUsd",
+          "type": "u64",
           "index": false
         }
       ]
@@ -8767,6 +12013,241 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "OpenPositionLogV4",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PlaceLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "takeProfitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "takeProfitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PlaceTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "priceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "RefreshStakeLog",
       "fields": [
         {
@@ -8777,6 +12258,91 @@ export type Perpetuals = {
         {
           "name": "rewardPerLpStaked",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RemoveCollateralAndSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "deltaCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
           "index": false
         }
       ]
@@ -9097,6 +12663,426 @@ export type Perpetuals = {
         {
           "name": "isStopLoss",
           "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SwapAndAddCollateralLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "receivingCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "deltaCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SwapAndOpenLog",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "receivingCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amountIn",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapAmountOut",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SwapAndOpenLogV2",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "receivingCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amountIn",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapAmountOut",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
           "index": false
         }
       ]
@@ -9471,7 +13457,7 @@ export type Perpetuals = {
     {
       "code": 6012,
       "name": "InvalidMarketState",
-      "msg": "Invalid custody state"
+      "msg": "Invalid Market state"
     },
     {
       "code": 6013,
@@ -9667,6 +13653,36 @@ export type Perpetuals = {
       "code": 6051,
       "name": "ExposureLimitExceeded",
       "msg": "Max exposure limit exceeded for the market"
+    },
+    {
+      "code": 6052,
+      "name": "MaxStopLossOrders",
+      "msg": "Stop Loss limit exhausted"
+    },
+    {
+      "code": 6053,
+      "name": "MaxTakeProfitOrders",
+      "msg": "Take Profit limit exhausted"
+    },
+    {
+      "code": 6054,
+      "name": "MaxOpenOrder",
+      "msg": "Open order limit exhausted"
+    },
+    {
+      "code": 6055,
+      "name": "InvalidOrder",
+      "msg": "Invalid Order"
+    },
+    {
+      "code": 6056,
+      "name": "InvalidLimitPrice",
+      "msg": "Invalid Limit price"
+    },
+    {
+      "code": 6057,
+      "name": "MinReserve",
+      "msg": "Minimum reserve limit breached"
     }
   ]
 };
@@ -9916,6 +13932,50 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "addInternalOracle",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "intOracleAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "AddInternalOracleParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "addCollection",
       "accounts": [
         {
@@ -10239,7 +14299,7 @@ export const IDL: Perpetuals = {
       "accounts": [
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -10255,6 +14315,11 @@ export const IDL: Perpetuals = {
         {
           "name": "custody",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -10376,6 +14441,16 @@ export const IDL: Perpetuals = {
         {
           "name": "market",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -10511,6 +14586,45 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawSolFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "updateCustody",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpdateCustodyParams"
           }
         }
       ],
@@ -11073,6 +15187,355 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": "u64"
+    },
+    {
+      "name": "swapAndAddCollateral",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapAndAddCollateralParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "swapAndOpen",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapAndOpenParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "closeAndSwap",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CloseAndSwapParams"
+          }
+        }
+      ]
     },
     {
       "name": "addLiquidityAndStake",
@@ -11808,6 +16271,104 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "migrateFlp",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "compoundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "flpStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolStakedLpVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolCompoundingLpVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "compoundingTokenMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MigrateFlpParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "migrateStake",
       "accounts": [
         {
@@ -11899,6 +16460,42 @@ export const IDL: Perpetuals = {
           }
         }
       ]
+    },
+    {
+      "name": "migrateTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "compoundFees",
@@ -12466,6 +17063,124 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "removeCollateralAndSwap",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "RemoveCollateralAndSwapParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "removeCollateral",
       "accounts": [
         {
@@ -12736,6 +17451,39 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "cancelTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CancelTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "closePosition",
       "accounts": [
         {
@@ -12927,6 +17675,780 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": "u64"
+    },
+    {
+      "name": "executeLimitWithSwap",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteLimitWithSwapParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeLimitOrder",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteLimitOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeLimitOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "PlaceLimitOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "editLimitOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserveOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reserveCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "EditLimitOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "EditTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "PlaceTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerWithSwap",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dispensingCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteTriggerWithSwapParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerOrder",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "ExecuteTriggerOrderParams"
+          }
+        }
+      ]
     },
     {
       "name": "levelUp",
@@ -13615,6 +19137,11 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "collateralCustody",
           "isMut": false,
           "isSigner": false
@@ -13870,47 +19397,6 @@ export const IDL: Perpetuals = {
       "returns": "u64"
     },
     {
-      "name": "resetCompounding",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "compoundingLpTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "transferAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "compoundingLpTokenMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "renameFlp",
       "accounts": [
         {
@@ -14081,6 +19567,31 @@ export const IDL: Perpetuals = {
           {
             "name": "sizeFactorForSpread",
             "type": "u8"
+          },
+          {
+            "name": "null",
+            "type": "u8"
+          },
+          {
+            "name": "reservedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "minReserveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceBufferBps",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           }
         ]
       }
@@ -14267,6 +19778,96 @@ export const IDL: Perpetuals = {
           {
             "name": "publishTime",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "order",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "limitOrders",
+            "type": {
+              "array": [
+                {
+                  "defined": "LimitOrder"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "takeProfitOrders",
+            "type": {
+              "array": [
+                {
+                  "defined": "TriggerOrder"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "stopLossOrders",
+            "type": {
+              "array": [
+                {
+                  "defined": "TriggerOrder"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "isInitialised",
+            "type": "bool"
+          },
+          {
+            "name": "openOrders",
+            "type": "u8"
+          },
+          {
+            "name": "openSl",
+            "type": "u8"
+          },
+          {
+            "name": "openTp",
+            "type": "u8"
+          },
+          {
+            "name": "inactiveSl",
+            "type": "u8"
+          },
+          {
+            "name": "inactiveTp",
+            "type": "u8"
+          },
+          {
+            "name": "activeOrders",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                8
+              ]
+            }
           }
         ]
       }
@@ -14769,6 +20370,13 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "AddInternalOracleParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "AddLiquidityAndStakeParams",
       "type": {
         "kind": "struct",
@@ -14871,6 +20479,46 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "CancelTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CloseAndSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceWithSlippage",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "minSwapAmountOut",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "ClosePositionParams",
       "type": {
         "kind": "struct",
@@ -14955,6 +20603,138 @@ export const IDL: Perpetuals = {
           {
             "name": "depositAmount",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "limitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "triggerPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "deltaSizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteLimitWithSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          },
+          {
+            "name": "orderId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExecuteTriggerWithSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          },
+          {
+            "name": "orderId",
+            "type": "u8"
           }
         ]
       }
@@ -15254,6 +21034,18 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "MigrateFlpParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "compoundingTokenAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "MigrateStakeParams",
       "type": {
         "kind": "struct",
@@ -15294,6 +21086,70 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "PlaceLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "reserveAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlaceTriggerOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "triggerPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "deltaSizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isStopLoss",
+            "type": "bool"
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "RefreshStakeParams",
       "type": {
         "kind": "struct",
@@ -15307,6 +21163,22 @@ export const IDL: Perpetuals = {
         "fields": [
           {
             "name": "amountIn",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RemoveCollateralAndSwapParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "collateralDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minSwapAmountOut",
             "type": "u64"
           }
         ]
@@ -15476,6 +21348,14 @@ export const IDL: Perpetuals = {
           {
             "name": "sizeFactorForSpread",
             "type": "u8"
+          },
+          {
+            "name": "minReserveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceBufferBps",
+            "type": "u64"
           }
         ]
       }
@@ -15574,6 +21454,10 @@ export const IDL: Perpetuals = {
             "type": {
               "defined": "MarketPermissions"
             }
+          },
+          {
+            "name": "correlation",
+            "type": "bool"
           }
         ]
       }
@@ -15710,6 +21594,54 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "SwapAndAddCollateralParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minCollateralAmountOut",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapAndOpenParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "minCollateralAmountOut",
+            "type": "u64"
+          },
+          {
+            "name": "priceWithSlippage",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "SwapFeeInternalParams",
       "type": {
         "kind": "struct",
@@ -15773,6 +21705,22 @@ export const IDL: Perpetuals = {
         "fields": [
           {
             "name": "unstakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateCustodyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minReserveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceBufferBps",
             "type": "u64"
           }
         ]
@@ -15901,7 +21849,7 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "removeCollateral",
+            "name": "volatility",
             "type": "u64"
           }
         ]
@@ -16230,7 +22178,11 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "maxPriceAgeSec",
-            "type": "u64"
+            "type": "u32"
+          },
+          {
+            "name": "maxBackupAgeSec",
+            "type": "u32"
           }
         ]
       }
@@ -16275,6 +22227,70 @@ export const IDL: Perpetuals = {
                 "defined": "BackupOracle"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "LimitOrder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "reserveAmount",
+            "type": "u64"
+          },
+          {
+            "name": "reserveCustodyId",
+            "type": "u8"
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TriggerOrder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "triggerPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "triggerSize",
+            "type": "u64"
+          },
+          {
+            "name": "receiveCustodyId",
+            "type": "u8"
           }
         ]
       }
@@ -16729,7 +22745,13 @@ export const IDL: Perpetuals = {
             "name": "SetTestTime"
           },
           {
+            "name": "UpdateCustody"
+          },
+          {
             "name": "UpdateTokenRatios"
+          },
+          {
+            "name": "AddInternalOracle"
           }
         ]
       }
@@ -17114,6 +23136,171 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "tokenInPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "priceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CloseAndSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "duration",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "exitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "profitUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lossUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
           "type": "i32",
           "index": false
         }
@@ -17660,6 +23847,936 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "EditLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "takeProfitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "takeProfitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "takeProfitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "takeProfitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "EditTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "priceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitOrderLogV2",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitWithSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteLimitWithSwapLogV2",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "duration",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "exitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "profitUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lossUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "triggerPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "triggerPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteTriggerWithSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "duration",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "exitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "profitUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lossUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "exitFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "triggerPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "triggerPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "ForceClosePositionLog",
       "fields": [
         {
@@ -18040,6 +25157,106 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "IncreaseSizeLogV4",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "deltaSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "deltaSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "LiquidateLog",
       "fields": [
         {
@@ -18220,6 +25437,51 @@ export const IDL: Perpetuals = {
         {
           "name": "oracleAccountPriceExponent",
           "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MigrateFlpLog",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lpAmountOut",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rewardLpAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rewardPerLpStaked",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lpPriceUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "compoundingPriceUsd",
+          "type": "u64",
           "index": false
         }
       ]
@@ -18440,6 +25702,241 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "OpenPositionLogV4",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PlaceLimitOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "limitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "limitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reservePriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "reserveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "reserveUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "stopLossPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "takeProfitPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "takeProfitPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PlaceTriggerOrderLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "priceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "isStopLoss",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "RefreshStakeLog",
       "fields": [
         {
@@ -18450,6 +25947,91 @@ export const IDL: Perpetuals = {
         {
           "name": "rewardPerLpStaked",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RemoveCollateralAndSwapLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "deltaCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
           "index": false
         }
       ]
@@ -18770,6 +26352,426 @@ export const IDL: Perpetuals = {
         {
           "name": "isStopLoss",
           "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SwapAndAddCollateralLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "receivingCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receiveAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "deltaCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalCollateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "finalSizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SwapAndOpenLog",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "receivingCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amountIn",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapAmountOut",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SwapAndOpenLogV2",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "receivingCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetCustodyId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "amountIn",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapAmountOut",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "swapFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "receivingOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountTime",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "targetOracleAccountPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
           "index": false
         }
       ]
@@ -19144,7 +27146,7 @@ export const IDL: Perpetuals = {
     {
       "code": 6012,
       "name": "InvalidMarketState",
-      "msg": "Invalid custody state"
+      "msg": "Invalid Market state"
     },
     {
       "code": 6013,
@@ -19340,6 +27342,36 @@ export const IDL: Perpetuals = {
       "code": 6051,
       "name": "ExposureLimitExceeded",
       "msg": "Max exposure limit exceeded for the market"
+    },
+    {
+      "code": 6052,
+      "name": "MaxStopLossOrders",
+      "msg": "Stop Loss limit exhausted"
+    },
+    {
+      "code": 6053,
+      "name": "MaxTakeProfitOrders",
+      "msg": "Take Profit limit exhausted"
+    },
+    {
+      "code": 6054,
+      "name": "MaxOpenOrder",
+      "msg": "Open order limit exhausted"
+    },
+    {
+      "code": 6055,
+      "name": "InvalidOrder",
+      "msg": "Invalid Order"
+    },
+    {
+      "code": 6056,
+      "name": "InvalidLimitPrice",
+      "msg": "Invalid Limit price"
+    },
+    {
+      "code": 6057,
+      "name": "MinReserve",
+      "msg": "Minimum reserve limit breached"
     }
   ]
 };

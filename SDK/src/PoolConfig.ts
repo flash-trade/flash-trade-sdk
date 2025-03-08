@@ -24,6 +24,7 @@ export interface CustodyConfig {
 export interface MarketConfig {
   marketId: number;
   marketAccount: PublicKey;
+  marketCorrelation: boolean;
   pool: PublicKey;
   targetCustody: PublicKey;
   collateralCustody: PublicKey;
@@ -58,6 +59,7 @@ export class PoolConfig {
     public stakedLpTokenMint: PublicKey,
     public compoundingTokenMint: PublicKey,
     public stakedLpVault: PublicKey,
+    public compoundingLpVault: PublicKey,
     public lpDecimals: number,
     public compoundingLpTokenSymbol: string,
     public stakedLpTokenSymbol: string,
@@ -125,6 +127,17 @@ export class PoolConfig {
   ): PublicKey {
     return PublicKey.findProgramAddressSync([
       Buffer.from("position"),
+      owner.toBuffer(),
+      marketAccount.toBuffer(),
+    ], this.programId)[0]
+  }
+
+  public getOrderFromMarketPk(
+    owner: PublicKey,
+    marketAccount : PublicKey,
+  ): PublicKey {
+    return PublicKey.findProgramAddressSync([
+      Buffer.from("order"),
       owner.toBuffer(),
       marketAccount.toBuffer(),
     ], this.programId)[0]
@@ -266,6 +279,7 @@ export class PoolConfig {
         return {
           ...i,
           marketAccount: new PublicKey(i.marketAccount),
+          marketCorrelation : i.marketCorrelation,
           pool: new PublicKey(i.pool),
           targetCustody: new PublicKey(i.targetCustody),
           collateralCustody: new PublicKey(i.collateralCustody),
@@ -289,6 +303,7 @@ export class PoolConfig {
       new PublicKey(poolConfig.stakedLpTokenMint),
       new PublicKey(poolConfig.compoundingTokenMint),
       new PublicKey(poolConfig.stakedLpVault),
+      new PublicKey(poolConfig.compoundingLpVault),
       poolConfig.lpDecimals,
       poolConfig.compoundingLpTokenSymbol,
       poolConfig.stakedLpTokenSymbol,
