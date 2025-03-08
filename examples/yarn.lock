@@ -344,7 +344,28 @@
   dependencies:
     buffer "^6.0.3"
 
-"@solana/web3.js@^1.32.0", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.70.1", "@solana/web3.js@^1.95.3":
+"@solana/web3.js@=1.95.8":
+  version "1.95.8"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.95.8.tgz#2d49abda23f7a79a3cc499ab6680f7be11786ee1"
+  integrity sha512-sBHzNh7dHMrmNS5xPD1d0Xa2QffW/RXaxu/OysRXBfwTp+LYqGGmMtCYYwrHPrN5rjAmJCsQRNAwv4FM0t3B6g==
+  dependencies:
+    "@babel/runtime" "^7.25.0"
+    "@noble/curves" "^1.4.2"
+    "@noble/hashes" "^1.4.0"
+    "@solana/buffer-layout" "^4.0.1"
+    agentkeepalive "^4.5.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.2.1"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.3"
+    fast-stable-stringify "^1.0.0"
+    jayson "^4.1.1"
+    node-fetch "^2.7.0"
+    rpc-websockets "^9.0.2"
+    superstruct "^2.0.2"
+
+"@solana/web3.js@^1.32.0", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.95.3":
   version "1.95.3"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.95.3.tgz#70b5f4d76823f56b5af6403da51125fffeb65ff3"
   integrity sha512-O6rPUN0w2fkNqx/Z3QJMB9L225Ex10PRDH8bTaIUPZXMPV0QP8ZpPvjQnXK+upUczlRgzHzd6SjKIha1p+I6og==
@@ -772,16 +793,16 @@ file-uri-to-path@1.0.0:
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
   integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
 
-flash-sdk@^2.13.3:
-  version "2.13.3"
-  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-2.13.3.tgz#7efd9f154f559bbaa698951333094dd023e004a4"
-  integrity sha512-aVboWMQqcfz/iXswIxBOutDvvcwEO/lEzjDiLP0Z2TChrFWzz0UvDHaUUGvuxx9aBeYwceWZLLb3zX9dfDLWLw==
+flash-sdk@^2.33.3:
+  version "2.33.3"
+  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-2.33.3.tgz#2451f768859c3db8ae0e12b9550e3d2d98f6c545"
+  integrity sha512-Lg/QQqJifcFzaxxHTdTd5lcYH2HdD3El7CWPZnlsPpjF4UH6zJSsb9tOt/T8Az6EzO+5Jgkm9nmEKhIT9s/DUg==
   dependencies:
     "@coral-xyz/anchor" "^0.27.0"
     "@pythnetwork/client" "^2.19.0"
     "@pythnetwork/price-service-client" "^1.8.2"
     "@solana/spl-token" "^0.3.6"
-    "@solana/web3.js" "^1.70.1"
+    "@solana/web3.js" "=1.95.8"
     "@types/node" "^20.0.0"
     bignumber.js "^9.1.2"
     bs58 "^5.0.0"

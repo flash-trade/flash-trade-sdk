@@ -40,7 +40,9 @@ const addLiquidityAndStake = async () => {
 
     await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
-    const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFee(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
+
+    // flash-sdk version >= 2.31.6
+    const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFeeView(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
 
     const minLpAmountOutAfterSlippage = minLpAmountOut
         .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
@@ -75,7 +77,8 @@ const addCompoundingLiquidity = async () => {
 
     await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
-    const { amount: minLpAmountOut, fee } = await flashClient.getSFLPAddLiquidityAmountAndFee(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
+    // flash-sdk version >= 2.31.6
+    const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFeeView(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
 
     const minLpAmountOutAfterSlippage = minLpAmountOut
         .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
@@ -118,7 +121,9 @@ const removeSflpLiquidity = async () => {
         flpStakeAccount?.stakeStats.activeAmount.add(flpStakeAccount?.stakeStats.pendingActivation) ??
         BN_ZERO
 
-    const { amount: minTokenAmountOut, fee } = await flashClient.getRemoveLiquidityAmountAndFee(flpWithPendingAndActive, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
+
+    // flash-sdk version >= 2.31.6
+    const { amount: minTokenAmountOut, fee } = await flashClient.getRemoveLiquidityAmountAndFeeView(flpWithPendingAndActive, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
 
     const { instructions: unstakeInstantInstructions, additionalSigners: unstakeInstantAdditionalSigners } =
         await flashClient.unstakeInstant('USDC', flpWithPendingAndActive, POOL_CONFIG)
@@ -168,7 +173,9 @@ const removeFlpLiquidity = async () => {
     const compoundingTokenBalance = new BN(walletBalance.value.amount)
 
 
-    const { amount: minTokenAmountOut, fee } = await flashClient.getSFLPRemoveLiquidityAmountAndFee(compoundingTokenBalance, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
+    // const { amount: minTokenAmountOut, fee } = await flashClient.getSFLPRemoveLiquidityAmountAndFee(compoundingTokenBalance, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
+    // flash-sdk version >= 2.31.6
+    const { amount: minTokenAmountOut, fee } = await flashClient.getRemoveCompoundingLiquidityAmountAndFeeView(compoundingTokenBalance, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
 
     const minTokenAmountOutAfterSlippage = minTokenAmountOut
         .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
