@@ -289,10 +289,10 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
         outputAmount,
         side,
         POOL_CONFIG,
+        Privilege.Referral, // if you own the nft, set this to Privilege.NFT
         new PublicKey('...'), // nftTradingAccount,
         new PublicKey('...'), // nftRerralAccount
         new PublicKey('...'), // nftRebateTokenAccount
-        Privilege.Referral // if you own the nft, set this to Privilege.NFT
     )
 
     instructions.push(...openPositionData.instructions)
@@ -437,7 +437,7 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
         .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
         .div(new BN(10 ** BPS_DECIMALS))
 
-    const openPositionData = await flashClient.openPositionWithSwap(
+    const openPositionData = await flashClient.swapAndOpen(
         outputToken.symbol,
         outputToken.symbol,
         inputToken.symbol,
@@ -447,11 +447,10 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
         size,
         side,
         POOL_CONFIG,
-        POOL_CONFIG,
+        Privilege.Referral,
         new PublicKey('...'), // nftTradingAccount,
         new PublicKey('...'), // nftRerralAccount
         new PublicKey('...'),
-        Privilege.Referral
     )
 
     instructions.push(...openPositionData.instructions)
@@ -521,7 +520,7 @@ const closePositionWithSwap = async (userRecievingTokenSymbol: string) => {
         .mul(new BN(100 - Number(0.8)))
         .div(new BN(100))
     
-    const closePositionWithSwapData = await flashClient.closePositionWithSwap(
+    const closePositionWithSwapData = await flashClient.closeAndSwap(
         targetToken.symbol,
         userRecievingToken.symbol,
         collateralToken.symbol,
