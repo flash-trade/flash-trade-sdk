@@ -6,12 +6,26 @@ import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connec
 import { getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
 import { PriceData, PythHttpClient, getPythProgramKeyForCluster } from '@pythnetwork/client';
 
-export const RPC_URL = process.env.RPC_URL;
-
 export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
 
+
+export const RPC_URL = process.env.RPC_URL;
+console.log("RPC_URL:>> ", RPC_URL);
+if (!RPC_URL) {
+    throw new Error('RPC_URL is not set');
+}
+
+
+
+
+export const PYTHNET_URL = process.env.PYTHNET_URL!;
+console.log("PYTHNET_URL:>> ", PYTHNET_URL);
+if (!PYTHNET_URL) {
+    throw new Error('PYTHNET_URL is not set');
+}
+
 const connectionFromPyth = new Connection(
-    process.env.PYTHNET_URL!
+    PYTHNET_URL
 )
 
 const provider: AnchorProvider = AnchorProvider.local(RPC_URL, {
@@ -31,174 +45,7 @@ export const flashClient = new PerpetualsClient(
     }
 )
 
-const addLiquidityAndStake = async () => {
-    const usdcInputAmount = new BN(1_000_000);
-    const usdcCustody = POOL_CONFIG.custodies.find(c => c.symbol === 'USDC')!;
-    const slippageBps: number = 800 // 0.8%
-    let instructions: TransactionInstruction[] = []
-    let additionalSigners: Signer[] = []
 
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
-
-
-    // flash-sdk version >= 2.31.6
-    const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFeeView(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
-
-    const minLpAmountOutAfterSlippage = minLpAmountOut
-        .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
-        .div(new BN(10 ** BPS_DECIMALS))
-
-    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }) // addLiquidity
-
-    const addLiquidityAndStakeData = await flashClient.addLiquidityAndStake('USDC', usdcInputAmount, minLpAmountOutAfterSlippage, POOL_CONFIG);
-    instructions.push(...addLiquidityAndStakeData.instructions)
-    additionalSigners.push(...addLiquidityAndStakeData.additionalSigners)
-
-    const flpStakeAccountPK = PublicKey.findProgramAddressSync(
-        [Buffer.from('stake'), flashClient.provider.publicKey.toBuffer(), POOL_CONFIG.poolAddress.toBuffer()],
-        POOL_CONFIG.programId
-    )[0]
-
-    const refreshStakeInstruction = await flashClient.refreshStake('USDC', POOL_CONFIG, [flpStakeAccountPK])
-
-    instructions.push(refreshStakeInstruction)
-
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-
-    console.log('addLiquidityAndStake trx :>> ', trxId);
-}
-
-const addCompoundingLiquidity = async () => {
-    const usdcInputAmount = new BN(1_000_000);
-    const usdcCustody = POOL_CONFIG.custodies.find(c => c.symbol === 'USDC')!;
-    const slippageBps: number = 800 // 0.8%
-    let instructions: TransactionInstruction[] = []
-    let additionalSigners: Signer[] = []
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
-
-    // flash-sdk version >= 2.31.6
-    const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFeeView(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
-
-    const minLpAmountOutAfterSlippage = minLpAmountOut
-        .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
-        .div(new BN(10 ** BPS_DECIMALS))
-
-    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }) // addLiquidity
-
-    const addCompoundingLiquidityData = await flashClient.addCompoundingLiquidity(
-        usdcInputAmount,
-        minLpAmountOutAfterSlippage,
-        'USDC',
-        usdcCustody.mintKey,
-        POOL_CONFIG
-    )
-
-    instructions.push(...addCompoundingLiquidityData.instructions)
-    additionalSigners.push(...addCompoundingLiquidityData.additionalSigners)
-
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-
-    console.log('addCompoundingLiquidity trx :>> ', trxId);
-}
-
-const removeSflpLiquidity = async () => {
-    const usdcCustody = POOL_CONFIG.custodies.find(c => c.symbol === 'USDC')!;
-    const slippageBps: number = 800 // 0.8%
-    let instructions: TransactionInstruction[] = []
-    let additionalSigners: Signer[] = []
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
-
-    const flpStakeAccountPK = PublicKey.findProgramAddressSync(
-        [Buffer.from('stake'), flashClient.provider.publicKey.toBuffer(), POOL_CONFIG.poolAddress.toBuffer()],
-        POOL_CONFIG.programId
-    )[0]
-
-    const flpStakeAccount = await flashClient.program.account.flpStake.fetch(flpStakeAccountPK);
-
-    const flpWithPendingAndActive =
-        flpStakeAccount?.stakeStats.activeAmount.add(flpStakeAccount?.stakeStats.pendingActivation) ??
-        BN_ZERO
-
-
-    // flash-sdk version >= 2.31.6
-    const { amount: minTokenAmountOut, fee } = await flashClient.getRemoveLiquidityAmountAndFeeView(flpWithPendingAndActive, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
-
-    const { instructions: unstakeInstantInstructions, additionalSigners: unstakeInstantAdditionalSigners } =
-        await flashClient.unstakeInstant('USDC', flpWithPendingAndActive, POOL_CONFIG)
-
-    const { instructions: withdrawStakeInstructions, additionalSigners: withdrawStakeAdditionalSigners } =
-        await flashClient.withdrawStake(POOL_CONFIG, true, true)
-
-    instructions.push(...unstakeInstantInstructions)
-    additionalSigners.push(...unstakeInstantAdditionalSigners)
-
-    instructions.push(...withdrawStakeInstructions)
-    additionalSigners.push(...withdrawStakeAdditionalSigners)
-
-    const minTokenAmountOutAfterSlippage = minTokenAmountOut
-        .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
-        .div(new BN(10 ** BPS_DECIMALS))
-
-    const removeLiquidityData = await flashClient.removeLiquidity(
-        'USDC',
-        flpWithPendingAndActive,
-        minTokenAmountOutAfterSlippage,
-        POOL_CONFIG
-    )
-
-    instructions.push(...removeLiquidityData.instructions)
-    additionalSigners.push(...removeLiquidityData.additionalSigners)
-
-    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }) // addLiquidity
-
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-
-    console.log('trx :>> ', trxId);
-}
-
-const removeFlpLiquidity = async () => {
-    const usdcCustody = POOL_CONFIG.custodies.find(c => c.symbol === 'USDC')!;
-    const slippageBps: number = 800 // 0.8%
-    let instructions: TransactionInstruction[] = []
-    let additionalSigners: Signer[] = []
-    const usdcToken = POOL_CONFIG.tokens.find(t => t.symbol === 'USDC')!;
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
-
-    const account = getAssociatedTokenAddressSync(POOL_CONFIG.compoundingTokenMint, flashClient.provider.publicKey, true)
-
-    const walletBalance = await flashClient.provider.connection.getTokenAccountBalance(account, 'processed')
-    const compoundingTokenBalance = new BN(walletBalance.value.amount)
-
-
-    // const { amount: minTokenAmountOut, fee } = await flashClient.getSFLPRemoveLiquidityAmountAndFee(compoundingTokenBalance, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
-    // flash-sdk version >= 2.31.6
-    const { amount: minTokenAmountOut, fee } = await flashClient.getRemoveCompoundingLiquidityAmountAndFeeView(compoundingTokenBalance, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
-
-    const minTokenAmountOutAfterSlippage = minTokenAmountOut
-        .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
-        .div(new BN(10 ** BPS_DECIMALS))
-
-    const removeCompoundingLiquidityData = await flashClient.removeCompoundingLiquidity(
-        compoundingTokenBalance,
-        minTokenAmountOutAfterSlippage,
-        'USDC',
-        usdcToken.mintKey,
-        POOL_CONFIG,
-        true
-    )
-
-    instructions.push(...removeCompoundingLiquidityData.instructions)
-    additionalSigners.push(...removeCompoundingLiquidityData.additionalSigners)
-
-    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }) // addLiquidity
-
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-
-    console.log('trx :>> ', trxId);
-}
 
 const pythClient = new PythHttpClient(connectionFromPyth, getPythProgramKeyForCluster('pythnet'))
 
@@ -289,10 +136,10 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
         outputAmount,
         side,
         POOL_CONFIG,
-        Privilege.Referral, // if you own the nft, set this to Privilege.NFT
-        new PublicKey('...'), // nftTradingAccount,
-        new PublicKey('...'), // nftRerralAccount
-        new PublicKey('...'), // nftRebateTokenAccount
+        Privilege.None, //Privilege.Referral, // if you own the nft, set this to Privilege.NFT
+        // new PublicKey('...'), // nftTradingAccount,
+        // new PublicKey('...'), // nftRerralAccount
+        // new PublicKey('...'), // nftRebateTokenAccount
     )
 
     instructions.push(...openPositionData.instructions)
@@ -330,10 +177,10 @@ const closePosition = async (targetTokenSymbol: string, side: Side) => {
         priceAfterSlippage,
         side,
         POOL_CONFIG,
-        new PublicKey('...'), // nftTradingAccount,
-        new PublicKey('...'), // nftRerralAccount
-        new PublicKey('...'), // nftRebateTokenAccount
-        Privilege.Referral
+        Privilege.None, // Privilege.Referral, // if you own the nft, set this to Privilege.NFT
+        // new PublicKey('...'), // nftTradingAccount,
+        // new PublicKey('...'), // nftRerralAccount
+        // new PublicKey('...'), // nftRebateTokenAccount
     )
 
     instructions.push(...openPositionData.instructions)
@@ -447,10 +294,10 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
         size,
         side,
         POOL_CONFIG,
-        Privilege.Referral,
-        new PublicKey('...'), // nftTradingAccount,
-        new PublicKey('...'), // nftRerralAccount
-        new PublicKey('...'),
+        Privilege.None, //Privilege.Referral,
+        // new PublicKey('...'), // nftTradingAccount,
+        // new PublicKey('...'), // nftRerralAccount
+        // new PublicKey('...'),
     )
 
     instructions.push(...openPositionData.instructions)
@@ -462,7 +309,7 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
     console.log('trx :>> ', trxId);
 }
 
-const closePositionWithSwap = async (userRecievingTokenSymbol: string) => {  
+const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingTokenSymbol: string) => {  
     const slippageBps: number = 800 // 0.8%
 
     const instructions: TransactionInstruction[] = []
@@ -470,7 +317,10 @@ const closePositionWithSwap = async (userRecievingTokenSymbol: string) => {
 
     const positions = await flashClient.getUserPositions(flashClient.provider.publicKey, POOL_CONFIG);
 
-    const positionToClose = positions[1];
+    const positionToClose =  positions.find(p => p.pubkey.equals(positionPubKey));
+    if(!positionToClose){
+        throw new Error('position not found')
+    }
 
     const marketConfig = POOL_CONFIG.markets.find(f => f.marketAccount.equals(positionToClose.market))!;
 
@@ -528,11 +378,10 @@ const closePositionWithSwap = async (userRecievingTokenSymbol: string) => {
         priceAfterSlippage,
         side,
         POOL_CONFIG,
-        POOL_CONFIG,
-        new PublicKey('...'), // nftTradingAccount,
-        new PublicKey('...'), // nftRerralAccount
-        new PublicKey('...'),
-        Privilege.Referral
+        Privilege.None, //Privilege.Referral,
+        // new PublicKey('...'), // nftTradingAccount,
+        // new PublicKey('...'), // nftRerralAccount
+        // new PublicKey('...'),
     )
 
     instructions.push(...closePositionWithSwapData.instructions)
@@ -544,10 +393,31 @@ const closePositionWithSwap = async (userRecievingTokenSymbol: string) => {
     console.log('trx :>> ', trxId);
 }
 
-const getLpTokenPrices = async () => {
-    const stakedLpPrice = await flashClient.getStakedLpTokenPrice(POOL_CONFIG.poolAddress, POOL_CONFIG); // sFLP price
-    const compoundingLPTokenPrice = await flashClient.getCompoundingLPTokenPrice(POOL_CONFIG.poolAddress, POOL_CONFIG); // FLP price
 
-    console.log('stakedLpPrice :>> ', stakedLpPrice);
-    console.log('compoundingLPTokenPrice :>> ', compoundingLPTokenPrice);
-}
+
+(async () => {
+
+    console.log(" testing... uncomment below to test");
+
+    //  await openPosition('SOL', 'SOL', '0.1', Side.Long)
+    //  console.log("openPosition done");
+
+    // await closePosition('SOL', Side.Long);
+    // console.log("closePosition done");
+
+    // NOTE use openPositionWithSwap only when you want to swap and open 
+    // await openPositionWithSwap('USDC', 'SOL', '2', Side.Long)
+    // console.log("openPositionWithSwap done");
+
+
+    // const positions = await flashClient.getUserPositions(flashClient.provider.publicKey, POOL_CONFIG);
+    // if(!positions.length){
+    //      throw new Error('no positions to close');
+    // }
+    // const closePositionPubKey = positions[0].pubkey
+    // // NOTE use closePositionWithSwap only when you want to close and swap 
+    // await closePositionWithSwap(closePositionPubKey, 'USDC')
+    //  console.log("closePositionWithSwap done");
+
+   
+})()
