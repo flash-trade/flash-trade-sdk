@@ -73,7 +73,7 @@ const addLiquidityAndStake = async () => {
 const addCompoundingLiquidity = async () => {
     const usdcInputAmount = new BN(1_000_000);
     const usdcCustody = POOL_CONFIG.custodies.find(c => c.symbol === 'USDC')!;
-    const slippageBps: number = 800 // 0.8%
+    const slippageBps: number = 700 // 0.7%
     let instructions: TransactionInstruction[] = []
     let additionalSigners: Signer[] = []
 
@@ -96,7 +96,8 @@ const addCompoundingLiquidity = async () => {
             minLpAmountOutAfterSlippage,
             'USDC',
             usdcCustody.mintKey,
-            POOL_CONFIG
+            POOL_CONFIG,
+            false
         )
     
         instructions.push(...addCompoundingLiquidityData.instructions)
