@@ -23,6 +23,12 @@ cp .env.example .env
 yarn
 ```
 6. Run the script
+for LP interactions 
 ```
-npx ts-node src/index.ts
+npx ts-node src/liquidity.ts
+```
+
+for Trade interactions 
+```
+npx ts-node src/trade.ts
 ```
