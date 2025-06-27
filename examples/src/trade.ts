@@ -394,6 +394,25 @@ const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingT
 }
 
 
+const getLiquidationPrice = async (positionPubKey : PublicKey) => {
+   
+    const data =  await flashClient.getLiquidationPriceView(positionPubKey, POOL_CONFIG)
+    if(!data){
+        throw new Error('position not found')
+    }
+
+     const LiqOraclePrice = OraclePrice.from({
+                        price: data.price,
+                        exponent: new BN(data.exponent),
+                        confidence: new BN(0),
+                        timestamp: new BN(0),
+                    })
+
+    console.log('price :>> ', LiqOraclePrice.toUiPrice(6) );
+    return LiqOraclePrice.toUiPrice(6) // 6 is the decimals precision for liquidation price, you can change it based on your needs
+}
+
+
 
 (async () => {
 
@@ -419,5 +438,6 @@ const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingT
     // await closePositionWithSwap(closePositionPubKey, 'USDC')
     //  console.log("closePositionWithSwap done");
 
-   
+    // await getLiquidationPrice(new PublicKey('4hXHkgakfMxRo1TMYbT6iFUET7748VYs9CY8GVjZsDT1'));
+
 })()
