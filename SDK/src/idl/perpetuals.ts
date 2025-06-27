@@ -252,7 +252,7 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -334,6 +334,11 @@ export type Perpetuals = {
           "isSigner": true
         },
         {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "multisig",
           "isMut": true,
           "isSigner": false
@@ -359,6 +364,11 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "custodyTokenAccount",
           "isMut": true,
           "isSigner": false
@@ -370,6 +380,11 @@ export type Perpetuals = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -522,7 +537,7 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -737,6 +752,35 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setProtocolFeeShare",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolVault",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetProtocolFeeShareParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "setMarketConfig",
       "accounts": [
         {
@@ -805,6 +849,113 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setTokenReward",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetTokenRewardParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setTokenStakeLevel",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetTokenStakeLevelParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setTokenVaultConfig",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetTokenVaultConfigParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "withdrawFees",
       "accounts": [
         {
@@ -828,17 +979,12 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "pool",
+          "name": "protocolVault",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custodyTokenAccount",
+          "name": "protocolTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -858,6 +1004,60 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "withdrawInstantFees",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawInstantFeesParams"
           }
         }
       ],
@@ -1123,6 +1323,149 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "InitCompoundingParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "initRevenueTokenAccount",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "revenueTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitRevenueTokenAccountParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "initTokenVault",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitTokenVaultParams"
           }
         }
       ],
@@ -2218,6 +2561,138 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "depositTokenStake",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DepositTokenStakeParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "distributeTokenReward",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DistributeTokenRewardParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "depositStake",
       "accounts": [
         {
@@ -2450,6 +2925,132 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "withdrawToken",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawTokenParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "collectRevenue",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingRevenueAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "revenueTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CollectRevenueParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "collectStakeFees",
       "accounts": [
         {
@@ -2529,6 +3130,69 @@ export type Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "collectTokenReward",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CollectTokenRewardParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "unstakeRequest",
       "accounts": [
         {
@@ -2577,6 +3241,107 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "UnstakeRequestParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unstakeTokenInstant",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UnstakeTokenInstantParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unstakeTokenRequest",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UnstakeTokenRequestParams"
           }
         }
       ]
@@ -2809,6 +3574,72 @@ export type Perpetuals = {
       "args": []
     },
     {
+      "name": "moveProtocolFees",
+      "accounts": [
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "revenueTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "compoundFees",
       "accounts": [
         {
@@ -2984,11 +3815,6 @@ export type Perpetuals = {
       "name": "createTradingAccount",
       "accounts": [
         {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "feePayer",
           "isMut": true,
           "isSigner": true
@@ -3001,11 +3827,6 @@ export type Perpetuals = {
         {
           "name": "nftMint",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftTokenAccount",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -3085,7 +3906,7 @@ export type Perpetuals = {
           "isSigner": true
         },
         {
-          "name": "tradingAccount",
+          "name": "tokenStakeAccount",
           "isMut": false,
           "isSigner": false
         },
@@ -3762,6 +4583,32 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "cancelAllTriggerOrders",
+      "accounts": [
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelTriggerOrder",
       "accounts": [
         {
@@ -3790,6 +4637,44 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "CancelTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancelUnstakeTokenRequest",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CancelUnstakeTokenRequestParams"
           }
         }
       ]
@@ -3991,8 +4876,18 @@ export type Perpetuals = {
       "name": "executeLimitWithSwap",
       "accounts": [
         {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "feePayer",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -4051,6 +4946,11 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -4089,9 +4989,19 @@ export type Perpetuals = {
       "name": "executeLimitOrder",
       "accounts": [
         {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "feePayer",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "perpetuals",
@@ -4136,6 +5046,11 @@ export type Perpetuals = {
         {
           "name": "collateralOracleAccount",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -4239,6 +5154,11 @@ export type Perpetuals = {
         {
           "name": "reserveCustodyTokenAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiveCustody",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -4350,6 +5270,11 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "receiveCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -4429,6 +5354,11 @@ export type Perpetuals = {
         },
         {
           "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receiveCustody",
           "isMut": false,
           "isSigner": false
         },
@@ -4516,6 +5446,11 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "receiveCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -4548,6 +5483,11 @@ export type Perpetuals = {
     {
       "name": "executeTriggerWithSwap",
       "accounts": [
+        {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "feePayer",
           "isMut": true,
@@ -4666,6 +5606,11 @@ export type Perpetuals = {
     {
       "name": "executeTriggerOrder",
       "accounts": [
+        {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "feePayer",
           "isMut": true,
@@ -5708,6 +6653,204 @@ export type Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "getPositionQuote",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetPositionQuoteParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "QuoteData"
+      }
+    },
+    {
+      "name": "getAddCollateralQuote",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetAddCollateralQuoteParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "GetAddCollateralQuoteData"
+      }
+    },
+    {
+      "name": "getClosePositionQuote",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetClosePositionQuoteParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "CloseQuoteData"
+      }
+    },
+    {
       "name": "renameFlp",
       "accounts": [
         {
@@ -5775,6 +6918,227 @@ export type Perpetuals = {
         }
       ],
       "returns": "u8"
+    },
+    {
+      "name": "burnAndClaim",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tradingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "BurnAndClaimParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "burnAndStake",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tradingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "BurnAndStakeParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -5880,7 +7244,7 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "null",
+            "name": "uid",
             "type": "u8"
           },
           {
@@ -5940,7 +7304,7 @@ export type Perpetuals = {
           },
           {
             "name": "isInitialized",
-            "type": "bool"
+            "type": "u8"
           },
           {
             "name": "bump",
@@ -5997,12 +7361,30 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "targetCustodyId",
-            "type": "u64"
+            "name": "targetCustodyUid",
+            "type": "u8"
           },
           {
-            "name": "collateralCustodyId",
-            "type": "u64"
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
+            "name": "collateralCustodyUid",
+            "type": "u8"
+          },
+          {
+            "name": "padding2",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "bump",
@@ -6231,7 +7613,7 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "referralDiscount",
+            "name": "defaultRebate",
             "type": "u64"
           },
           {
@@ -6347,11 +7729,15 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
+            "name": "uniqueCustodyCount",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                4
+                3
               ]
             }
           },
@@ -6488,6 +7874,51 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "protocolVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          },
+          {
+            "name": "feeShareBps",
+            "type": "u64"
+          },
+          {
+            "name": "feeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "referral",
       "type": {
         "kind": "struct",
@@ -6501,7 +7932,7 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "refererTradingAccount",
+            "name": "refererTokenStakeAccount",
             "type": "publicKey"
           },
           {
@@ -6510,6 +7941,209 @@ export type Perpetuals = {
           },
           {
             "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenStake",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "withdrawRequestCount",
+            "type": "u8"
+          },
+          {
+            "name": "withdrawRequest",
+            "type": {
+              "array": [
+                {
+                  "defined": "WithdrawRequest"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "updateTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "tradeTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "tradeCounter",
+            "type": "u32"
+          },
+          {
+            "name": "lastRewardEpochCount",
+            "type": "u32"
+          },
+          {
+            "name": "rewardTokens",
+            "type": "u64"
+          },
+          {
+            "name": "unclaimedRevenueAmount",
+            "type": "u64"
+          },
+          {
+            "name": "revenueSnapshot",
+            "type": "u128"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                1
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenVaultTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenPermissions",
+            "type": {
+              "defined": "TokenPermissions"
+            }
+          },
+          {
+            "name": "withdrawTimeLimit",
+            "type": "i64"
+          },
+          {
+            "name": "withdrawInstantFee",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawInstantFeeEarned",
+            "type": "u64"
+          },
+          {
+            "name": "stakeLevel",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "tokensStaked",
+            "type": {
+              "defined": "StakeStats"
+            }
+          },
+          {
+            "name": "rewardTokensToDistribute",
+            "type": "u128"
+          },
+          {
+            "name": "rewardTokensPaid",
+            "type": "u128"
+          },
+          {
+            "name": "tokensToDistribute",
+            "type": "u128"
+          },
+          {
+            "name": "tokensDistributed",
+            "type": "u128"
+          },
+          {
+            "name": "lastRewardEpochCount",
+            "type": "u32"
+          },
+          {
+            "name": "rewardTokensDistributed",
+            "type": "u128"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u32",
+                3
+              ]
+            }
+          },
+          {
+            "name": "revenueTokenAccountBump",
+            "type": "u8"
+          },
+          {
+            "name": "revenuePerFafStaked",
+            "type": "u64"
+          },
+          {
+            "name": "revenueAccrued",
+            "type": "u128"
+          },
+          {
+            "name": "revenueDistributed",
+            "type": "u128"
+          },
+          {
+            "name": "revenuePaid",
+            "type": "u128"
+          },
+          {
+            "name": "padding2",
             "type": {
               "array": [
                 "u64",
@@ -6574,11 +8208,19 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "tokenStakeAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "burnt",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
-                "u64",
-                6
+                "u8",
+                15
               ]
             }
           }
@@ -6790,6 +8432,20 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "BurnAndClaimParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "BurnAndStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "CancelTriggerOrderParams",
       "type": {
         "kind": "struct",
@@ -6801,6 +8457,18 @@ export type Perpetuals = {
           {
             "name": "isStopLoss",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CancelUnstakeTokenRequestParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "withdrawRequestId",
+            "type": "u8"
           }
         ]
       }
@@ -6850,7 +8518,21 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "CollectRevenueParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "CollectStakeRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "CollectTokenRewardParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -6919,6 +8601,34 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "DepositTokenStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "depositAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DistributeTokenRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "epochCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "EditLimitOrderParams",
       "type": {
         "kind": "struct",
@@ -6948,10 +8658,6 @@ export type Perpetuals = {
             "type": {
               "defined": "OraclePrice"
             }
-          },
-          {
-            "name": "receiveCustodyId",
-            "type": "u8"
           }
         ]
       }
@@ -7030,6 +8736,12 @@ export type Perpetuals = {
           {
             "name": "orderId",
             "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
           }
         ]
       }
@@ -7046,6 +8758,12 @@ export type Perpetuals = {
           {
             "name": "orderId",
             "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
           }
         ]
       }
@@ -7064,6 +8782,124 @@ export type Perpetuals = {
           {
             "name": "isStopLoss",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetAddCollateralQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "collateralDelta",
+            "type": "u64"
+          },
+          {
+            "name": "finalCollateralAmount",
+            "type": "u64"
+          },
+          {
+            "name": "finalCollateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "finalSizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "finalSizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "finalAvgEntryPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "passesMinCollateralCheck",
+            "type": "bool"
+          },
+          {
+            "name": "passesLeverageCheck",
+            "type": "bool"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "receivingCustodyId",
+            "type": "u64"
+          },
+          {
+            "name": "swapPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "swapFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "swapFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "swapPossible",
+            "type": "bool"
+          },
+          {
+            "name": "increaseSizeEntryPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "increaseSizeFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "increaseSizeFeeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetAddCollateralQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "isIncreaseSize",
+            "type": "bool"
+          },
+          {
+            "name": "sizeDelta",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
           }
         ]
       }
@@ -7097,6 +8933,84 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "CloseQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "exitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "collateralReturn",
+            "type": "u64"
+          },
+          {
+            "name": "feeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "feeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "pnlAmount",
+            "type": "u64"
+          },
+          {
+            "name": "pnlUsd",
+            "type": "u64"
+          },
+          {
+            "name": "isProfitable",
+            "type": "bool"
+          },
+          {
+            "name": "remainingCollateral",
+            "type": "u64"
+          },
+          {
+            "name": "remainingSize",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetClosePositionQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "closeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
       }
     },
     {
@@ -7182,6 +9096,34 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "GetPositionQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
       }
     },
     {
@@ -7273,6 +9215,18 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "InitRevenueTokenAccountParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeShareBps",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitStakingParams",
       "type": {
         "kind": "struct",
@@ -7280,6 +9234,41 @@ export type Perpetuals = {
           {
             "name": "stakingFeeShareBps",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitTokenVaultParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenPermissions",
+            "type": {
+              "defined": "TokenPermissions"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawTimeLimit",
+            "type": "i64"
+          },
+          {
+            "name": "withdrawInstantFee",
+            "type": "u64"
+          },
+          {
+            "name": "stakeLevel",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
           }
         ]
       }
@@ -7324,7 +9313,7 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "referralDiscount",
+            "name": "defaultRebate",
             "type": "u64"
           }
         ]
@@ -7426,10 +9415,6 @@ export type Perpetuals = {
             "type": {
               "defined": "OraclePrice"
             }
-          },
-          {
-            "name": "receiveCustodyId",
-            "type": "u8"
           }
         ]
       }
@@ -7452,10 +9437,6 @@ export type Perpetuals = {
           {
             "name": "isStopLoss",
             "type": "bool"
-          },
-          {
-            "name": "receiveCustodyId",
-            "type": "u8"
           }
         ]
       }
@@ -7815,7 +9796,7 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "referralDiscount",
+            "name": "defaultRebate",
             "type": "u64"
           },
           {
@@ -7875,6 +9856,18 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "SetProtocolFeeShareParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeShareBps",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SetTestTimeParams",
       "type": {
         "kind": "struct",
@@ -7882,6 +9875,65 @@ export type Perpetuals = {
           {
             "name": "time",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetTokenRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "epochCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetTokenStakeLevelParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "level",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetTokenVaultConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenPermissions",
+            "type": {
+              "defined": "TokenPermissions"
+            }
+          },
+          {
+            "name": "withdrawTimeLimit",
+            "type": "i64"
+          },
+          {
+            "name": "withdrawInstantFee",
+            "type": "u64"
+          },
+          {
+            "name": "stakeLevel",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
           }
         ]
       }
@@ -8022,6 +10074,30 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "UnstakeTokenInstantParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unstakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnstakeTokenRequestParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unstakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateCustodyParams",
       "type": {
         "kind": "struct",
@@ -8077,6 +10153,13 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "WithdrawInstantFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "WithdrawSolFeesParams",
       "type": {
         "kind": "struct",
@@ -8100,6 +10183,18 @@ export type Perpetuals = {
           {
             "name": "deactivated",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawTokenParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "withdrawRequestId",
+            "type": "u8"
           }
         ]
       }
@@ -8558,11 +10653,11 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "reserveCustodyId",
+            "name": "reserveCustodyUid",
             "type": "u8"
           },
           {
-            "name": "receiveCustodyId",
+            "name": "receiveCustodyUid",
             "type": "u8"
           },
           {
@@ -8600,7 +10695,7 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "receiveCustodyId",
+            "name": "receiveCustodyUid",
             "type": "u8"
           }
         ]
@@ -8717,6 +10812,82 @@ export type Perpetuals = {
           },
           {
             "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "liquidationPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "collateralAmount",
+            "type": "u64"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "entryPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "totalFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "totalFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "entryFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "entryFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "volatilityFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "volatilityFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "swapFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "swapFeeUsd",
             "type": "u64"
           },
           {
@@ -8911,6 +11082,42 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "WithdrawRequest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pendingDeactivation",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawRequestTimestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenPermissions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "allowDeposits",
+            "type": "bool"
+          },
+          {
+            "name": "allowWithdrawal",
+            "type": "bool"
+          },
+          {
+            "name": "allowRewardWithdrawal",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "VoltageStats",
       "type": {
         "kind": "struct",
@@ -9063,6 +11270,36 @@ export type Perpetuals = {
           },
           {
             "name": "AddInternalOracle"
+          },
+          {
+            "name": "RenameFlp"
+          },
+          {
+            "name": "SetFeeShare"
+          },
+          {
+            "name": "InitCompounding"
+          },
+          {
+            "name": "InitTokenVault"
+          },
+          {
+            "name": "SetTokenVaultConfig"
+          },
+          {
+            "name": "WithdrawInstantFees"
+          },
+          {
+            "name": "DistributeTokenReward"
+          },
+          {
+            "name": "SetTokenReward"
+          },
+          {
+            "name": "SetTokenStakeLevel"
+          },
+          {
+            "name": "InitRevenueTokenAccount"
           }
         ]
       }
@@ -9127,10 +11364,54 @@ export type Perpetuals = {
             "name": "None"
           },
           {
-            "name": "NFT"
+            "name": "Stake"
           },
           {
             "name": "Referral"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoltagePointsType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OpenPosition"
+          },
+          {
+            "name": "SwapAndOpen"
+          },
+          {
+            "name": "IncreaseSize"
+          },
+          {
+            "name": "DecreaseSize"
+          },
+          {
+            "name": "CloseAndSwap"
+          },
+          {
+            "name": "ClosePosition"
+          },
+          {
+            "name": "ExecuteLimitOrder"
+          },
+          {
+            "name": "ExecuteLimitWithSwap"
+          },
+          {
+            "name": "ExecuteTriggerOrder"
+          },
+          {
+            "name": "ExecuteTriggerWithSwap"
+          },
+          {
+            "name": "CollectStakeReward"
+          },
+          {
+            "name": "DecreaseAndRemoveCollateral"
           }
         ]
       }
@@ -9276,7 +11557,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -9331,7 +11612,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -9381,7 +11662,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -9416,7 +11697,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -9453,6 +11734,76 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "BurnAndClaimLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "nftMint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "claimAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "BurnAndStakeLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "nftMint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "stakeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "CancelTriggerOrderLog",
       "fields": [
         {
@@ -9481,13 +11832,53 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
         {
           "name": "isStopLoss",
           "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelUnstakeTokenRequestLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
           "index": false
         }
       ]
@@ -9581,7 +11972,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -9823,6 +12214,41 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "CollectRevenueLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "revenueAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lastEpochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "CollectStakeRewardLog",
       "fields": [
         {
@@ -9873,6 +12299,41 @@ export type Perpetuals = {
         {
           "name": "rewardShare",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CollectTokenRewardLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lastEpochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
           "index": false
         }
       ]
@@ -10158,6 +12619,71 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "DepositTokenStakeLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "depositAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "DistributeTokenRewardLog",
+      "fields": [
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "epochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "EditLimitOrderLog",
       "fields": [
         {
@@ -10231,7 +12757,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -10331,7 +12857,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -10391,7 +12917,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -10586,11 +13112,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -10656,7 +13187,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "reserveCustodyId",
+          "name": "reserveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -10766,7 +13297,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "reserveCustodyId",
+          "name": "reserveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -10811,11 +13342,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -11041,7 +13577,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -11843,6 +14379,41 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "MoveProtocolFeesLog",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "revenueAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "protocolFee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "revenueFeeShare",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "OpenPositionLog",
       "fields": [
         {
@@ -12176,7 +14747,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -12236,7 +14807,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -12257,6 +14828,36 @@ export type Perpetuals = {
         },
         {
           "name": "rewardPerLpStaked",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RefreshStakeUserLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "rewardAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rewardMint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "rewardShare",
           "type": "u64",
           "index": false
         }
@@ -12311,7 +14912,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -12486,7 +15087,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -12541,7 +15142,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -12576,7 +15177,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -12608,6 +15209,36 @@ export type Perpetuals = {
         {
           "name": "tokenOutPriceExponent",
           "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SetTokenRewardLog",
+      "fields": [
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "epochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
           "index": false
         }
       ]
@@ -12681,7 +15312,7 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receivingCustodyId",
+          "name": "receivingCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -12766,17 +15397,17 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receivingCustodyId",
+          "name": "receivingCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "collateralCustodyId",
+          "name": "collateralCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "targetCustodyId",
+          "name": "targetCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -12926,17 +15557,17 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "receivingCustodyId",
+          "name": "receivingCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "collateralCustodyId",
+          "name": "collateralCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "targetCustodyId",
+          "name": "targetCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -13101,12 +15732,12 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -13136,12 +15767,12 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -13211,12 +15842,12 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -13256,12 +15887,12 @@ export type Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -13373,6 +16004,86 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "UnstakeTokenInstantLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "withdrawAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "UnstakeTokenRequestLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "unstakeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "WithdrawStakeLog",
       "fields": [
         {
@@ -13388,6 +16099,81 @@ export type Perpetuals = {
         {
           "name": "lpTokens",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "WithdrawTokenLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "withdrawAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "VoltagePointsLog",
+      "fields": [
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "voltagePoints",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rebateUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "voltagePointsType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
           "index": false
         }
       ]
@@ -13631,8 +16417,8 @@ export type Perpetuals = {
     },
     {
       "code": 6047,
-      "name": "TradingAccountMismatch",
-      "msg": "Trading account doesnot match referral account"
+      "name": "TokenStakeAccountMismatch",
+      "msg": "Token Stake account doesnot match referral account"
     },
     {
       "code": 6048,
@@ -13683,6 +16469,16 @@ export type Perpetuals = {
       "code": 6057,
       "name": "MinReserve",
       "msg": "Minimum reserve limit breached"
+    },
+    {
+      "code": 6058,
+      "name": "MaxWithdrawTokenRequest",
+      "msg": "Withdraw Token Request limit exhausted"
+    },
+    {
+      "code": 6059,
+      "name": "InvalidRewardDistribution",
+      "msg": "Invalid Reward Distribution"
     }
   ]
 };
@@ -13941,7 +16737,7 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "multisig",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -14023,6 +16819,11 @@ export const IDL: Perpetuals = {
           "isSigner": true
         },
         {
+          "name": "receivingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "multisig",
           "isMut": true,
           "isSigner": false
@@ -14048,6 +16849,11 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "custodyTokenAccount",
           "isMut": true,
           "isSigner": false
@@ -14059,6 +16865,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -14211,7 +17022,7 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "multisig",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -14426,6 +17237,35 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setProtocolFeeShare",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolVault",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetProtocolFeeShareParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "setMarketConfig",
       "accounts": [
         {
@@ -14494,6 +17334,113 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setTokenReward",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetTokenRewardParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setTokenStakeLevel",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetTokenStakeLevelParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setTokenVaultConfig",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetTokenVaultConfigParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "withdrawFees",
       "accounts": [
         {
@@ -14517,17 +17464,12 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "pool",
+          "name": "protocolVault",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custodyTokenAccount",
+          "name": "protocolTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -14547,6 +17489,60 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawFeesParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "withdrawInstantFees",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawInstantFeesParams"
           }
         }
       ],
@@ -14812,6 +17808,149 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "InitCompoundingParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "initRevenueTokenAccount",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "revenueTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitRevenueTokenAccountParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "initTokenVault",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitTokenVaultParams"
           }
         }
       ],
@@ -15907,6 +19046,138 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "depositTokenStake",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DepositTokenStakeParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "distributeTokenReward",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "DistributeTokenRewardParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "depositStake",
       "accounts": [
         {
@@ -16139,6 +19410,132 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "withdrawToken",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawTokenParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "collectRevenue",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingRevenueAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "revenueTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CollectRevenueParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "collectStakeFees",
       "accounts": [
         {
@@ -16218,6 +19615,69 @@ export const IDL: Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "collectTokenReward",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CollectTokenRewardParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "unstakeRequest",
       "accounts": [
         {
@@ -16266,6 +19726,107 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "UnstakeRequestParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unstakeTokenInstant",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UnstakeTokenInstantParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unstakeTokenRequest",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UnstakeTokenRequestParams"
           }
         }
       ]
@@ -16498,6 +20059,72 @@ export const IDL: Perpetuals = {
       "args": []
     },
     {
+      "name": "moveProtocolFees",
+      "accounts": [
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "revenueTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "compoundFees",
       "accounts": [
         {
@@ -16673,11 +20300,6 @@ export const IDL: Perpetuals = {
       "name": "createTradingAccount",
       "accounts": [
         {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "feePayer",
           "isMut": true,
           "isSigner": true
@@ -16690,11 +20312,6 @@ export const IDL: Perpetuals = {
         {
           "name": "nftMint",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftTokenAccount",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -16774,7 +20391,7 @@ export const IDL: Perpetuals = {
           "isSigner": true
         },
         {
-          "name": "tradingAccount",
+          "name": "tokenStakeAccount",
           "isMut": false,
           "isSigner": false
         },
@@ -17451,6 +21068,32 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "cancelAllTriggerOrders",
+      "accounts": [
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "order",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelTriggerOrder",
       "accounts": [
         {
@@ -17479,6 +21122,44 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "CancelTriggerOrderParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancelUnstakeTokenRequest",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CancelUnstakeTokenRequestParams"
           }
         }
       ]
@@ -17680,8 +21361,18 @@ export const IDL: Perpetuals = {
       "name": "executeLimitWithSwap",
       "accounts": [
         {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "feePayer",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -17740,6 +21431,11 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -17778,9 +21474,19 @@ export const IDL: Perpetuals = {
       "name": "executeLimitOrder",
       "accounts": [
         {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "feePayer",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "perpetuals",
@@ -17825,6 +21531,11 @@ export const IDL: Perpetuals = {
         {
           "name": "collateralOracleAccount",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -17928,6 +21639,11 @@ export const IDL: Perpetuals = {
         {
           "name": "reserveCustodyTokenAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "receiveCustody",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -18039,6 +21755,11 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "receiveCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -18118,6 +21839,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receiveCustody",
           "isMut": false,
           "isSigner": false
         },
@@ -18205,6 +21931,11 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
+          "name": "receiveCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -18237,6 +21968,11 @@ export const IDL: Perpetuals = {
     {
       "name": "executeTriggerWithSwap",
       "accounts": [
+        {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "feePayer",
           "isMut": true,
@@ -18355,6 +22091,11 @@ export const IDL: Perpetuals = {
     {
       "name": "executeTriggerOrder",
       "accounts": [
+        {
+          "name": "positionOwner",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "feePayer",
           "isMut": true,
@@ -19397,6 +23138,204 @@ export const IDL: Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "getPositionQuote",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetPositionQuoteParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "QuoteData"
+      }
+    },
+    {
+      "name": "getAddCollateralQuote",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetAddCollateralQuoteParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "GetAddCollateralQuoteData"
+      }
+    },
+    {
+      "name": "getClosePositionQuote",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "position",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "targetOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralCustody",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GetClosePositionQuoteParams"
+          }
+        }
+      ],
+      "returns": {
+        "defined": "CloseQuoteData"
+      }
+    },
+    {
       "name": "renameFlp",
       "accounts": [
         {
@@ -19464,6 +23403,227 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": "u8"
+    },
+    {
+      "name": "burnAndClaim",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "receivingTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tradingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "BurnAndClaimParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "burnAndStake",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenStakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tradingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "transferAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "BurnAndStakeParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -19569,7 +23729,7 @@ export const IDL: Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "null",
+            "name": "uid",
             "type": "u8"
           },
           {
@@ -19629,7 +23789,7 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "isInitialized",
-            "type": "bool"
+            "type": "u8"
           },
           {
             "name": "bump",
@@ -19686,12 +23846,30 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "targetCustodyId",
-            "type": "u64"
+            "name": "targetCustodyUid",
+            "type": "u8"
           },
           {
-            "name": "collateralCustodyId",
-            "type": "u64"
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
+            "name": "collateralCustodyUid",
+            "type": "u8"
+          },
+          {
+            "name": "padding2",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "bump",
@@ -19920,7 +24098,7 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "referralDiscount",
+            "name": "defaultRebate",
             "type": "u64"
           },
           {
@@ -20036,11 +24214,15 @@ export const IDL: Perpetuals = {
             "type": "u8"
           },
           {
+            "name": "uniqueCustodyCount",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                4
+                3
               ]
             }
           },
@@ -20177,6 +24359,51 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "protocolVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          },
+          {
+            "name": "feeShareBps",
+            "type": "u64"
+          },
+          {
+            "name": "feeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "referral",
       "type": {
         "kind": "struct",
@@ -20190,7 +24417,7 @@ export const IDL: Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "refererTradingAccount",
+            "name": "refererTokenStakeAccount",
             "type": "publicKey"
           },
           {
@@ -20199,6 +24426,209 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenStake",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "withdrawRequestCount",
+            "type": "u8"
+          },
+          {
+            "name": "withdrawRequest",
+            "type": {
+              "array": [
+                {
+                  "defined": "WithdrawRequest"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "updateTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "tradeTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "tradeCounter",
+            "type": "u32"
+          },
+          {
+            "name": "lastRewardEpochCount",
+            "type": "u32"
+          },
+          {
+            "name": "rewardTokens",
+            "type": "u64"
+          },
+          {
+            "name": "unclaimedRevenueAmount",
+            "type": "u64"
+          },
+          {
+            "name": "revenueSnapshot",
+            "type": "u128"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                1
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenAccountBump",
+            "type": "u8"
+          },
+          {
+            "name": "tokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenVaultTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenPermissions",
+            "type": {
+              "defined": "TokenPermissions"
+            }
+          },
+          {
+            "name": "withdrawTimeLimit",
+            "type": "i64"
+          },
+          {
+            "name": "withdrawInstantFee",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawInstantFeeEarned",
+            "type": "u64"
+          },
+          {
+            "name": "stakeLevel",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "tokensStaked",
+            "type": {
+              "defined": "StakeStats"
+            }
+          },
+          {
+            "name": "rewardTokensToDistribute",
+            "type": "u128"
+          },
+          {
+            "name": "rewardTokensPaid",
+            "type": "u128"
+          },
+          {
+            "name": "tokensToDistribute",
+            "type": "u128"
+          },
+          {
+            "name": "tokensDistributed",
+            "type": "u128"
+          },
+          {
+            "name": "lastRewardEpochCount",
+            "type": "u32"
+          },
+          {
+            "name": "rewardTokensDistributed",
+            "type": "u128"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u32",
+                3
+              ]
+            }
+          },
+          {
+            "name": "revenueTokenAccountBump",
+            "type": "u8"
+          },
+          {
+            "name": "revenuePerFafStaked",
+            "type": "u64"
+          },
+          {
+            "name": "revenueAccrued",
+            "type": "u128"
+          },
+          {
+            "name": "revenueDistributed",
+            "type": "u128"
+          },
+          {
+            "name": "revenuePaid",
+            "type": "u128"
+          },
+          {
+            "name": "padding2",
             "type": {
               "array": [
                 "u64",
@@ -20263,11 +24693,19 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "tokenStakeAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "burnt",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
-                "u64",
-                6
+                "u8",
+                15
               ]
             }
           }
@@ -20479,6 +24917,20 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "BurnAndClaimParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "BurnAndStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "CancelTriggerOrderParams",
       "type": {
         "kind": "struct",
@@ -20490,6 +24942,18 @@ export const IDL: Perpetuals = {
           {
             "name": "isStopLoss",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CancelUnstakeTokenRequestParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "withdrawRequestId",
+            "type": "u8"
           }
         ]
       }
@@ -20539,7 +25003,21 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "CollectRevenueParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "CollectStakeRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "CollectTokenRewardParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -20608,6 +25086,34 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "DepositTokenStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "depositAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DistributeTokenRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "epochCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "EditLimitOrderParams",
       "type": {
         "kind": "struct",
@@ -20637,10 +25143,6 @@ export const IDL: Perpetuals = {
             "type": {
               "defined": "OraclePrice"
             }
-          },
-          {
-            "name": "receiveCustodyId",
-            "type": "u8"
           }
         ]
       }
@@ -20719,6 +25221,12 @@ export const IDL: Perpetuals = {
           {
             "name": "orderId",
             "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
           }
         ]
       }
@@ -20735,6 +25243,12 @@ export const IDL: Perpetuals = {
           {
             "name": "orderId",
             "type": "u8"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
           }
         ]
       }
@@ -20753,6 +25267,124 @@ export const IDL: Perpetuals = {
           {
             "name": "isStopLoss",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetAddCollateralQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "collateralDelta",
+            "type": "u64"
+          },
+          {
+            "name": "finalCollateralAmount",
+            "type": "u64"
+          },
+          {
+            "name": "finalCollateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "finalSizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "finalSizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "finalAvgEntryPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "passesMinCollateralCheck",
+            "type": "bool"
+          },
+          {
+            "name": "passesLeverageCheck",
+            "type": "bool"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "receivingCustodyId",
+            "type": "u64"
+          },
+          {
+            "name": "swapPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "swapFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "swapFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "swapPossible",
+            "type": "bool"
+          },
+          {
+            "name": "increaseSizeEntryPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "increaseSizeFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "increaseSizeFeeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetAddCollateralQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "isIncreaseSize",
+            "type": "bool"
+          },
+          {
+            "name": "sizeDelta",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
           }
         ]
       }
@@ -20786,6 +25418,84 @@ export const IDL: Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "CloseQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "exitPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "collateralReturn",
+            "type": "u64"
+          },
+          {
+            "name": "feeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "feeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "pnlAmount",
+            "type": "u64"
+          },
+          {
+            "name": "pnlUsd",
+            "type": "u64"
+          },
+          {
+            "name": "isProfitable",
+            "type": "bool"
+          },
+          {
+            "name": "remainingCollateral",
+            "type": "u64"
+          },
+          {
+            "name": "remainingSize",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GetClosePositionQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "closeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
       }
     },
     {
@@ -20871,6 +25581,34 @@ export const IDL: Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "GetPositionQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": "Privilege"
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
       }
     },
     {
@@ -20962,6 +25700,18 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "InitRevenueTokenAccountParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeShareBps",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitStakingParams",
       "type": {
         "kind": "struct",
@@ -20969,6 +25719,41 @@ export const IDL: Perpetuals = {
           {
             "name": "stakingFeeShareBps",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitTokenVaultParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenPermissions",
+            "type": {
+              "defined": "TokenPermissions"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawTimeLimit",
+            "type": "i64"
+          },
+          {
+            "name": "withdrawInstantFee",
+            "type": "u64"
+          },
+          {
+            "name": "stakeLevel",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
           }
         ]
       }
@@ -21013,7 +25798,7 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "referralDiscount",
+            "name": "defaultRebate",
             "type": "u64"
           }
         ]
@@ -21115,10 +25900,6 @@ export const IDL: Perpetuals = {
             "type": {
               "defined": "OraclePrice"
             }
-          },
-          {
-            "name": "receiveCustodyId",
-            "type": "u8"
           }
         ]
       }
@@ -21141,10 +25922,6 @@ export const IDL: Perpetuals = {
           {
             "name": "isStopLoss",
             "type": "bool"
-          },
-          {
-            "name": "receiveCustodyId",
-            "type": "u8"
           }
         ]
       }
@@ -21504,7 +26281,7 @@ export const IDL: Perpetuals = {
             }
           },
           {
-            "name": "referralDiscount",
+            "name": "defaultRebate",
             "type": "u64"
           },
           {
@@ -21564,6 +26341,18 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "SetProtocolFeeShareParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeShareBps",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SetTestTimeParams",
       "type": {
         "kind": "struct",
@@ -21571,6 +26360,65 @@ export const IDL: Perpetuals = {
           {
             "name": "time",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetTokenRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "epochCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetTokenStakeLevelParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "level",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetTokenVaultConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenPermissions",
+            "type": {
+              "defined": "TokenPermissions"
+            }
+          },
+          {
+            "name": "withdrawTimeLimit",
+            "type": "i64"
+          },
+          {
+            "name": "withdrawInstantFee",
+            "type": "u64"
+          },
+          {
+            "name": "stakeLevel",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
           }
         ]
       }
@@ -21711,6 +26559,30 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "UnstakeTokenInstantParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unstakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnstakeTokenRequestParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unstakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateCustodyParams",
       "type": {
         "kind": "struct",
@@ -21766,6 +26638,13 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "WithdrawInstantFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "WithdrawSolFeesParams",
       "type": {
         "kind": "struct",
@@ -21789,6 +26668,18 @@ export const IDL: Perpetuals = {
           {
             "name": "deactivated",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawTokenParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "withdrawRequestId",
+            "type": "u8"
           }
         ]
       }
@@ -22247,11 +27138,11 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "reserveCustodyId",
+            "name": "reserveCustodyUid",
             "type": "u8"
           },
           {
-            "name": "receiveCustodyId",
+            "name": "receiveCustodyUid",
             "type": "u8"
           },
           {
@@ -22289,7 +27180,7 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "receiveCustodyId",
+            "name": "receiveCustodyUid",
             "type": "u8"
           }
         ]
@@ -22406,6 +27297,82 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "liquidationPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "collateralAmount",
+            "type": "u64"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "entryPrice",
+            "type": {
+              "defined": "OraclePrice"
+            }
+          },
+          {
+            "name": "totalFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "totalFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "entryFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "entryFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "volatilityFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "volatilityFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "swapFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "swapFeeUsd",
             "type": "u64"
           },
           {
@@ -22600,6 +27567,42 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "WithdrawRequest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pendingDeactivation",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawRequestTimestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenPermissions",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "allowDeposits",
+            "type": "bool"
+          },
+          {
+            "name": "allowWithdrawal",
+            "type": "bool"
+          },
+          {
+            "name": "allowRewardWithdrawal",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "VoltageStats",
       "type": {
         "kind": "struct",
@@ -22752,6 +27755,36 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "AddInternalOracle"
+          },
+          {
+            "name": "RenameFlp"
+          },
+          {
+            "name": "SetFeeShare"
+          },
+          {
+            "name": "InitCompounding"
+          },
+          {
+            "name": "InitTokenVault"
+          },
+          {
+            "name": "SetTokenVaultConfig"
+          },
+          {
+            "name": "WithdrawInstantFees"
+          },
+          {
+            "name": "DistributeTokenReward"
+          },
+          {
+            "name": "SetTokenReward"
+          },
+          {
+            "name": "SetTokenStakeLevel"
+          },
+          {
+            "name": "InitRevenueTokenAccount"
           }
         ]
       }
@@ -22816,10 +27849,54 @@ export const IDL: Perpetuals = {
             "name": "None"
           },
           {
-            "name": "NFT"
+            "name": "Stake"
           },
           {
             "name": "Referral"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoltagePointsType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OpenPosition"
+          },
+          {
+            "name": "SwapAndOpen"
+          },
+          {
+            "name": "IncreaseSize"
+          },
+          {
+            "name": "DecreaseSize"
+          },
+          {
+            "name": "CloseAndSwap"
+          },
+          {
+            "name": "ClosePosition"
+          },
+          {
+            "name": "ExecuteLimitOrder"
+          },
+          {
+            "name": "ExecuteLimitWithSwap"
+          },
+          {
+            "name": "ExecuteTriggerOrder"
+          },
+          {
+            "name": "ExecuteTriggerWithSwap"
+          },
+          {
+            "name": "CollectStakeReward"
+          },
+          {
+            "name": "DecreaseAndRemoveCollateral"
           }
         ]
       }
@@ -22965,7 +28042,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -23020,7 +28097,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -23070,7 +28147,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -23105,7 +28182,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -23142,6 +28219,76 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "BurnAndClaimLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "nftMint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "claimAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "BurnAndStakeLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "nftMint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "stakeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "CancelTriggerOrderLog",
       "fields": [
         {
@@ -23170,13 +28317,53 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
         {
           "name": "isStopLoss",
           "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelUnstakeTokenRequestLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
           "index": false
         }
       ]
@@ -23270,7 +28457,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -23512,6 +28699,41 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "CollectRevenueLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "revenueAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lastEpochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "CollectStakeRewardLog",
       "fields": [
         {
@@ -23562,6 +28784,41 @@ export const IDL: Perpetuals = {
         {
           "name": "rewardShare",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CollectTokenRewardLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "lastEpochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
           "index": false
         }
       ]
@@ -23847,6 +29104,71 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "DepositTokenStakeLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "depositAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "DistributeTokenRewardLog",
+      "fields": [
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "epochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "EditLimitOrderLog",
       "fields": [
         {
@@ -23920,7 +29242,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -24020,7 +29342,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -24080,7 +29402,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -24275,11 +29597,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -24345,7 +29672,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "reserveCustodyId",
+          "name": "reserveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -24455,7 +29782,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "reserveCustodyId",
+          "name": "reserveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -24500,11 +29827,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "feeRebateAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -24730,7 +30062,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -25532,6 +30864,41 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "MoveProtocolFeesLog",
+      "fields": [
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "revenueAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "protocolFee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "revenueFeeShare",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "OpenPositionLog",
       "fields": [
         {
@@ -25865,7 +31232,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -25925,7 +31292,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u8",
           "index": false
         },
@@ -25946,6 +31313,36 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "rewardPerLpStaked",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RefreshStakeUserLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "poolName",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "rewardAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rewardMint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "rewardShare",
           "type": "u64",
           "index": false
         }
@@ -26000,7 +31397,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receiveCustodyId",
+          "name": "receiveCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -26175,7 +31572,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -26230,7 +31627,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -26265,7 +31662,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyId",
+          "name": "custodyUid",
           "type": "u64",
           "index": false
         },
@@ -26297,6 +31694,36 @@ export const IDL: Perpetuals = {
         {
           "name": "tokenOutPriceExponent",
           "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SetTokenRewardLog",
+      "fields": [
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "epochCount",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              2
+            ]
+          },
           "index": false
         }
       ]
@@ -26370,7 +31797,7 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receivingCustodyId",
+          "name": "receivingCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -26455,17 +31882,17 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receivingCustodyId",
+          "name": "receivingCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "collateralCustodyId",
+          "name": "collateralCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "targetCustodyId",
+          "name": "targetCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -26615,17 +32042,17 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "receivingCustodyId",
+          "name": "receivingCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "collateralCustodyId",
+          "name": "collateralCustodyUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "targetCustodyId",
+          "name": "targetCustodyUid",
           "type": "u64",
           "index": false
         },
@@ -26790,12 +32217,12 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -26825,12 +32252,12 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -26900,12 +32327,12 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -26945,12 +32372,12 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
-          "name": "custodyIdIn",
+          "name": "custodyInUid",
           "type": "u64",
           "index": false
         },
         {
-          "name": "custodyIdOut",
+          "name": "custodyOutUid",
           "type": "u64",
           "index": false
         },
@@ -27062,6 +32489,86 @@ export const IDL: Perpetuals = {
       ]
     },
     {
+      "name": "UnstakeTokenInstantLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "withdrawAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "UnstakeTokenRequestLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "unstakeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "WithdrawStakeLog",
       "fields": [
         {
@@ -27077,6 +32584,81 @@ export const IDL: Perpetuals = {
         {
           "name": "lpTokens",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "WithdrawTokenLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "withdrawAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "currentTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "lastUpdatedTimestamp",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "level",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "activeStakeAmount",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "VoltagePointsLog",
+      "fields": [
+        {
+          "name": "tokenStake",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "voltagePoints",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "rebateUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "voltagePointsType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
           "index": false
         }
       ]
@@ -27320,8 +32902,8 @@ export const IDL: Perpetuals = {
     },
     {
       "code": 6047,
-      "name": "TradingAccountMismatch",
-      "msg": "Trading account doesnot match referral account"
+      "name": "TokenStakeAccountMismatch",
+      "msg": "Token Stake account doesnot match referral account"
     },
     {
       "code": 6048,
@@ -27372,6 +32954,16 @@ export const IDL: Perpetuals = {
       "code": 6057,
       "name": "MinReserve",
       "msg": "Minimum reserve limit breached"
+    },
+    {
+      "code": 6058,
+      "name": "MaxWithdrawTokenRequest",
+      "msg": "Withdraw Token Request limit exhausted"
+    },
+    {
+      "code": 6059,
+      "name": "InvalidRewardDistribution",
+      "msg": "Invalid Reward Distribution"
     }
   ]
 };

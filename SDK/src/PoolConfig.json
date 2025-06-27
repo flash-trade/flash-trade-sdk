@@ -23,6 +23,12 @@
       "stakedLpTokenSymbol": "sFLP.1",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -304,6 +310,12 @@
       "stakedLpTokenSymbol": "sFLP.2",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -374,15 +386,15 @@
           "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1"
         },
         {
-          "symbol": "AUD",
-          "mintKey": "AUDdbsJZpT1pFErezhe9pvcf97XnvD8oo8etZbeFbBX",
+          "symbol": "CRUDEOIL",
+          "mintKey": "o1Lw5djE8o6wMbPXU7U8Us8a6DJhWJc9WrWWUc1LHAo",
           "decimals": 6,
           "usdPrecision": 4,
-          "tokenPrecision": 6,
+          "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "pythTicker": "FX.AUD/USD",
-          "pythPriceId": "0x67a6f93030420c1c9e3fe37c1ab6b77966af82f995944a9fefce357a22854a80"
+          "pythTicker": "Commodities.WTI1M",
+          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
         }
       ],
       "custodies": [
@@ -467,20 +479,20 @@
           "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1"
         },
         {
-          "custodyId": 5,
-          "custodyAccount": "AFrALLNuCbBBnhUvEjxrK96e8yjComh2xuTak1y5TEJL",
-          "tokenAccount": "6yofaNof5vxFfpRMmrmGK2Qge5aSUTAvUW15cL7z8fB1",
-          "symbol": "AUD",
-          "mintKey": "AUDdbsJZpT1pFErezhe9pvcf97XnvD8oo8etZbeFbBX",
+          "custodyId": 6,
+          "custodyAccount": "5mggznCHoC98t2xXNYPVR8cqNhRhYdhV7qGWqMoY6YSJ",
+          "tokenAccount": "691sY53AoYXHnqEUnBLLiywNLNGHqeupC86RhSkQnHvK",
+          "symbol": "CRUDEOIL",
+          "mintKey": "o1Lw5djE8o6wMbPXU7U8Us8a6DJhWJc9WrWWUc1LHAo",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 6,
           "isStable": false,
           "isVirtual": true,
-          "intOracleAddress": "3RDtyt5bEFEmWwh99mDN7amsn1uz4eVQ8CJuXzAGaKL8",
-          "extOracleAddress": "6pPXqXcgFFoLEcXfedWJy3ypNZVJ1F3mgipaDFsvZ1co",
-          "pythTicker": "FX.AUD/USD",
-          "pythPriceId": "0x67a6f93030420c1c9e3fe37c1ab6b77966af82f995944a9fefce357a22854a80"
+          "intOracleAddress": "5qLQ3BT7JCf4fUxoAH1xZwHCca9fZuuTWTgTsNxLNcoZ",
+          "extOracleAddress": "nt1JuGVRBJNrvMpdZt9RJnxVSxRuoeVx5LRq3R1bS16",
+          "pythTicker": "Commodities.WTI1M",
+          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
         }
       ],
       "markets": [
@@ -597,31 +609,31 @@
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         },
         {
-          "marketId": 8,
-          "marketAccount": "CxC8u5SBCtu9a53x7jSZtaAuJoKYA2ukXLuMuB9NtqoQ",
+          "marketId": 10,
+          "marketAccount": "5D2t4gqE8BjbvJaz5NUShUo3EVkqJD72P5YTzgV7n5nj",
           "marketCorrelation" : false,
           "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
-          "targetCustody": "AFrALLNuCbBBnhUvEjxrK96e8yjComh2xuTak1y5TEJL",
+          "targetCustody": "5mggznCHoC98t2xXNYPVR8cqNhRhYdhV7qGWqMoY6YSJ",
           "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
           "side": "long",
-          "maxLev": 100,
-          "targetCustodyId": 5,
+          "maxLev": 50,
+          "targetCustodyId": 6,
           "collateralCustodyId": 0,
-          "targetMint": "AUDdbsJZpT1pFErezhe9pvcf97XnvD8oo8etZbeFbBX",
+          "targetMint": "o1Lw5djE8o6wMbPXU7U8Us8a6DJhWJc9WrWWUc1LHAo",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         },
         {
-          "marketId": 9,
-          "marketAccount": "JCwYots22PTcPn2XQz9un15kMj6tqEYjUKgQaay5sMY1",
+          "marketId": 11,
+          "marketAccount": "DE7Erm5pGgxBhyxuhtFePKfnsyMvrnE713G9Ks8bPbgr",
           "marketCorrelation" : false,
           "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
-          "targetCustody": "AFrALLNuCbBBnhUvEjxrK96e8yjComh2xuTak1y5TEJL",
+          "targetCustody": "5mggznCHoC98t2xXNYPVR8cqNhRhYdhV7qGWqMoY6YSJ",
           "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
           "side": "short",
-          "maxLev": 100,
-          "targetCustodyId": 5,
+          "maxLev": 50,
+          "targetCustodyId": 6,
           "collateralCustodyId": 0,
-          "targetMint": "AUDdbsJZpT1pFErezhe9pvcf97XnvD8oo8etZbeFbBX",
+          "targetMint": "o1Lw5djE8o6wMbPXU7U8Us8a6DJhWJc9WrWWUc1LHAo",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         }
       ]
@@ -643,6 +655,12 @@
       "stakedLpTokenSymbol": "sFLP.3",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -1037,6 +1055,12 @@
       "stakedLpTokenSymbol": "sFLP.4",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -1211,6 +1235,12 @@
       "stakedLpTokenSymbol": "sFLP.5",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -1330,6 +1360,12 @@
       "stakedLpTokenSymbol": "sFLP.6",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -1449,6 +1485,12 @@
       "stakedLpTokenSymbol": "sFLP.7",
       "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
       "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
+      "tokenMint": "FAFxVxnkzZHMCodkWyoccgUNgVScqMw2mhhQBYDFjFAF",
+      "tokenVault": "DBh5a25KUsmbz62sxStp4PRu8WdJmdGUmuCJWvxse5YL",
+      "tokenVaultTokenAccount": "7tULeZXC2UyPPzHyE9BhFJmFtfNedACJrVywyWYSwzJP",
+      "revenueTokenAccount": "Aw9fQzvcRuSmAkjzB6BMZRvywmGrpWtCzYrD63HoguXr",
+      "protocolVault": "6N5wgTi4z29N1MCPiiDRPhxDkhHM83Q6WA2CVvnNKSme",
+      "protocolTokenAccount": "9iQ9saFbTfYPHsJwnKY9BMc7xACxEL9mcHrP7qYWoTKG",
       "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
       "addressLookupTableAddresses": [
         "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
@@ -1475,15 +1517,15 @@
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
         },
         {
-          "symbol": "TRUMP",
-          "mintKey": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+          "symbol": "FARTCOIN",
+          "mintKey": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": false,
-          "pythTicker": "Crypto.TRUMP/USD",
-          "pythPriceId": "0x879551021853eec7a7dc827578e8e69da7e4fa8148339aa0d3d5296405be4b1a"
+          "pythTicker": "Crypto.FARTCOIN/USD",
+          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608"
         }
       ],
       "custodies": [
@@ -1504,168 +1546,49 @@
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
         },
         {
-          "custodyId": 1,
-          "custodyAccount": "Ckt7Bzzq5S1aKukXZqMZov9i2gxJGAT2Yn4AunqkKdDP",
-          "tokenAccount": "6m3KTmMtvmWMJvUDjxZ6RzHVikUJ6V6bDpYwjmHos3Vf",
-          "symbol": "TRUMP",
-          "mintKey": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+          "custodyId": 2,
+          "custodyAccount": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
+          "tokenAccount": "ERtCuHUe8L4WFefMTR7T5dSndszikuF7db9EbisF5Gyi",
+          "symbol": "FARTCOIN",
+          "mintKey": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": false,
-          "intOracleAddress": "Dku3XJ6sFEpoQtN1JYYgY64EtMMWEsz448Z4j1XPfcad",
-          "extOracleAddress": "9vNb2tQoZ8bB4vzMbQLWViGwNaDJVtct13AGgno1wazp",
-          "pythTicker": "Crypto.TRUMP/USD",
-          "pythPriceId": "0x879551021853eec7a7dc827578e8e69da7e4fa8148339aa0d3d5296405be4b1a"
+          "intOracleAddress": "CXUxUV4tsf7sYnX52KrKDdkskyGGHXGkQgDHXf2fk2UW",
+          "extOracleAddress": "2t8eUbYKjidMs3uSeYM9jXM9uudYZwGkSeTB4TKjmvnC",
+          "pythTicker": "Crypto.FARTCOIN/USD",
+          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608"
         }
       ],
       "markets": [
         {
-          "marketId": 0,
-          "marketAccount": "53zJK3muUnpmp1LBZKYiiDsJLnqNw9vTWALVanaRMdyv",
+          "marketId": 2,
+          "marketAccount": "9PYLfK5KFQVKptGjZdUGWW3hs24g3TMcYAS3B73k3BDi",
           "marketCorrelation" : true,
           "pool": "Crk3yzGpPCt9thXmV9wCkBM9nBq8EHhBct71ArkKY9wA",
-          "targetCustody": "Ckt7Bzzq5S1aKukXZqMZov9i2gxJGAT2Yn4AunqkKdDP",
-          "collateralCustody": "Ckt7Bzzq5S1aKukXZqMZov9i2gxJGAT2Yn4AunqkKdDP",
+          "targetCustody": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
+          "collateralCustody": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
           "side": "long",
           "maxLev": 5,
-          "targetCustodyId": 1,
-          "collateralCustodyId": 1,
-          "targetMint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
-          "collateralMint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN"
+          "targetCustodyId": 2,
+          "collateralCustodyId": 2,
+          "targetMint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+          "collateralMint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump"
         },
         {
-          "marketId": 1,
-          "marketAccount": "DvK3NQLuwEH525Yw8XchJySNYWiy1gZNY4wfPENBakA3",
+          "marketId": 3,
+          "marketAccount": "Cgf9B7zfxFxtamBMgDsg879fHaXGcoxX5a9wpcSbTUnF",
           "marketCorrelation" : false,
           "pool": "Crk3yzGpPCt9thXmV9wCkBM9nBq8EHhBct71ArkKY9wA",
-          "targetCustody": "Ckt7Bzzq5S1aKukXZqMZov9i2gxJGAT2Yn4AunqkKdDP",
+          "targetCustody": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
           "collateralCustody": "B1b3WnCbwrQC8yk6o5rVLGGJFD7BdQBLyaWsRw4Lqgp2",
           "side": "short",
           "maxLev": 5,
-          "targetCustodyId": 1,
+          "targetCustodyId": 2,
           "collateralCustodyId": 0,
-          "targetMint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
-          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-        }
-      ]
-    },
-    {
-      "programId": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
-      "perpComposibilityProgramId": "FSWAPViR8ny5K96hezav8jynVubP2dJ2L7SbKzds2hwm",
-      "fbNftRewardProgramId": "FBRWDXSLysNbFQk64MQJcpkXP8e4fjezsGabV8jV7d7o",
-      "cluster": "mainnet-beta",
-      "poolName": "Test.2",
-      "poolAddress": "HAMrKdJu6UKaELV7hRy9d2ZQaaT4YHmdbac9HQGcSs4p",
-      "stakedLpTokenMint": "ByTQ9ppwD2DgPSjsAB8t7n2BtGKHU98vyCByAAcpmaJM",
-      "compoundingTokenMint": "6w6Kx49cTb9oCZyPpqCFLMEr9CatsEDJBfsMkGZqnEaH",
-      "stakedLpVault": "DPLMya2ap8dcxCBbBEsxwakPUHQckjLaby6JwnZ99T95",
-      "compoundingLpVault": "54FMNZG5YBbCv5bCATqXXZemt7o1bjfK1a2qXkV6zhDr",
-      "metadataAccount": "F5c5aokEimuxvFUU7RwzjB2g9g95wgUqMtFdRdyti1oi",
-      "lpDecimals": 6,
-      "compoundingLpTokenSymbol": "FLP.7",
-      "stakedLpTokenSymbol": "sFLP.7",
-      "perpetuals": "7DWCtB5Z8rPiyBMKUwqyC95R9tJpbhoQhLM9LbK3Z5QZ",
-      "transferAuthority": "81xGAvJ27ZeRThU2JEfKAUeT4Fx6qCCd8WHZpujZbiiG",
-      "multisig": "3FqKnAQrvr6G6AqCAWKdqg9fVe6ceAk3A5Y1ibeQqV2V",
-      "addressLookupTableAddresses": [
-        "AUebVLw8UwN35Us2XcPQaTQejJoQ5T7ckWzxHTwN1mkM"
-      ],
-      "backupOracle": "AjAubETeBLhebBxLcErmzbavZfqF9bCxkpRAdyJtoi9G",
-      "nftCollectionAddress": "H4EQ8pcE7PQSQGG1WYW4hAA1nizU6ULYipHZcYk9b64u",
-      "rewardDistributionProgram": {
-        "programId": "FARNT7LL119pmy9vSkN9q1ApZESPaKHuuX5Acz1oBoME",
-        "transferAuthority": "E2GZM2FQmX2uGBcBpLQB3s5UhPJvM2F8BgHEkBG45xBN",
-        "rewardVault": "6sXyDryKp6hqV6E1jc7gbzTeWxTFUW1A6s39vzp55hLL",
-        "rewardMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "rewardTokenAccount": "EhH4KEra2UfKdwRErjEFf2286BQ3BstKxfLiyYnF513h"
-      },
-      "tokens": [
-        {
-          "symbol": "USDC",
-          "mintKey": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-          "decimals": 6,
-          "usdPrecision": 2,
-          "tokenPrecision": 4,
-          "isStable": true,
-          "isVirtual": false,
-          "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
-        },
-        {
-          "symbol": "TNSR",
-          "mintKey": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
-          "decimals": 9,
-          "usdPrecision": 4,
-          "tokenPrecision": 4,
-          "isStable": false,
-          "isVirtual": false,
-          "pythTicker": "Crypto.TNSR/USD",
-          "pythPriceId": "05ecd4597cd48fe13d6cc3596c62af4f9675aee06e2e0b94c06d8bee2b659e05"
-        }
-      ],
-      "custodies": [
-        {
-          "custodyId": 0,
-          "custodyAccount": "AaA92Zfjz3qDa2WQdqRZ7apdnvNDK5iaXuEoNYckgYE5",
-          "tokenAccount": "BNewNn9RfZA7bNtpsmLUu4x58VpVjny9NqUqVietRGf8",
-          "symbol": "USDC",
-          "mintKey": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-          "decimals": 6,
-          "usdPrecision": 2,
-          "tokenPrecision": 2,
-          "isStable": true,
-          "isVirtual": false,
-          "intOracleAddress": "GCtJxWQ57B3BJUYdWrhb3TUxzeiDUx275ZCxKkTV6G3N",
-          "extOracleAddress": "Dpw1EAVrSB1ibxiDQyTAW6Zip3J4Btk2x4SgApQCeFbX",
-          "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
-        },
-        {
-          "custodyId": 1,
-          "custodyAccount": "12UF24xdtkb2xuGA5qK74jE52JzeB29y1J3zKXsGRHNJ",
-          "tokenAccount": "4vaGYK2gNupRTYyNjUxbTxARyVW9hmHC19iRVkTtxRfX",
-          "symbol": "TNSR",
-          "mintKey": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
-          "decimals": 9,
-          "usdPrecision": 4,
-          "tokenPrecision": 4,
-          "isStable": false,
-          "isVirtual": false,
-          "intOracleAddress": "AH1f6CwHweibN4qybx7eu7AS1jUD2WtAG4ZXkndZKMyg",
-          "extOracleAddress": "9TSGDwcPQX4JpAvZbu2Wp5b68wSYkQvHCvfeBjYcCyC",
-          "pythTicker": "Crypto.TNSR/USD",
-          "pythPriceId": "05ecd4597cd48fe13d6cc3596c62af4f9675aee06e2e0b94c06d8bee2b659e05"
-        }
-      ],
-      "markets": [
-        {
-          "marketId": 0,
-          "marketAccount": "VUP8ywiDqH5ZbEmUCmwrmUCNuETwbxSksono1BVj2jN",
-          "marketCorrelation" : true,
-          "pool": "HAMrKdJu6UKaELV7hRy9d2ZQaaT4YHmdbac9HQGcSs4p",
-          "targetCustody": "12UF24xdtkb2xuGA5qK74jE52JzeB29y1J3zKXsGRHNJ",
-          "collateralCustody": "12UF24xdtkb2xuGA5qK74jE52JzeB29y1J3zKXsGRHNJ",
-          "side": "long",
-          "maxLev": 10,
-          "targetCustodyId": 1,
-          "collateralCustodyId": 1,
-          "targetMint": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
-          "collateralMint": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6"
-        },
-        {
-          "marketId": 1,
-          "marketAccount": "91ki4mEELMuEpweTMdSAuiykj3wTCsogEtVQsetRDnwQ",
-          "marketCorrelation" : false,
-          "pool": "HAMrKdJu6UKaELV7hRy9d2ZQaaT4YHmdbac9HQGcSs4p",
-          "targetCustody": "12UF24xdtkb2xuGA5qK74jE52JzeB29y1J3zKXsGRHNJ",
-          "collateralCustody": "AaA92Zfjz3qDa2WQdqRZ7apdnvNDK5iaXuEoNYckgYE5",
-          "side": "short",
-          "maxLev": 10,
-          "targetCustodyId": 1,
-          "collateralCustodyId": 0,
-          "targetMint": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
+          "targetMint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         }
       ]
@@ -1687,6 +1610,12 @@
       "stakedLpTokenSymbol": "sFLP.1",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -1968,6 +1897,12 @@
       "stakedLpTokenSymbol": "sFLP.2",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -2038,15 +1973,15 @@
           "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1"
         },
         {
-          "symbol": "AUD",
-          "mintKey": "auduqqUHqZC3DRmZaAtzccTs3NTi1fSYp5rgg4uYwFz",
+          "symbol": "CRUDEOIL",
+          "mintKey": "oi1DkCGa5CVm379ZuznLMevqjg7KGWnDDFB96JXAi7a",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "pythTicker": "FX.AUD/USD",
-          "pythPriceId": "0x67a6f93030420c1c9e3fe37c1ab6b77966af82f995944a9fefce357a22854a80"
+          "pythTicker": "Commodities.WTI1M",
+          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
         }
       ],
       "custodies": [
@@ -2131,20 +2066,20 @@
           "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1"
         },
         {
-          "custodyId": 5,
-          "custodyAccount": "GcMKm7441Vx3rtUuE4qQzV7tWmv8mHWShZ9CerasWuwc",
-          "tokenAccount": "B4z3UgMM4KnCyWbrju8HWhLX7b7xd1TSrdheLMDtTj2N",
-          "symbol": "AUD",
-          "mintKey": "auduqqUHqZC3DRmZaAtzccTs3NTi1fSYp5rgg4uYwFz",
+          "custodyId": 6,
+          "custodyAccount": "7B6jnXZTsMtCzcrwFv1Pnr4WpGu8tkw6rqBThucG4Pkw",
+          "tokenAccount": "6zid736ekcjJUpqNVcySXqbdf2qtW5EGHiVg7uLtfRfz",
+          "symbol": "CRUDEOIL",
+          "mintKey": "oi1DkCGa5CVm379ZuznLMevqjg7KGWnDDFB96JXAi7a",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "intOracleAddress": "BttDaqMMzPPvUvakrRsddcjJxiTs2qTmrCcWvk5nvtc9",
-          "extOracleAddress": "6pPXqXcgFFoLEcXfedWJy3ypNZVJ1F3mgipaDFsvZ1co",
-          "pythTicker": "FX.AUD/USD",
-          "pythPriceId": "0x67a6f93030420c1c9e3fe37c1ab6b77966af82f995944a9fefce357a22854a80"
+          "intOracleAddress": "J7XXRCMCrNHFSn6WgSEJREEX74XmGtmvnq3JZusHQ5Kg",
+          "extOracleAddress": "nt1JuGVRBJNrvMpdZt9RJnxVSxRuoeVx5LRq3R1bS16",
+          "pythTicker": "Commodities.WTI1M",
+          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
         }
       ],
       "markets": [
@@ -2261,31 +2196,31 @@
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         },
         {
-          "marketId": 8,
-          "marketAccount": "6yCsUoaTU4JVNikkEXfCV7KKDh7FcMY23hcvKk9dqhqf",
+          "marketId": 10,
+          "marketAccount": "9LuTyn29Ro7atJmGfu31F77dcQ3vATT5GovTair6stWF",
           "marketCorrelation" : false,
           "pool": "5MCtcNsF3dxna8ArzMamyciWDV3TBkiAzY1NqLtNiXvw",
-          "targetCustody": "GcMKm7441Vx3rtUuE4qQzV7tWmv8mHWShZ9CerasWuwc",
+          "targetCustody": "7B6jnXZTsMtCzcrwFv1Pnr4WpGu8tkw6rqBThucG4Pkw",
           "collateralCustody": "8DrHPGQq4dBrSYV2oy8oDi3sQDSgeCaAe1jq3s9tSh42",
           "side": "long",
-          "maxLev": 200,
-          "targetCustodyId": 5,
+          "maxLev": 50,
+          "targetCustodyId": 6,
           "collateralCustodyId": 0,
-          "targetMint": "auduqqUHqZC3DRmZaAtzccTs3NTi1fSYp5rgg4uYwFz",
+          "targetMint": "oi1DkCGa5CVm379ZuznLMevqjg7KGWnDDFB96JXAi7a",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         },
         {
-          "marketId": 9,
-          "marketAccount": "BnA1TVMsE4jsrdCwo38n6EwpRCkKzVxwVhXE7izmBd8F",
+          "marketId": 11,
+          "marketAccount": "GK7BUuv6iWXcSpBHUMV7vXT8NXhXBTGjcxfhdu5rodCC",
           "marketCorrelation" : false,
           "pool": "5MCtcNsF3dxna8ArzMamyciWDV3TBkiAzY1NqLtNiXvw",
-          "targetCustody": "GcMKm7441Vx3rtUuE4qQzV7tWmv8mHWShZ9CerasWuwc",
+          "targetCustody": "7B6jnXZTsMtCzcrwFv1Pnr4WpGu8tkw6rqBThucG4Pkw",
           "collateralCustody": "8DrHPGQq4dBrSYV2oy8oDi3sQDSgeCaAe1jq3s9tSh42",
           "side": "short",
-          "maxLev": 200,
-          "targetCustodyId": 5,
+          "maxLev": 50,
+          "targetCustodyId": 6,
           "collateralCustodyId": 0,
-          "targetMint": "auduqqUHqZC3DRmZaAtzccTs3NTi1fSYp5rgg4uYwFz",
+          "targetMint": "oi1DkCGa5CVm379ZuznLMevqjg7KGWnDDFB96JXAi7a",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         }
       ]
@@ -2307,6 +2242,12 @@
       "stakedLpTokenSymbol": "sFLP.3",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -2701,6 +2642,12 @@
       "stakedLpTokenSymbol": "sFLP.4",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -2875,6 +2822,12 @@
       "stakedLpTokenSymbol": "sFLP.5",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -2994,6 +2947,12 @@
       "stakedLpTokenSymbol": "sFLP.6",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -3113,6 +3072,12 @@
       "stakedLpTokenSymbol": "sFLP.7",
       "perpetuals": "445GcRLAJ64DcxSRbvQTkbwXgWUyubAxzQUQ2wL73KLS",
       "transferAuthority": "EPyHAAHUYnFATwd8CJ7owLnozFeS8pFsr3RNJD1eueYq",
+      "tokenMint": "fafsR7zoBPiSBAa96fUQiCJExsoXV5u6HaWrdXL19B2",
+      "tokenVault": "8HkMjr8NRq2sgQHotDVQ5Vd8HRNv7Gp1n4KV2yDk6UHu",
+      "tokenVaultTokenAccount": "2jvtbNxp9nyQkCF7XW1MKBo2GDh1yZGc2oW332fCTMBK",
+      "revenueTokenAccount": "Vmtmtb2FPtNDhZ5rsrNUgxEcXM7DJyRpRKj97QWxohR",
+      "protocolVault": "DG9jg5MJswA81dwVJ3MqoDqLR8aRFtoQiP9hm3m18tme",
+      "protocolTokenAccount": "FAgD1sJ7NRroGTHCwTV49Kth3LrvuB4fLRdfeDpYwAWT",
       "multisig": "Eu3cBFRo18AeN9BFb5ndzk2PEmBT7yWEhh3VkG21pyGo",
       "addressLookupTableAddresses": [
         "8YQHv2K84A7a7UA6tKKwrD4DsnKHAa24qLYMEH17Atwc"
@@ -3139,15 +3104,15 @@
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
         },
         {
-          "symbol": "TRUMP",
-          "mintKey": "trmpE3o2TJpkvszv7hZvFw72ynYYfyoVJXjJajfK5VH",
+          "symbol": "FARTCOIN",
+          "mintKey": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": false,
-          "pythTicker": "Crypto.TRUMP/USD",
-          "pythPriceId": "0x879551021853eec7a7dc827578e8e69da7e4fa8148339aa0d3d5296405be4b1a"
+          "pythTicker": "Crypto.FARTCOIN/USD",
+          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608"
         }
       ],
       "custodies": [
@@ -3168,49 +3133,49 @@
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
         },
         {
-          "custodyId": 1,
-          "custodyAccount": "2dLnRMbXfMx8DnGb6CbM3BrLv4F78SWLx7uWRTZPTZ1y",
-          "tokenAccount": "DDKaMxvZmgUNHDjWPf12LZrMnWF4gLHFnvRYtK17kUCq",
-          "symbol": "TRUMP",
-          "mintKey": "trmpE3o2TJpkvszv7hZvFw72ynYYfyoVJXjJajfK5VH",
+          "custodyId": 2,
+          "custodyAccount": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
+          "tokenAccount": "422tzHNrMwXNXwU6L9PSYrhJAN93gubGM78r5es5V1jg",
+          "symbol": "FARTCOIN",
+          "mintKey": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t",
           "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": false,
-          "intOracleAddress": "2X5dR335kR9zvcS6XeYAoQ91X2i1eGvzBu2niPW8vFM5",
-          "extOracleAddress": "9vNb2tQoZ8bB4vzMbQLWViGwNaDJVtct13AGgno1wazp",
-          "pythTicker": "Crypto.TRUMP/USD",
-          "pythPriceId": "0x879551021853eec7a7dc827578e8e69da7e4fa8148339aa0d3d5296405be4b1a"
+          "intOracleAddress": "97WpDbJGCpjSQmWsP7ao5CF7kesyyQ4MTk54tWoaP4bD",
+          "extOracleAddress": "2t8eUbYKjidMs3uSeYM9jXM9uudYZwGkSeTB4TKjmvnC",
+          "pythTicker": "Crypto.FARTCOIN/USD",
+          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608"
         }
       ],
       "markets": [
         {
-          "marketId": 0,
-          "marketAccount": "CZBZsoRS8zyoysWqQoQGQct12srenVvKdqG5cyFhyRJN",
+          "marketId": 2,
+          "marketAccount": "B1ZSHUD97mU8DPG4LeWx7QcN4wV6KkTKNmv9hXU2Qb95",
           "marketCorrelation" : true,
-          "pool": "CVdbySirAWcygBo3WsmJH1QPnQi3oyDaDWv5C3d3xQAH",
-          "targetCustody": "2dLnRMbXfMx8DnGb6CbM3BrLv4F78SWLx7uWRTZPTZ1y",
-          "collateralCustody": "2dLnRMbXfMx8DnGb6CbM3BrLv4F78SWLx7uWRTZPTZ1y",
+          "pool": "GJMj6ZeK8JYvwYNfurMKf6sEYZLkonqvYzXowcS6TL5D",
+          "targetCustody": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
+          "collateralCustody": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
           "side": "long",
           "maxLev": 5,
-          "targetCustodyId": 1,
-          "collateralCustodyId": 1,
-          "targetMint": "trmpE3o2TJpkvszv7hZvFw72ynYYfyoVJXjJajfK5VH",
-          "collateralMint": "trmpE3o2TJpkvszv7hZvFw72ynYYfyoVJXjJajfK5VH"
+          "targetCustodyId": 2,
+          "collateralCustodyId": 2,
+          "targetMint": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t",
+          "collateralMint": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t"
         },
         {
-          "marketId": 1,
-          "marketAccount": "E2f2k4bMv6g4usjt9zAz43CudykXWGwjG8s6nYtJF8Yy",
+          "marketId": 3,
+          "marketAccount": "8zyghWdrtfKA8YAb78zibWdrUqByURiFihipodg3R5x8",
           "marketCorrelation" : false,
-          "pool": "CVdbySirAWcygBo3WsmJH1QPnQi3oyDaDWv5C3d3xQAH",
-          "targetCustody": "2dLnRMbXfMx8DnGb6CbM3BrLv4F78SWLx7uWRTZPTZ1y",
+          "pool": "GJMj6ZeK8JYvwYNfurMKf6sEYZLkonqvYzXowcS6TL5D",
+          "targetCustody": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
           "collateralCustody": "FheNnJ2RmuVCJFvHbhADFHwfQwnCX9nMhdsay1hxSmkv",
           "side": "short",
           "maxLev": 5,
-          "targetCustodyId": 1,
+          "targetCustodyId": 2,
           "collateralCustodyId": 0,
-          "targetMint": "trmpE3o2TJpkvszv7hZvFw72ynYYfyoVJXjJajfK5VH",
+          "targetMint": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         }
       ]

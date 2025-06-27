@@ -191,7 +191,14 @@ export type RewardDistribution = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CollectRewardParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -276,6 +283,18 @@ export type RewardDistribution = {
         "fields": [
           {
             "name": "rewardAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "raffleCounter",
             "type": "u64"
           }
         ]
@@ -519,7 +538,14 @@ export const IDL: RewardDistribution = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CollectRewardParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -604,6 +630,18 @@ export const IDL: RewardDistribution = {
         "fields": [
           {
             "name": "rewardAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectRewardParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "raffleCounter",
             "type": "u64"
           }
         ]

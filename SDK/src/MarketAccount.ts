@@ -17,8 +17,10 @@ export class MarketAccount implements Market {
     permissions: MarketPermissions;
     openInterest: BN;
     collectivePosition: PositionStats;
-    targetCustodyId: BN;
-    collateralCustodyId: BN;
+    targetCustodyUid: number;
+    padding: number[];
+    collateralCustodyUid: number;
+    padding2: number[];
     bump: number;
 
     constructor(publicKey: PublicKey, parseData: Market) {

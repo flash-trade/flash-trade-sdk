@@ -1,5 +1,6 @@
 import { AnchorProvider } from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes';
 import {
   AddressLookupTableAccount,
   BlockhashWithExpiryBlockHeight,
@@ -262,6 +263,166 @@ export async function confirmTransactionV2(
   }
   return signature;
 }
+
+
+export async function sendTransactionV3(
+  provider: AnchorProvider,
+  ixs: TransactionInstruction[],
+  opts: SendTransactionOpts = {}
+) {
+  const connection = provider.connection
+  const latestBlockhash =
+      opts.latestBlockhash ??
+      (await connection.getLatestBlockhash(
+          opts.preflightCommitment ?? provider.opts.preflightCommitment ?? 'finalized'
+      ))
+
+  const payer = (provider as AnchorProvider).wallet
+  // console.log(
+  //     'usePriorityFeeStore.getState().priorityFeeInMicroLaportsPerCu :>> ',
+  //     usePriorityFeeStore.getState().priorityFeeInMicroLaportsPerCu
+  // )
+  // if (usePriorityFeeStore.getState().priorityFeeInMicroLaportsPerCu) {
+  // }
+  // ixs = [...ixs, createComputeBudgetIx(usePriorityFeeStore.getState().priorityFeeInMicroLaportsPerCu ?? 2500000)]
+
+  const message = MessageV0.compile({
+      payerKey: (provider as AnchorProvider).wallet.publicKey,
+      instructions: ixs,
+      recentBlockhash: latestBlockhash.blockhash,
+      addressLookupTableAccounts: opts.alts,
+  })
+
+  // OLD way
+  let vtx = new VersionedTransaction(message)
+  if (opts?.additionalSigners?.length) {
+      vtx.sign([...opts?.additionalSigners])
+  }
+
+  if (
+      typeof payer.signTransaction === 'function' &&
+      !(payer instanceof NodeWallet || payer.constructor.name == 'NodeWallet')
+  ) {
+      vtx = (await payer.signTransaction(vtx as any)) as unknown as VersionedTransaction
+  } else {
+      // Maybe this path is only correct for NodeWallet?
+      vtx.sign([(payer as any).payer as Signer])
+  }
+
+  //  way-1
+  // const signature = await connection.sendRawTransaction(vtx.serialize(), {
+  //   skipPreflight: true, // mergedOpts.skipPreflight,
+  //   // maxRetries: 0,
+  // });
+  bs58.encode(vtx.serialize())
+  const tx = bs58.encode(vtx.serialize())
+  // console.log('full ttt:', tx)
+  // const ok = await sendTransactionWithMangoLite(tx)
+  // console.log('mangolite ok :>> ', ok)
+  //  way-2
+  const signature = await connection.sendTransaction(vtx, {
+      skipPreflight: true, // mergedOpts.skipPreflight,
+      maxRetries: 0,
+  })
+
+  return { signature, versionedTransaction: vtx }
+}
+
+export async function confirmTransactionV3(
+  provider: AnchorProvider,
+  versionedTransaction: VersionedTransaction,
+  signature: string,
+  opts: any = {}
+): Promise<string> {
+  const connection = provider.connection
+  let status: any
+  //   let done = false;
+  const blockhashResponse = await connection.getLatestBlockhashAndContext()
+  const lastValidBlockHeight = blockhashResponse.context.slot + 150
+  let blockheight = await connection.getBlockHeight()
+
+  while (blockheight < lastValidBlockHeight) {
+      console.log('inside while :', signature, blockheight, lastValidBlockHeight)
+      const signatureStatuses = await connection.getSignatureStatuses([signature])
+      const result = signatureStatuses && signatureStatuses.value[0]
+      console.log('result:', result, signatureStatuses.value[0])
+      if (!result) {
+          // console.log('REST null result for', txid, result);
+      } else if (result.err) {
+          // console.log('REST error for', txid, result);
+          //   done = true;
+          status = result // shouln't user result.err here
+          console.log('breakinng with err', result.err)
+          break
+          // @ts-ignore
+      } else if (!['processed', 'confirmed', 'finalized'].includes(result.confirmationStatus)) {
+          // console.log('REST not confirmed', txid, result);
+      } else {
+          // console.log('REST confirmed', txid, result);
+          //   done = true;
+          status = result
+          console.log('breakinng with susccess', result)
+          break
+      }
+      console.log('status:', status)
+
+      // === jito bundle
+      // bs58.encode(versionedTransaction.serialize())
+      // const tx = bs58.encode(versionedTransaction.serialize())
+      // // console.log('ttt:', tx)
+      // const ok = await sendTransactionWithJito(tx)
+      // console.log('jito trx ok :>> ', ok)
+      // =======
+
+      const x = await connection.sendTransaction(versionedTransaction, {
+          skipPreflight: true, // mergedOpts.skipPreflight,
+          maxRetries: 0,
+      })
+      console.log('retyr send :', x)
+      await sleep(2_000)
+      blockheight = await connection.getBlockHeight()
+  }
+
+  // const latestBlockhash =
+  // opts.latestBlockhash ??
+  // (await connection.getLatestBlockhash(
+  //   opts.preflightCommitment ??
+  //   provider.opts.preflightCommitment ??
+  //   'finalized',
+  // ));
+  // const txConfirmationCommitment = opts.txConfirmationCommitment ?? 'processed';
+  // if (
+  //   latestBlockhash.blockhash != null &&
+  //   latestBlockhash.lastValidBlockHeight != null
+  // ) {
+  //   status = (
+  //     await connection.confirmTransaction(
+  //       {
+  //         signature: signature,
+  //         blockhash: latestBlockhash.blockhash,
+  //         lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+  //       },
+  //       txConfirmationCommitment,
+  //     )
+  //   ).value;
+  // } else {
+  //   status = (
+  //     await connection.confirmTransaction(signature, txConfirmationCommitment)
+  //   ).value;
+  // }
+
+  if (status.err) {
+      console.warn('Tx status: ', status)
+      throw new TransactionFailError({
+          txid: signature,
+          message: `${JSON.stringify(status)}`,
+      })
+  }
+  return signature
+}
+
+
+
 // ----
 
 export const createComputeBudgetIx = (

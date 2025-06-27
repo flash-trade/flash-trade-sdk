@@ -20,7 +20,9 @@ export class TradingAccount implements Trading {
     snapshot: VoltageStats;
     timestamp: BN;
     counter: BN;
-    padding: BN[];
+    tokenStakeAccount: PublicKey;
+    burnt: boolean;
+    padding: number[];
 
 
     constructor(publicKey: PublicKey, parseData: Trading) {

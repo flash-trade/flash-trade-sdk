@@ -25,6 +25,7 @@ export class PoolAccount implements Pool {
     lpMintBump: number;
     stakedLpVaultBump: number;
     vpVolumeFactor: number;
+    uniqueCustodyCount: number;
     padding: number[];
     stakingFeeBoostBps: BN[];
     compoundingMint: PublicKey;
@@ -47,7 +48,7 @@ export class PoolAccount implements Pool {
         Object.assign(this, parseData);
     }
 
-    getTokenId(custodyKey: PublicKey) : number {
+    getCustodyId(custodyKey: PublicKey) : number {
         return this.custodies.findIndex(i => i.toBase58()==custodyKey.toBase58())
     }
 

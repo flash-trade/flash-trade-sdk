@@ -11,6 +11,9 @@ export const BPS_POWER = 10**(BPS_DECIMALS);
 
 export const LP_DECIMALS = USD_DECIMALS;
 
+export const FAF_DECIMALS = 6;
+
+
 export const RATE_DECIMALS = 9; // borow rate 
 export const RATE_POWER = 10**(RATE_DECIMALS);
 

@@ -1,8 +1,8 @@
 import { PublicKey, RpcResponseAndContext, SimulatedTransactionResponse, Transaction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
-import { IDL } from "./idl/perpetuals";
-import { IdlCoder } from "./IdlCoder";
-import { PerpetualsClient } from "./PerpetualsClient";
 import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
+import { IDL } from "./idl/perpetuals";
+import { IdlCoder } from "./utils/IdlCoder";
+import { PerpetualsClient } from "./PerpetualsClient";
 
 export class ViewHelper {
     private perpetualsClient: PerpetualsClient;
@@ -41,14 +41,15 @@ export class ViewHelper {
                 throw new Error(`FLASH No Logs Found ${{ cause: data }}`);
             }
         } catch (error) {
-            console.log(error);
+            console.log("decode error::",error);
         }
     }
 
     async simulateTransaction(
-        transaction: Transaction
+        transaction: Transaction,
+        userPublicKey: PublicKey | undefined = undefined
     ): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
-        transaction.feePayer = this.perpetualsClient.provider.publicKey;
+        transaction.feePayer = userPublicKey ?? this.perpetualsClient.provider.publicKey;
         let latestBlockhash = await this.perpetualsClient.provider.connection.getLatestBlockhash('confirmed');
 
         const messageV0 = new TransactionMessage({
@@ -60,4 +61,6 @@ export class ViewHelper {
         const transaction2 = new VersionedTransaction(messageV0);
         return this.perpetualsClient.provider.connection.simulateTransaction(transaction2, { sigVerify: false, replaceRecentBlockhash: true });
     }
+
+    // ... (other methods would be here)
 }

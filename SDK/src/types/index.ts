@@ -44,6 +44,8 @@ export type FeesStats = Types["FeesStats"];
 export type PositionStats = Types["PositionStats"];
 export type BorrowRateState = Types["BorrowRateState"];
 
+export type TokenPermissions = Types["TokenPermissions"];
+
 // export type CustomOracle = Types["CustomOracle"]
 
 export type Custody = Accounts["custody"];
@@ -53,11 +55,15 @@ export type Position = Accounts["position"];
 export type Order = Accounts["order"];
 
 
-
 export type PerpetualsAccount = Accounts["perpetuals"];
 export type Referral = Accounts["referral"];
 export type Trading = Accounts["trading"];
 export type FlpStake = Accounts["flpStake"];
+
+export type TokenVault = Accounts["tokenVault"];
+export type TokenStake = Accounts["tokenStake"];
+export type ProtocolVault = Accounts["protocolVault"];
+
 
 export type RewardRecord = FbnftRewardsAccounts["rewardRecord"];
 export type RewardVault = FbnftRewardsAccounts["rewardVault"];
@@ -107,6 +113,7 @@ export type AddLiquidityAndStakeLog = Events["AddLiquidityAndStakeLog"];
 export type DepositStakeLog = Events["DepositStakeLog"];
 export type MigrateStakeLog = Events["MigrateStakeLog"];
 export type RefreshStakeLog = Events["RefreshStakeLog"];
+export type RefreshStakeUserLog = Events["RefreshStakeUserLog"];
 export type CompoundingFeesLog = Events["CompoundingFeesLog"];
 export type RemoveCompoundingLiquidityLog = Events["RemoveCompoundingLiquidityLog"];
 export type SwapFeeInternalLog = Events["SwapFeeInternalLog"];
@@ -132,7 +139,20 @@ export type CloseAndSwapLog = Events["CloseAndSwapLog"]
 export type SwapAndAddCollateralLog = Events["SwapAndAddCollateralLog"]
 export type RemoveCollateralAndSwapLog = Events["RemoveCollateralAndSwapLog"]
 
+export type BurnAndClaimLog = Events["BurnAndClaimLog"]
+export type BurnAndStakeLog = Events["BurnAndStakeLog"]
+export type CancelUnstakeTokenRequestLog = Events["CancelUnstakeTokenRequestLog"]
+export type DepositTokenStakeLog = Events["DepositTokenStakeLog"]
+export type UnstakeTokenInstantLog = Events["UnstakeTokenInstantLog"]
+export type UnstakeTokenRequestLog = Events["UnstakeTokenRequestLog"]
+export type WithdrawTokenLog = Events["WithdrawTokenLog"]
+export type DistributeTokenRewardLog = Events["DistributeTokenRewardLog"]
+export type SetTokenRewardLog = Events["SetTokenRewardLog"]
+export type CollectTokenRewardLog = Events["CollectTokenRewardLog"]
+export type CollectRevenueLog = Events["CollectRevenueLog"]
+export type MoveProtocolFeesLog = Events["MoveProtocolFeesLog"]
 
+export type VoltagePointsLog = Events["VoltagePointsLog"]
 
 //  taken from drift 
 export function isVariant(object: any, type: string) {
@@ -148,7 +168,7 @@ export function isOneOfVariant(object: any, types: string[]) {
 
 export class Privilege {
     static None = { none: {} };
-    static NFT = { nft: {} };
+    static Stake = { stake: {} };
     static Referral = { referral: {} };
 }
 
@@ -263,6 +283,7 @@ export interface RemoveCollateralData {
     newSizeUsd: BN,
     feeUsd: BN,
     feeUsdWithDiscount : BN,
+    lockAndUnsettledFeeUsd : BN,
     newLev: BN,
     liquidationPrice: OraclePrice,
     collateralAmountRecieved: BN
