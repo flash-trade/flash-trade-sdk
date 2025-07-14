@@ -841,10 +841,10 @@ file-uri-to-path@1.0.0:
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
   integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
 
-flash-sdk@^2.52.2:
-  version "2.52.2"
-  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-2.52.2.tgz#ceb098f2da105b65484b33706fb62521caee895f"
-  integrity sha512-gLMhifmxe82SCArNppwXU4MlD2wtHmouW6hdDpPeyZGdJGyjK4xNuKPPn6AJFZm9aSq6cK9i01FmWhC+sPIrwQ==
+flash-sdk@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-3.1.0.tgz#0f81b92381f619ffbdfe56db3d0efeac747e4a0e"
+  integrity sha512-Y1jg/umj6ayMX/U1Z6pbN788hozBtWJawKMUK/P7v7aWh8W0JWCWdlaFHy602AZlM89wSY8ku7s8jv905LmrpQ==
   dependencies:
     "@coral-xyz/anchor" "=0.27.0"
     "@pythnetwork/client" "^2.19.0"

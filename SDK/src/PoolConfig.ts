@@ -46,6 +46,7 @@ export type Token = {
   isVirtual: boolean;
   pythTicker: string;
   pythPriceId: string;
+  isToken2022: boolean
 };
 
 export class PoolConfig {

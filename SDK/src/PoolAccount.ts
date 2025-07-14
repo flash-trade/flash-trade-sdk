@@ -34,6 +34,14 @@ export class PoolAccount implements Pool {
     compoundingMintBump: number;
     compoundingLpVaultBump: number;
 
+    minLpPriceUsd: BN;
+    maxLpPriceUsd: BN;
+
+    lpPrice: BN;
+    compoundingLpPrice: BN;
+    lastUpdatedTimestamp: BN;
+    padding2: BN[];
+
     constructor(publicKey: PublicKey, parseData: Pool) {
         this.publicKey = publicKey;
         Object.assign(this, parseData);

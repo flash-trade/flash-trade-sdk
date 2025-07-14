@@ -387,6 +387,11 @@ export type Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -582,6 +587,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -997,6 +1007,11 @@ export type Perpetuals = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1049,6 +1064,11 @@ export type Perpetuals = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -1521,6 +1541,44 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setInternalCurrentPrice",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetInternalCurrentPriceParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setInternalEmaPrice",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetInternalEmaPriceParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "setInternalOraclePrice",
       "accounts": [
         {
@@ -1568,6 +1626,39 @@ export type Perpetuals = {
         }
       ],
       "returns": "u8"
+    },
+    {
+      "name": "setLpTokenPrice",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetLpTokenPriceParams"
+          }
+        }
+      ]
     },
     {
       "name": "setFeeShare",
@@ -1812,11 +1903,6 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "eventAuthority",
           "isMut": false,
           "isSigner": false
@@ -1828,6 +1914,26 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1926,7 +2032,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1942,6 +2048,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -2044,7 +2155,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2060,6 +2171,21 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -2162,7 +2288,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2178,6 +2304,21 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -2278,6 +2419,16 @@ export type Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2360,6 +2511,16 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -2466,6 +2627,16 @@ export type Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2549,6 +2720,16 @@ export type Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2617,6 +2798,11 @@ export type Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2678,6 +2864,11 @@ export type Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -2752,6 +2943,11 @@ export type Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -2913,6 +3109,11 @@ export type Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2976,6 +3177,11 @@ export type Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3037,6 +3243,11 @@ export type Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -3117,6 +3328,11 @@ export type Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3179,6 +3395,11 @@ export type Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -3295,6 +3516,11 @@ export type Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -3635,6 +3861,11 @@ export type Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -3800,6 +4031,16 @@ export type Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3807,49 +4048,6 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "RemoveCompoundingLiquidityParams"
-          }
-        }
-      ]
-    },
-    {
-      "name": "createTradingAccount",
-      "accounts": [
-        {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "nftMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tradingAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "metadataAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "CreateTradingAccountParams"
           }
         }
       ]
@@ -4004,7 +4202,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4020,6 +4218,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4165,7 +4368,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4181,6 +4384,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4283,7 +4491,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4299,6 +4507,21 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -4376,7 +4599,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4392,6 +4615,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4465,7 +4693,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4481,6 +4709,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4553,7 +4786,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4569,6 +4802,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4748,7 +4986,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4764,6 +5002,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4858,6 +5101,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -4956,7 +5204,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4972,6 +5220,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -5059,7 +5312,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -5075,6 +5328,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -5167,7 +5425,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -5183,6 +5441,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -5275,7 +5538,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -5291,6 +5554,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -5574,11 +5842,6 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "eventAuthority",
           "isMut": false,
           "isSigner": false
@@ -5590,6 +5853,26 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -5677,7 +5960,7 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -5693,6 +5976,11 @@ export type Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -7016,6 +7304,11 @@ export type Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -7240,8 +7533,8 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "sizeFactorForSpread",
-            "type": "u8"
+            "name": "token22",
+            "type": "bool"
           },
           {
             "name": "uid",
@@ -7771,6 +8064,35 @@ export type Perpetuals = {
           {
             "name": "compoundingLpVaultBump",
             "type": "u8"
+          },
+          {
+            "name": "minLpPriceUsd",
+            "type": "u64"
+          },
+          {
+            "name": "maxLpPriceUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lpPrice",
+            "type": "u64"
+          },
+          {
+            "name": "compoundingLpPrice",
+            "type": "u64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "padding2",
+            "type": {
+              "array": [
+                "u64",
+                1
+              ]
+            }
           }
         ]
       }
@@ -8282,6 +8604,10 @@ export type Perpetuals = {
             "type": "bool"
           },
           {
+            "name": "token22",
+            "type": "bool"
+          },
+          {
             "name": "oracle",
             "type": {
               "defined": "OracleParams"
@@ -8326,7 +8652,12 @@ export type Perpetuals = {
       "name": "AddInternalOracleParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "expo",
+            "type": "i32"
+          }
+        ]
       }
     },
     {
@@ -8550,18 +8881,6 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
-      }
-    },
-    {
-      "name": "CreateTradingAccountParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "collectionIndex",
-            "type": "u8"
-          }
-        ]
       }
     },
     {
@@ -9638,16 +9957,16 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "sizeFactorForSpread",
-            "type": "u8"
-          },
-          {
             "name": "minReserveUsd",
             "type": "u64"
           },
           {
             "name": "limitPriceBufferBps",
             "type": "u64"
+          },
+          {
+            "name": "token22",
+            "type": "bool"
           }
         ]
       }
@@ -9705,6 +10024,38 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "SetInternalCurrentPriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prices",
+            "type": {
+              "vec": {
+                "defined": "InternalPrice"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetInternalEmaPriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prices",
+            "type": {
+              "vec": {
+                "defined": "InternalEmaPrice"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "SetInternalOraclePriceParams",
       "type": {
         "kind": "struct",
@@ -9730,6 +10081,13 @@ export type Perpetuals = {
             "type": "i64"
           }
         ]
+      }
+    },
+    {
+      "name": "SetLpTokenPriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -9851,6 +10209,14 @@ export type Perpetuals = {
                 6
               ]
             }
+          },
+          {
+            "name": "minLpPriceUsd",
+            "type": "u64"
+          },
+          {
+            "name": "maxLpPriceUsd",
+            "type": "u64"
           }
         ]
       }
@@ -10589,6 +10955,42 @@ export type Perpetuals = {
           {
             "name": "maxBackupAgeSec",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InternalPrice",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "conf",
+            "type": "u64"
+          },
+          {
+            "name": "publishTime",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InternalEmaPrice",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "emaPrice",
+            "type": "u64"
+          },
+          {
+            "name": "publishTime",
+            "type": "i64"
           }
         ]
       }
@@ -16323,17 +16725,17 @@ export type Perpetuals = {
     {
       "code": 6028,
       "name": "UnsupportedCustody",
-      "msg": "Token is not supported"
+      "msg": "Custody is not supported"
     },
     {
       "code": 6029,
       "name": "UnsupportedPool",
-      "msg": "Token is not supported"
+      "msg": "Pool is not supported"
     },
     {
       "code": 6030,
       "name": "UnsupportedMarket",
-      "msg": "Token is not supported"
+      "msg": "Market is not supported"
     },
     {
       "code": 6031,
@@ -16479,6 +16881,11 @@ export type Perpetuals = {
       "code": 6059,
       "name": "InvalidRewardDistribution",
       "msg": "Invalid Reward Distribution"
+    },
+    {
+      "code": 6060,
+      "name": "LpPriceOutOfBounds",
+      "msg": "Liquidity Token price is out of bounds"
     }
   ]
 };
@@ -16872,6 +17279,11 @@ export const IDL: Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -17067,6 +17479,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -17482,6 +17899,11 @@ export const IDL: Perpetuals = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -17534,6 +17956,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -18006,6 +18433,44 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setInternalCurrentPrice",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetInternalCurrentPriceParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setInternalEmaPrice",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetInternalEmaPriceParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "setInternalOraclePrice",
       "accounts": [
         {
@@ -18053,6 +18518,39 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": "u8"
+    },
+    {
+      "name": "setLpTokenPrice",
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetLpTokenPriceParams"
+          }
+        }
+      ]
     },
     {
       "name": "setFeeShare",
@@ -18297,11 +18795,6 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "eventAuthority",
           "isMut": false,
           "isSigner": false
@@ -18313,6 +18806,26 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -18411,7 +18924,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -18427,6 +18940,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -18529,7 +19047,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -18545,6 +19063,21 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -18647,7 +19180,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -18663,6 +19196,21 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -18763,6 +19311,16 @@ export const IDL: Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -18845,6 +19403,16 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -18951,6 +19519,16 @@ export const IDL: Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "fundingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -19034,6 +19612,16 @@ export const IDL: Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -19102,6 +19690,11 @@ export const IDL: Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -19163,6 +19756,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -19237,6 +19835,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpTokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -19398,6 +20001,11 @@ export const IDL: Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -19461,6 +20069,11 @@ export const IDL: Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -19522,6 +20135,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -19602,6 +20220,11 @@ export const IDL: Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -19664,6 +20287,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -19780,6 +20408,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
           "isMut": false,
           "isSigner": false
         }
@@ -20120,6 +20753,11 @@ export const IDL: Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -20285,6 +20923,16 @@ export const IDL: Perpetuals = {
           "name": "ixSysvar",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -20292,49 +20940,6 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "RemoveCompoundingLiquidityParams"
-          }
-        }
-      ]
-    },
-    {
-      "name": "createTradingAccount",
-      "accounts": [
-        {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "nftMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tradingAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "metadataAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "CreateTradingAccountParams"
           }
         }
       ]
@@ -20489,7 +21094,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -20505,6 +21110,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -20650,7 +21260,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -20666,6 +21276,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -20768,7 +21383,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -20784,6 +21399,21 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -20861,7 +21491,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -20877,6 +21507,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -20950,7 +21585,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -20966,6 +21601,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21038,7 +21678,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -21054,6 +21694,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21233,7 +21878,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -21249,6 +21894,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21343,6 +21993,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21441,7 +22096,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -21457,6 +22112,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21544,7 +22204,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -21560,6 +22220,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21652,7 +22317,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "fundingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -21668,6 +22333,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fundingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -21760,7 +22430,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -21776,6 +22446,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -22059,11 +22734,6 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "eventAuthority",
           "isMut": false,
           "isSigner": false
@@ -22075,6 +22745,26 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -22162,7 +22852,7 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "receivingTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -22178,6 +22868,11 @@ export const IDL: Perpetuals = {
         },
         {
           "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receivingMint",
           "isMut": false,
           "isSigner": false
         }
@@ -23501,6 +24196,11 @@ export const IDL: Perpetuals = {
           "name": "program",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "receivingTokenMint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -23725,8 +24425,8 @@ export const IDL: Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "sizeFactorForSpread",
-            "type": "u8"
+            "name": "token22",
+            "type": "bool"
           },
           {
             "name": "uid",
@@ -24256,6 +24956,35 @@ export const IDL: Perpetuals = {
           {
             "name": "compoundingLpVaultBump",
             "type": "u8"
+          },
+          {
+            "name": "minLpPriceUsd",
+            "type": "u64"
+          },
+          {
+            "name": "maxLpPriceUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lpPrice",
+            "type": "u64"
+          },
+          {
+            "name": "compoundingLpPrice",
+            "type": "u64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "padding2",
+            "type": {
+              "array": [
+                "u64",
+                1
+              ]
+            }
           }
         ]
       }
@@ -24767,6 +25496,10 @@ export const IDL: Perpetuals = {
             "type": "bool"
           },
           {
+            "name": "token22",
+            "type": "bool"
+          },
+          {
             "name": "oracle",
             "type": {
               "defined": "OracleParams"
@@ -24811,7 +25544,12 @@ export const IDL: Perpetuals = {
       "name": "AddInternalOracleParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "expo",
+            "type": "i32"
+          }
+        ]
       }
     },
     {
@@ -25035,18 +25773,6 @@ export const IDL: Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
-      }
-    },
-    {
-      "name": "CreateTradingAccountParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "collectionIndex",
-            "type": "u8"
-          }
-        ]
       }
     },
     {
@@ -26123,16 +26849,16 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "sizeFactorForSpread",
-            "type": "u8"
-          },
-          {
             "name": "minReserveUsd",
             "type": "u64"
           },
           {
             "name": "limitPriceBufferBps",
             "type": "u64"
+          },
+          {
+            "name": "token22",
+            "type": "bool"
           }
         ]
       }
@@ -26190,6 +26916,38 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "SetInternalCurrentPriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prices",
+            "type": {
+              "vec": {
+                "defined": "InternalPrice"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetInternalEmaPriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prices",
+            "type": {
+              "vec": {
+                "defined": "InternalEmaPrice"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "SetInternalOraclePriceParams",
       "type": {
         "kind": "struct",
@@ -26215,6 +26973,13 @@ export const IDL: Perpetuals = {
             "type": "i64"
           }
         ]
+      }
+    },
+    {
+      "name": "SetLpTokenPriceParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -26336,6 +27101,14 @@ export const IDL: Perpetuals = {
                 6
               ]
             }
+          },
+          {
+            "name": "minLpPriceUsd",
+            "type": "u64"
+          },
+          {
+            "name": "maxLpPriceUsd",
+            "type": "u64"
           }
         ]
       }
@@ -27074,6 +27847,42 @@ export const IDL: Perpetuals = {
           {
             "name": "maxBackupAgeSec",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InternalPrice",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "conf",
+            "type": "u64"
+          },
+          {
+            "name": "publishTime",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InternalEmaPrice",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "emaPrice",
+            "type": "u64"
+          },
+          {
+            "name": "publishTime",
+            "type": "i64"
           }
         ]
       }
@@ -32808,17 +33617,17 @@ export const IDL: Perpetuals = {
     {
       "code": 6028,
       "name": "UnsupportedCustody",
-      "msg": "Token is not supported"
+      "msg": "Custody is not supported"
     },
     {
       "code": 6029,
       "name": "UnsupportedPool",
-      "msg": "Token is not supported"
+      "msg": "Pool is not supported"
     },
     {
       "code": 6030,
       "name": "UnsupportedMarket",
-      "msg": "Token is not supported"
+      "msg": "Market is not supported"
     },
     {
       "code": 6031,
@@ -32964,6 +33773,11 @@ export const IDL: Perpetuals = {
       "code": 6059,
       "name": "InvalidRewardDistribution",
       "msg": "Invalid Reward Distribution"
+    },
+    {
+      "code": 6060,
+      "name": "LpPriceOutOfBounds",
+      "msg": "Liquidity Token price is out of bounds"
     }
   ]
 };

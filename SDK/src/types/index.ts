@@ -46,6 +46,11 @@ export type BorrowRateState = Types["BorrowRateState"];
 
 export type TokenPermissions = Types["TokenPermissions"];
 
+export type InternalPrice = Types["InternalPrice"];
+export type InternalEmaPrice = Types["InternalEmaPrice"];
+
+
+
 // export type CustomOracle = Types["CustomOracle"]
 
 export type Custody = Accounts["custody"];

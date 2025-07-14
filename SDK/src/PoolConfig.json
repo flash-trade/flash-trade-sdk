@@ -52,7 +52,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "SOL",
@@ -63,7 +64,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.SOL/USD",
-          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
+          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
+          "isToken2022": false
         },
         {
           "symbol": "WSOL",
@@ -74,7 +76,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.SOL/USD",
-          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
+          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
+          "isToken2022": false
         },
         {
           "symbol": "BTC",
@@ -85,7 +88,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.BTC/USD",
-          "pythPriceId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+          "pythPriceId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+          "isToken2022": false
         },
         {
           "symbol": "ETH",
@@ -96,7 +100,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.ETH/USD",
-          "pythPriceId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
+          "pythPriceId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+          "isToken2022": false
         },
         {
           "symbol": "JitoSOL",
@@ -107,7 +112,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.JITOSOL/USD",
-          "pythPriceId": "0x67be9f519b95cf24338801051f9a808eff0a578ccb388db73b7f6fe1de019ffb"
+          "pythPriceId": "0x67be9f519b95cf24338801051f9a808eff0a578ccb388db73b7f6fe1de019ffb",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -339,7 +345,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "XAU",
@@ -350,7 +357,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "Metal.XAU/USD",
-          "pythPriceId": "0x765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2"
+          "pythPriceId": "0x765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2",
+          "isToken2022": false
         },
         {
           "symbol": "XAG",
@@ -361,7 +369,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "Metal.XAG/USD",
-          "pythPriceId": "0xf2fb02c32b055c805e7238d628e5e9dadef274376114eb1f012337cabe93871e"
+          "pythPriceId": "0xf2fb02c32b055c805e7238d628e5e9dadef274376114eb1f012337cabe93871e",
+          "isToken2022": false
         },
         {
           "symbol": "EUR",
@@ -372,7 +381,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "FX.EUR/USD",
-          "pythPriceId": "0xa995d00bb36a63cef7fd2c287dc105fc8f3d93779f062f09551b0af3e81ec30b"
+          "pythPriceId": "0xa995d00bb36a63cef7fd2c287dc105fc8f3d93779f062f09551b0af3e81ec30b",
+          "isToken2022": false
         },
         {
           "symbol": "GBP",
@@ -383,7 +393,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "FX.GBP/USD",
-          "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1"
+          "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1",
+          "isToken2022": false
         },
         {
           "symbol": "CRUDEOIL",
@@ -394,7 +405,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "Commodities.WTI1M",
-          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
+          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -684,7 +696,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "JUP",
@@ -695,7 +708,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.JUP/USD",
-          "pythPriceId": "0x0a0408d619e9380abad35060f9192039ed5042fa6f82301d0e48bb52be830996"
+          "pythPriceId": "0x0a0408d619e9380abad35060f9192039ed5042fa6f82301d0e48bb52be830996",
+          "isToken2022": false
         },
         {
           "symbol": "PYTH",
@@ -706,7 +720,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.PYTH/USD",
-          "pythPriceId": "0x0bbf28e9a841a1cc788f6a361b17ca072d0ea3098a1e5df1c3922d06719579ff"
+          "pythPriceId": "0x0bbf28e9a841a1cc788f6a361b17ca072d0ea3098a1e5df1c3922d06719579ff",
+          "isToken2022": false
         },
         {
           "symbol": "JTO",
@@ -717,18 +732,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.JTO/USD",
-          "pythPriceId": "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2"
-        },
-        {
-          "symbol": "W",
-          "mintKey": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
-          "decimals": 6,
-          "usdPrecision": 4,
-          "tokenPrecision": 4,
-          "isStable": false,
-          "isVirtual": false,
-          "pythTicker": "Crypto.W/USD",
-          "pythPriceId": "0xeff7446475e218517566ea99e72a4abec2e1bd8498b43b7d8331e29dcb059389"
+          "pythPriceId": "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2",
+          "isToken2022": false
         },
         {
           "symbol": "RAY",
@@ -739,7 +744,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.RAY/USD",
-          "pythPriceId": "0x91568baa8beb53db23eb3fb7f22c6e8bd303d103919e19733f2bb642d3e7987a"
+          "pythPriceId": "0x91568baa8beb53db23eb3fb7f22c6e8bd303d103919e19733f2bb642d3e7987a",
+          "isToken2022": false
         },
         {
           "symbol": "KMNO",
@@ -750,7 +756,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.KMNO/USD",
-          "pythPriceId": "0xb17e5bc5de742a8a378b54c9c75442b7d51e30ada63f28d9bd28d3c0e26511a0"
+          "pythPriceId": "0xb17e5bc5de742a8a378b54c9c75442b7d51e30ada63f28d9bd28d3c0e26511a0",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -817,22 +824,6 @@
           "extOracleAddress": "7ajR2zA4MGMMTqRAVjghTKqPPn4kbrj3pYkAVRVwTGzP",
           "pythTicker": "Crypto.JTO/USD",
           "pythPriceId": "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2"
-        },
-        {
-          "custodyId": 4,
-          "custodyAccount": "58NxGYaVq1CXpNJUsvUDGgBeBtMcoGHP8u58KSk2bagE",
-          "tokenAccount": "4xooDvD4S1BJECjGnKmzNJQrtSxxXVpHRHLiZYc5xyC3",
-          "symbol": "W",
-          "mintKey": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
-          "decimals": 6,
-          "usdPrecision": 4,
-          "tokenPrecision": 6,
-          "isStable": false,
-          "isVirtual": false,
-          "intOracleAddress": "F1xtMtakpmtDvtrGs7YXeJHAmQi4owUxNns5P5qsZN35",
-          "extOracleAddress": "BEMsCSQEGi2kwPA4mKnGjxnreijhMki7L4eeb96ypzF9",
-          "pythTicker": "Crypto.W/USD",
-          "pythPriceId": "0xeff7446475e218517566ea99e72a4abec2e1bd8498b43b7d8331e29dcb059389"
         },
         {
           "custodyId": 5,
@@ -953,34 +944,6 @@
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         },
         {
-          "marketId": 6,
-          "marketAccount": "Dk2P1xDyewb9nxsMacw6gfuhTb3DqPZM1Sm97K66CTQK",
-          "marketCorrelation" : true,
-          "pool": "D6bfytnxoZBSzJM7fcixg5sgWJ2hj8SbwkPvb2r8XpbH",
-          "targetCustody": "58NxGYaVq1CXpNJUsvUDGgBeBtMcoGHP8u58KSk2bagE",
-          "collateralCustody": "58NxGYaVq1CXpNJUsvUDGgBeBtMcoGHP8u58KSk2bagE",
-          "side": "long",
-          "maxLev": 50,
-          "targetCustodyId": 4,
-          "collateralCustodyId": 4,
-          "targetMint": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
-          "collateralMint": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ"
-        },
-        {
-          "marketId": 7,
-          "marketAccount": "9mMAN4hFvw5AGB6eNay1WvNsGoyK9xcBafZ5tVbHcHQq",
-          "marketCorrelation" : false,
-          "pool": "D6bfytnxoZBSzJM7fcixg5sgWJ2hj8SbwkPvb2r8XpbH",
-          "targetCustody": "58NxGYaVq1CXpNJUsvUDGgBeBtMcoGHP8u58KSk2bagE",
-          "collateralCustody": "6fiadNoZVTha5NdaktZgJ3PHm7bncZpiqGvFbCsrUv72",
-          "side": "short",
-          "maxLev": 50,
-          "targetCustodyId": 4,
-          "collateralCustodyId": 0,
-          "targetMint": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
-          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-        },
-        {
           "marketId": 8,
           "marketAccount": "aZCThBPnK1j8feCAKnVtS3QjULzNwPDy4a8V3FzbM9V",
           "marketCorrelation" : true,
@@ -1084,7 +1047,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "BONK",
@@ -1095,7 +1059,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.BONK/USD",
-          "pythPriceId": "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419"
+          "pythPriceId": "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419",
+          "isToken2022": false
         },
         {
           "symbol": "PENGU",
@@ -1106,7 +1071,20 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.PENGU/USD",
-          "pythPriceId": "0xbed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61"
+          "pythPriceId": "0xbed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61",
+          "isToken2022": false
+        },
+        {
+          "symbol": "PUMP",
+          "mintKey": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+          "decimals": 6,
+          "usdPrecision": 6,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "pythTicker": "Crypto.PUMP/USD",
+          "pythPriceId": "0x7a01fca212788bba7c5bf8c9efd576a8a722f070d2c17596ff7bb609b8d5c3b9",
+          "isToken2022": true
         }
       ],
       "custodies": [
@@ -1157,6 +1135,22 @@
           "extOracleAddress": "27zzC5wXCeZeuJ3h9uAJzV5tGn6r5Tzo98S1ZceYKEb8",
           "pythTicker": "Crypto.PENGU/USD",
           "pythPriceId": "0xbed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61"
+        },
+        {
+          "custodyId": 3,
+          "custodyAccount": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
+          "tokenAccount": "HVD2kxz3oGpiZZGLXHEcmbHr8MUjUBYKGKmSBbjzpBqZ",
+          "symbol": "PUMP",
+          "mintKey": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+          "decimals": 6,
+          "usdPrecision": 6,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "intOracleAddress": "HkbXAhndY1nErJ176ncjSYait341g23mBLcsRpFSM4QP",
+          "extOracleAddress": "HMm3GPbdnqGwbkTnUUqCFsH8AMHDdEC3Lg8gcPD3HJSH",
+          "pythTicker": "Crypto.PUMP/USD",
+          "pythPriceId": "0x7a01fca212788bba7c5bf8c9efd576a8a722f070d2c17596ff7bb609b8d5c3b9"
         }
       ],
       "markets": [
@@ -1168,7 +1162,7 @@
           "targetCustody": "7gfDTeMREaKcg3SMfrgVP7fjrstmrzzAeYCAcVaHTV9h",
           "collateralCustody": "7gfDTeMREaKcg3SMfrgVP7fjrstmrzzAeYCAcVaHTV9h",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 1,
           "targetMint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
@@ -1182,7 +1176,7 @@
           "targetCustody": "7gfDTeMREaKcg3SMfrgVP7fjrstmrzzAeYCAcVaHTV9h",
           "collateralCustody": "qFFbK8PHbNt4433AUTHHDsmDuQGTQhixc8t4sCzugG4",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 0,
           "targetMint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
@@ -1196,7 +1190,7 @@
           "targetCustody": "Gw81Uk5LarYkoCtwY95b1uT8tqTyzYQf3WM3yvgi9N43",
           "collateralCustody": "Gw81Uk5LarYkoCtwY95b1uT8tqTyzYQf3WM3yvgi9N43",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 2,
           "targetMint": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
@@ -1210,10 +1204,38 @@
           "targetCustody": "Gw81Uk5LarYkoCtwY95b1uT8tqTyzYQf3WM3yvgi9N43",
           "collateralCustody": "qFFbK8PHbNt4433AUTHHDsmDuQGTQhixc8t4sCzugG4",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 0,
           "targetMint": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "marketId": 4,
+          "marketAccount": "F8vVZZkWVgU7DvzaYEr539TsstaatWZMtAx6rwNNPL7R",
+          "marketCorrelation" : true,
+          "pool": "6HukhSeVVLQekKaGJYkwztBacjhKLKywVPrmcvccaYMz",
+          "targetCustody": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
+          "collateralCustody": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
+          "side": "long",
+          "maxLev": 10,
+          "targetCustodyId": 3,
+          "collateralCustodyId": 3,
+          "targetMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+          "collateralMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn"
+        },
+        {
+          "marketId": 5,
+          "marketAccount": "HZdu8XS4qxSGn96o6pj3o4CWq2FMHe7z26NPofx63xoS",
+          "marketCorrelation" : false,
+          "pool": "6HukhSeVVLQekKaGJYkwztBacjhKLKywVPrmcvccaYMz",
+          "targetCustody": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
+          "collateralCustody": "qFFbK8PHbNt4433AUTHHDsmDuQGTQhixc8t4sCzugG4",
+          "side": "short",
+          "maxLev": 10,
+          "targetCustodyId": 3,
+          "collateralCustodyId": 0,
+          "targetMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         }
       ]
@@ -1264,7 +1286,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "WIF",
@@ -1275,7 +1298,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.WIF/USD",
-          "pythPriceId": "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc"
+          "pythPriceId": "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -1321,7 +1345,7 @@
           "targetCustody": "AMAea38ijDJuoq14mwxzQkGEyZEnjw69eqrMQ9uHPdyP",
           "collateralCustody": "AMAea38ijDJuoq14mwxzQkGEyZEnjw69eqrMQ9uHPdyP",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 1,
           "targetMint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
@@ -1335,7 +1359,7 @@
           "targetCustody": "AMAea38ijDJuoq14mwxzQkGEyZEnjw69eqrMQ9uHPdyP",
           "collateralCustody": "EtLnmKsmbTPH1mUhZSNU5ErEoFrSgYoxoKX8BSzEZmnn",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 0,
           "targetMint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
@@ -1389,7 +1413,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "SAMO",
@@ -1400,7 +1425,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.SAMO/USD",
-          "pythPriceId": "0x49601625e1a342c1f90c3fe6a03ae0251991a1d76e480d2741524c29037be28a"
+          "pythPriceId": "0x49601625e1a342c1f90c3fe6a03ae0251991a1d76e480d2741524c29037be28a",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -1514,7 +1540,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "FARTCOIN",
@@ -1525,7 +1552,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.FARTCOIN/USD",
-          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608"
+          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -1571,7 +1599,7 @@
           "targetCustody": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
           "collateralCustody": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
           "side": "long",
-          "maxLev": 5,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 2,
           "targetMint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
@@ -1585,7 +1613,7 @@
           "targetCustody": "EHzgXgb2azBXG9bgPT2GEPfe6FtyQwiJtPxMUwny4WFe",
           "collateralCustody": "B1b3WnCbwrQC8yk6o5rVLGGJFD7BdQBLyaWsRw4Lqgp2",
           "side": "short",
-          "maxLev": 5,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 0,
           "targetMint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
@@ -1639,7 +1667,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "SOL",
@@ -1650,7 +1679,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.SOL/USD",
-          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
+          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
+          "isToken2022": false
         },
         {
           "symbol": "WSOL",
@@ -1661,7 +1691,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.SOL/USD",
-          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
+          "pythPriceId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
+          "isToken2022": false
         },
         {
           "symbol": "BTC",
@@ -1672,7 +1703,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.BTC/USD",
-          "pythPriceId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+          "pythPriceId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+          "isToken2022": false
         },
         {
           "symbol": "ETH",
@@ -1683,7 +1715,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.ETH/USD",
-          "pythPriceId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
+          "pythPriceId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+          "isToken2022": false
         },
         {
           "symbol": "JitoSOL",
@@ -1694,7 +1727,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.JITOSOL/USD",
-          "pythPriceId": "67be9f519b95cf24338801051f9a808eff0a578ccb388db73b7f6fe1de019ffb"
+          "pythPriceId": "67be9f519b95cf24338801051f9a808eff0a578ccb388db73b7f6fe1de019ffb",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -1926,7 +1960,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "XAU",
@@ -1937,7 +1972,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "Metal.XAU/USD",
-          "pythPriceId": "0x765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2"
+          "pythPriceId": "0x765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2",
+          "isToken2022": false
         },
         {
           "symbol": "XAG",
@@ -1948,7 +1984,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "Metal.XAG/USD",
-          "pythPriceId": "0xf2fb02c32b055c805e7238d628e5e9dadef274376114eb1f012337cabe93871e"
+          "pythPriceId": "0xf2fb02c32b055c805e7238d628e5e9dadef274376114eb1f012337cabe93871e",
+          "isToken2022": false
         },
         {
           "symbol": "EUR",
@@ -1959,7 +1996,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "FX.EUR/USD",
-          "pythPriceId": "0xa995d00bb36a63cef7fd2c287dc105fc8f3d93779f062f09551b0af3e81ec30b"
+          "pythPriceId": "0xa995d00bb36a63cef7fd2c287dc105fc8f3d93779f062f09551b0af3e81ec30b",
+          "isToken2022": false
         },
         {
           "symbol": "GBP",
@@ -1970,7 +2008,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "FX.GBP/USD",
-          "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1"
+          "pythPriceId": "0x84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1",
+          "isToken2022": false
         },
         {
           "symbol": "CRUDEOIL",
@@ -1981,7 +2020,8 @@
           "isStable": false,
           "isVirtual": true,
           "pythTicker": "Commodities.WTI1M",
-          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
+          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -2271,7 +2311,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "JUP",
@@ -2282,7 +2323,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.JUP/USD",
-          "pythPriceId": "0x0a0408d619e9380abad35060f9192039ed5042fa6f82301d0e48bb52be830996"
+          "pythPriceId": "0x0a0408d619e9380abad35060f9192039ed5042fa6f82301d0e48bb52be830996",
+          "isToken2022": false
         },
         {
           "symbol": "PYTH",
@@ -2293,7 +2335,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.PYTH/USD",
-          "pythPriceId": "0x0bbf28e9a841a1cc788f6a361b17ca072d0ea3098a1e5df1c3922d06719579ff"
+          "pythPriceId": "0x0bbf28e9a841a1cc788f6a361b17ca072d0ea3098a1e5df1c3922d06719579ff",
+          "isToken2022": false
         },
         {
           "symbol": "JTO",
@@ -2304,18 +2347,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.JTO/USD",
-          "pythPriceId": "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2"
-        },
-        {
-          "symbol": "W",
-          "mintKey": "wda4XRBjGzP2kbCuapvfseNnH49WNkTqLw5szmjjxDG",
-          "decimals": 6,
-          "usdPrecision": 4,
-          "tokenPrecision": 4,
-          "isStable": false,
-          "isVirtual": false,
-          "pythTicker": "Crypto.W/USD",
-          "pythPriceId": "0xeff7446475e218517566ea99e72a4abec2e1bd8498b43b7d8331e29dcb059389"
+          "pythPriceId": "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2",
+          "isToken2022": false
         },
         {
           "symbol": "RAY",
@@ -2326,7 +2359,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.RAY/USD",
-          "pythPriceId": "0x91568baa8beb53db23eb3fb7f22c6e8bd303d103919e19733f2bb642d3e7987a"
+          "pythPriceId": "0x91568baa8beb53db23eb3fb7f22c6e8bd303d103919e19733f2bb642d3e7987a",
+          "isToken2022": false
         },
         {
           "symbol": "KMNO",
@@ -2337,7 +2371,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.KMNO/USD",
-          "pythPriceId": "0xb17e5bc5de742a8a378b54c9c75442b7d51e30ada63f28d9bd28d3c0e26511a0"
+          "pythPriceId": "0xb17e5bc5de742a8a378b54c9c75442b7d51e30ada63f28d9bd28d3c0e26511a0",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -2404,22 +2439,6 @@
           "extOracleAddress": "7ajR2zA4MGMMTqRAVjghTKqPPn4kbrj3pYkAVRVwTGzP",
           "pythTicker": "Crypto.JTO/USD",
           "pythPriceId": "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2"
-        },
-        {
-          "custodyId": 4,
-          "custodyAccount": "7DLv5QVuRizNG4P5ak8jZRdn9PeSETSeGogzPMh6p3WU",
-          "tokenAccount": "71EcBjgsDBQJHGrD3kUKRHbKVr6jWZgpee7aRrcsxH9K",
-          "symbol": "W",
-          "mintKey": "wda4XRBjGzP2kbCuapvfseNnH49WNkTqLw5szmjjxDG",
-          "decimals": 6,
-          "usdPrecision": 4,
-          "tokenPrecision": 4,
-          "isStable": false,
-          "isVirtual": false,
-          "intOracleAddress": "H4JgM7j6H19YrvzGmrx67LDQRemm4G1ocgjASBfB7WBR",
-          "extOracleAddress": "BEMsCSQEGi2kwPA4mKnGjxnreijhMki7L4eeb96ypzF9",
-          "pythTicker": "Crypto.W/USD",
-          "pythPriceId": "0xeff7446475e218517566ea99e72a4abec2e1bd8498b43b7d8331e29dcb059389"
         },
         {
           "custodyId": 5,
@@ -2540,34 +2559,6 @@
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         },
         {
-          "marketId": 6,
-          "marketAccount": "9zvixTyYoxSeiEW1Acb3aScdi6HUPbSGQqTLa1PinAZb",
-          "marketCorrelation" : true,
-          "pool": "FpRXePeSYyPZrBKrCSvLNSQGYT6gkgZXGDCBWVVRkNRT",
-          "targetCustody": "7DLv5QVuRizNG4P5ak8jZRdn9PeSETSeGogzPMh6p3WU",
-          "collateralCustody": "7DLv5QVuRizNG4P5ak8jZRdn9PeSETSeGogzPMh6p3WU",
-          "side": "long",
-          "maxLev": 50,
-          "targetCustodyId": 4,
-          "collateralCustodyId": 4,
-          "targetMint": "wda4XRBjGzP2kbCuapvfseNnH49WNkTqLw5szmjjxDG",
-          "collateralMint": "wda4XRBjGzP2kbCuapvfseNnH49WNkTqLw5szmjjxDG"
-        },
-        {
-          "marketId": 7,
-          "marketAccount": "7AcT3XJsLT97MeXUpai71zEuFGdg5QetbTDTQheWMqFT",
-          "marketCorrelation" : false,
-          "pool": "FpRXePeSYyPZrBKrCSvLNSQGYT6gkgZXGDCBWVVRkNRT",
-          "targetCustody": "7DLv5QVuRizNG4P5ak8jZRdn9PeSETSeGogzPMh6p3WU",
-          "collateralCustody": "4BwjABgU78jqjKeyCemyCCLwEtFdZ8JSeP9ogPMQS8Zg",
-          "side": "short",
-          "maxLev": 50,
-          "targetCustodyId": 4,
-          "collateralCustodyId": 0,
-          "targetMint": "wda4XRBjGzP2kbCuapvfseNnH49WNkTqLw5szmjjxDG",
-          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
-        },
-        {
           "marketId": 8,
           "marketAccount": "CmKDkRzjB4sGiVqui7JPKL5wARFjcryPNFTbwDgPNxzB",
           "marketCorrelation" : true,
@@ -2671,7 +2662,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "BONK",
@@ -2682,7 +2674,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.BONK/USD",
-          "pythPriceId": "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419"
+          "pythPriceId": "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419",
+          "isToken2022": false
         },
         {
           "symbol": "PENGU",
@@ -2693,7 +2686,20 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.PENGU/USD",
-          "pythPriceId": "0xbed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61"
+          "pythPriceId": "0xbed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61",
+          "isToken2022": false
+        },
+        {
+          "symbol": "PUMP",
+          "mintKey": "pmp57jCjZ4iLnerDjsUc9gT1HUwcUG6Fbq3CriowiCm",
+          "decimals": 6,
+          "usdPrecision": 6,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "pythTicker": "Crypto.PUMP/USD",
+          "pythPriceId": "0x7a01fca212788bba7c5bf8c9efd576a8a722f070d2c17596ff7bb609b8d5c3b9",
+          "isToken2022": true
         }
       ],
       "custodies": [
@@ -2735,7 +2741,7 @@
           "tokenAccount": "7eVBaHXQ16EburMqUusg4ZQKFqaSJVn8jaPo2sNWG3Cm",
           "symbol": "PENGU",
           "mintKey": "pguzpUxEhB5Rd3dUhioFBQd8RTkQzrkE4JBenyC86ZU",
-          "decimals": 5,
+          "decimals": 6,
           "usdPrecision": 4,
           "tokenPrecision": 4,
           "isStable": false,
@@ -2744,6 +2750,22 @@
           "extOracleAddress": "27zzC5wXCeZeuJ3h9uAJzV5tGn6r5Tzo98S1ZceYKEb8",
           "pythTicker": "Crypto.PENGU/USD",
           "pythPriceId": "0xbed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61"
+        },
+        {
+          "custodyId": 3,
+          "custodyAccount": "Bv7YRye9mwbiCV9xyb2atMtTsCn2Uba47GYUscM9hgC7",
+          "tokenAccount": "34QBSfxJEj1UseQ97BqezXk2L4UqWeMPbsKW7k9w2WVW",
+          "symbol": "PUMP",
+          "mintKey": "pmp57jCjZ4iLnerDjsUc9gT1HUwcUG6Fbq3CriowiCm",
+          "decimals": 6,
+          "usdPrecision": 6,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "intOracleAddress": "2qu8NPhxAp3aV54amFQBgQ7f9rKgvRa1HUrwt3Vqg8Vq",
+          "extOracleAddress": "HMm3GPbdnqGwbkTnUUqCFsH8AMHDdEC3Lg8gcPD3HJSH",
+          "pythTicker": "Crypto.PUMP/USD",
+          "pythPriceId": "0x7a01fca212788bba7c5bf8c9efd576a8a722f070d2c17596ff7bb609b8d5c3b9"
         }
       ],
       "markets": [
@@ -2755,7 +2777,7 @@
           "targetCustody": "DtmPaayiEidB5VQEZXCv5g54F5aaTguCQXck13wfE7Sp",
           "collateralCustody": "DtmPaayiEidB5VQEZXCv5g54F5aaTguCQXck13wfE7Sp",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 1,
           "targetMint": "bonkmzC5QamYYD9LE73evR6UH49ojDxsFt9Juwqsx7h",
@@ -2769,7 +2791,7 @@
           "targetCustody": "DtmPaayiEidB5VQEZXCv5g54F5aaTguCQXck13wfE7Sp",
           "collateralCustody": "9ikjiYhjcNhGF7t6zfsDpXh2MwCT2ydm5rFsB4yN3XEs",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 0,
           "targetMint": "bonkmzC5QamYYD9LE73evR6UH49ojDxsFt9Juwqsx7h",
@@ -2783,7 +2805,7 @@
           "targetCustody": "D3o8xWXiaCx3JfWAFn2PGtGVChXUM2NtA7zLLZ7jSY4Z",
           "collateralCustody": "D3o8xWXiaCx3JfWAFn2PGtGVChXUM2NtA7zLLZ7jSY4Z",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 2,
           "targetMint": "pguzpUxEhB5Rd3dUhioFBQd8RTkQzrkE4JBenyC86ZU",
@@ -2797,10 +2819,38 @@
           "targetCustody": "D3o8xWXiaCx3JfWAFn2PGtGVChXUM2NtA7zLLZ7jSY4Z",
           "collateralCustody": "9ikjiYhjcNhGF7t6zfsDpXh2MwCT2ydm5rFsB4yN3XEs",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 0,
           "targetMint": "pguzpUxEhB5Rd3dUhioFBQd8RTkQzrkE4JBenyC86ZU",
+          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+        },
+        {
+          "marketId": 4,
+          "marketAccount": "EYHwy2DbhejuKbUVWXwuT4BWwfWR5XoLgxsMw8fSDxTV",
+          "marketCorrelation" : true,
+          "pool": "2SLfjsonPtdBugZke3UJzQ8s7DcHQHJxqUuVN1wrthnc",
+          "targetCustody": "Bv7YRye9mwbiCV9xyb2atMtTsCn2Uba47GYUscM9hgC7",
+          "collateralCustody": "Bv7YRye9mwbiCV9xyb2atMtTsCn2Uba47GYUscM9hgC7",
+          "side": "long",
+          "maxLev": 10,
+          "targetCustodyId": 3,
+          "collateralCustodyId": 3,
+          "targetMint": "pmp57jCjZ4iLnerDjsUc9gT1HUwcUG6Fbq3CriowiCm",
+          "collateralMint": "pmp57jCjZ4iLnerDjsUc9gT1HUwcUG6Fbq3CriowiCm"
+        },
+        {
+          "marketId": 5,
+          "marketAccount": "DBQaeiZWeKPek5e2CJxUuG3vVhDd2nnswBAjT1cXBnof",
+          "marketCorrelation" : false,
+          "pool": "2SLfjsonPtdBugZke3UJzQ8s7DcHQHJxqUuVN1wrthnc",
+          "targetCustody": "Bv7YRye9mwbiCV9xyb2atMtTsCn2Uba47GYUscM9hgC7",
+          "collateralCustody": "9ikjiYhjcNhGF7t6zfsDpXh2MwCT2ydm5rFsB4yN3XEs",
+          "side": "short",
+          "maxLev": 10,
+          "targetCustodyId": 3,
+          "collateralCustodyId": 0,
+          "targetMint": "pmp57jCjZ4iLnerDjsUc9gT1HUwcUG6Fbq3CriowiCm",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         }
       ]
@@ -2851,7 +2901,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "WIF",
@@ -2862,7 +2913,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.WIF/USD",
-          "pythPriceId": "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc"
+          "pythPriceId": "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -2908,7 +2960,7 @@
           "targetCustody": "8Z94RGNLFuAxxgi3e4TQ2mxsmD4JJypxFTVaTw5BANC7",
           "collateralCustody": "8Z94RGNLFuAxxgi3e4TQ2mxsmD4JJypxFTVaTw5BANC7",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 1,
           "targetMint": "wif1hWbc3yHA6ij5iPLhnMV19EDFcN6WETVP3QV16dQ",
@@ -2922,7 +2974,7 @@
           "targetCustody": "8Z94RGNLFuAxxgi3e4TQ2mxsmD4JJypxFTVaTw5BANC7",
           "collateralCustody": "6nMH1Yz7dDgqE4qiFP7FESD233zDBexuBsefGSshAJnM",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 1,
           "collateralCustodyId": 0,
           "targetMint": "wif1hWbc3yHA6ij5iPLhnMV19EDFcN6WETVP3QV16dQ",
@@ -2976,7 +3028,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "SAMO",
@@ -2987,7 +3040,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.SAMO/USD",
-          "pythPriceId": "0x49601625e1a342c1f90c3fe6a03ae0251991a1d76e480d2741524c29037be28a"
+          "pythPriceId": "0x49601625e1a342c1f90c3fe6a03ae0251991a1d76e480d2741524c29037be28a",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -3101,7 +3155,8 @@
           "isStable": true,
           "isVirtual": false,
           "pythTicker": "Crypto.USDC/USD",
-          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+          "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+          "isToken2022": false
         },
         {
           "symbol": "FARTCOIN",
@@ -3112,7 +3167,8 @@
           "isStable": false,
           "isVirtual": false,
           "pythTicker": "Crypto.FARTCOIN/USD",
-          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608"
+          "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608",
+          "isToken2022": true
         }
       ],
       "custodies": [
@@ -3158,7 +3214,7 @@
           "targetCustody": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
           "collateralCustody": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
           "side": "long",
-          "maxLev": 5,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 2,
           "targetMint": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t",
@@ -3172,7 +3228,7 @@
           "targetCustody": "EbH7fBbcTojR5P8kPDEFeUnFRGr5SXKWaavqtCgpH9G4",
           "collateralCustody": "FheNnJ2RmuVCJFvHbhADFHwfQwnCX9nMhdsay1hxSmkv",
           "side": "short",
-          "maxLev": 5,
+          "maxLev": 25,
           "targetCustodyId": 2,
           "collateralCustodyId": 0,
           "targetMint": "fartpRHniUMJ2dG3AFkFcmvDHptBSqBbttYwE3hKv5t",

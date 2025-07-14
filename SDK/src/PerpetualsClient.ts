@@ -28,13 +28,14 @@ import {
   createInitializeAccount3Instruction,
   getMinimumBalanceForRentExemptAccount,
   getAssociatedTokenAddressSync,
+  TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 
 import { sha256 } from "js-sha256";
 import { encode } from "bs58";
 import { PoolAccount } from "./PoolAccount";
 import { PositionAccount } from "./PositionAccount";
-import { AddLiquidityAmountAndFee, BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake } from "./types";
+import { AddLiquidityAmountAndFee,  BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice } from "./types";
 import { OraclePrice } from "./OraclePrice";
 import { CustodyAccount } from "./CustodyAccount";
 import { Perpetuals } from "./idl/perpetuals";
@@ -59,8 +60,8 @@ import * as nacl from "tweetnacl";
 import { MarketAccount } from "./MarketAccount";
 import { getReferralAccounts } from "./utils/getReferralAccounts";
 import { ViewHelper } from "./ViewHelper";
-import { TokenVaultAccount } from "./TokenVaultAccount";
 import { TokenStakeAccount } from "./TokenStakeAccount";
+import { TokenVaultAccount } from "./TokenVaultAccount";
 
 export type PerpClientOptions = {
   postSendTxCallback?: ({ txid }: { txid: string }) => void;
@@ -3503,7 +3504,8 @@ export class PerpetualsClient {
     poolKey: PublicKey,
     depositCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
-    userPublicKey: PublicKey | undefined = undefined
+    userPublicKey: PublicKey | undefined = undefined,
+    enableBackupOracle: boolean = false
   ): Promise<{
     amount: BN
     fee: BN
@@ -3552,6 +3554,11 @@ export class PerpetualsClient {
       .remainingAccounts([...custodyMetas, ...marketMetas])
       .transaction()
 
+    if (enableBackupOracle) {
+      const backUpOracleInstruction = await createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+      transaction.instructions.unshift(...backUpOracleInstruction)
+    }
+
     const result = await this.viewHelper.simulateTransaction(transaction, userPublicKey)
     const index = IDL.instructions.findIndex((f) => f.name === 'getAddLiquidityAmountAndFee')
     const res: any = this.viewHelper.decodeLogs(result, index, 'getAddLiquidityAmountAndFee')
@@ -3567,7 +3574,8 @@ export class PerpetualsClient {
     poolKey: PublicKey,
     removeTokenCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
-    userPublicKey: PublicKey | undefined = undefined
+    userPublicKey: PublicKey | undefined = undefined,
+    enableBackupOracle: boolean = false
   ): Promise<{
     amount: BN
     fee: BN
@@ -3616,6 +3624,11 @@ export class PerpetualsClient {
       })
       .remainingAccounts([...custodyMetas, ...marketMetas])
       .transaction()
+
+    if (enableBackupOracle) {
+      const backUpOracleInstruction = await createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+      transaction.instructions.unshift(...backUpOracleInstruction)
+    }
 
     const result = await this.viewHelper.simulateTransaction(transaction, userPublicKey)
     const index = IDL.instructions.findIndex((f) => f.name === 'getRemoveLiquidityAmountAndFee')
@@ -3692,7 +3705,8 @@ export class PerpetualsClient {
     poolKey: PublicKey,
     depositCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
-    userPublicKey: PublicKey | undefined = undefined
+    userPublicKey: PublicKey | undefined = undefined,
+    enableBackupOracle: boolean = false
   ): Promise<{
     amount: BN
     fee: BN
@@ -3745,6 +3759,11 @@ export class PerpetualsClient {
       .remainingAccounts([...custodyMetas, ...marketMetas])
       .transaction()
 
+    if (enableBackupOracle) {
+      const backUpOracleInstruction = await createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+      transaction.instructions.unshift(...backUpOracleInstruction)
+    }
+
     const result = await this.viewHelper.simulateTransaction(transaction, userPublicKey)
     const index = IDL.instructions.findIndex((f) => f.name === 'getAddCompoundingLiquidityAmountAndFee')
     const res: any = this.viewHelper.decodeLogs(result, index, 'getAddCompoundingLiquidityAmountAndFee')
@@ -3760,7 +3779,8 @@ export class PerpetualsClient {
     poolKey: PublicKey,
     removeTokenCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
-    userPublicKey: PublicKey | undefined = undefined
+    userPublicKey: PublicKey | undefined = undefined,
+    enableBackupOracle: boolean = false
   ): Promise<{
     amount: BN
     fee: BN
@@ -3813,6 +3833,11 @@ export class PerpetualsClient {
       })
       .remainingAccounts([...custodyMetas, ...marketMetas])
       .transaction()
+
+    if (enableBackupOracle) {
+      const backUpOracleInstruction = await createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
+      transaction.instructions.unshift(...backUpOracleInstruction)
+    }
 
     const result = await this.viewHelper.simulateTransaction(transaction, userPublicKey)
     const index = IDL.instructions.findIndex((f) => f.name === 'getRemoveCompoundingLiquidityAmountAndFee')
@@ -4011,13 +4036,14 @@ export class PerpetualsClient {
     let publicKey = this.provider.wallet.publicKey;
     const targetCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
     const collateralCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
-
+    const collateralToken = poolConfig.getTokenFromSymbol(collateralSymbol);
     const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
     
-    let userCollateralTokenAccount = await getAssociatedTokenAddress(
+    let userCollateralTokenAccount =  getAssociatedTokenAddressSync(
       poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
       publicKey,
-      true
+      true,
+      collateralToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
     );
     
     let wrappedSolAccount: Keypair | undefined;
@@ -4116,11 +4142,12 @@ export class PerpetualsClient {
         collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
         collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
         systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        fundingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
         eventAuthority: this.eventAuthority.publicKey,
         program: this.programId,
         transferAuthority: this.authority.publicKey,
-        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        fundingMint: collateralCustodyConfig.mintKey
       })
       .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
       .instruction()
@@ -4196,7 +4223,8 @@ export class PerpetualsClient {
         userReceivingTokenAccount = getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
           publicKey,
-          true
+          true,
+          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
 
@@ -4207,7 +4235,8 @@ export class PerpetualsClient {
               publicKey,
               userReceivingTokenAccount,
               publicKey,
-              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
             )
           );
         }
@@ -4242,9 +4271,11 @@ export class PerpetualsClient {
           collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
           collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount, 
           eventAuthority : this.eventAuthority.publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
+
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          collateralMint: collateralCustodyConfig.mintKey,
+          collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
         .instruction();
@@ -4308,8 +4339,10 @@ export class PerpetualsClient {
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
-
+    const targetToken = poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol);
     let userInputTokenAccount : PublicKey;
+
+    const userInputToken = poolConfig.getTokenFromSymbol(userInputTokenSymbol);
 
     // https://github.com/blockworks-foundation/mango-v4/blob/1ba6513b5ea2b0e557808e712fcf0a811968b45b/ts/client/src/client.ts#L1252 
     // Create WSOL Token account and not ATA and close it in end 
@@ -4361,7 +4394,8 @@ export class PerpetualsClient {
         let userOutputTokenAccount =  getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).mintKey,
           publicKey,
-          true
+          true,
+          poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
     
         // cannot skip this await TODO- check
@@ -4382,7 +4416,8 @@ export class PerpetualsClient {
       userInputTokenAccount =  getAssociatedTokenAddressSync(
         poolConfig.getTokenFromSymbol(userInputTokenSymbol).mintKey,
         publicKey,
-        true
+        true,
+        poolConfig.getTokenFromSymbol(userInputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
      
       if (!skipBalanceChecks) {
@@ -4399,7 +4434,8 @@ export class PerpetualsClient {
       let userOutputTokenAccount =  getAssociatedTokenAddressSync(
         poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).mintKey,
         publicKey,
-        true
+        true,
+        poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
       );
   
       // cannot skip this await TODO- check
@@ -4409,7 +4445,8 @@ export class PerpetualsClient {
             publicKey,
             userOutputTokenAccount,
             publicKey,
-            poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).mintKey
+            poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).mintKey,
+            poolConfig.getTokenFromSymbol(targetCustodyConfig.symbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID  
           )
         );
       }
@@ -4434,6 +4471,13 @@ export class PerpetualsClient {
     //     isWritable: false,
     //   });
     // }
+
+
+    let rebateMintAccount = {
+      pubkey: collateralCustodyConfig.mintKey,
+      isSigner: false,
+      isWritable: false
+    }
 
     try {
       
@@ -4469,10 +4513,13 @@ export class PerpetualsClient {
           collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
 
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority : this.eventAuthority.publicKey,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          fundingMint: userInputCustodyConfig.mintKey,
+          fundingTokenProgram: poolConfig.getTokenFromSymbol(userInputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
+          collateralMint: collateralCustodyConfig.mintKey,
+          collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
         .instruction();
@@ -4534,8 +4581,9 @@ export class PerpetualsClient {
     const additionalSigners: Signer[] = [];
 
     let userReceivingTokenAccount : PublicKey;
-
-
+    const collateralToken = poolConfig.getTokenFromSymbol(collateralTokenSymbol);
+    const userOutputToken = poolConfig.getTokenFromSymbol(userOutputTokenSymbol);
+    
     // https://github.com/blockworks-foundation/mango-v4/blob/1ba6513b5ea2b0e557808e712fcf0a811968b45b/ts/client/src/client.ts#L1252 
     // Create WSOL Token account and not ATA and close it in end 
     if (userOutputTokenSymbol == 'SOL') {
@@ -4574,10 +4622,11 @@ export class PerpetualsClient {
     }  else {
      
       // OTHER TOKENS including WSOL,USDC,..
-      userReceivingTokenAccount = await getAssociatedTokenAddress(
-        poolConfig.getTokenFromSymbol(userOutputTokenSymbol).mintKey,
+      userReceivingTokenAccount = getAssociatedTokenAddressSync(
+        userOutputToken.mintKey,
         publicKey,
-        true
+        true,
+        userOutputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
 
       if (!(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -4586,7 +4635,8 @@ export class PerpetualsClient {
             publicKey,
             userReceivingTokenAccount,
             publicKey,
-            poolConfig.getTokenFromSymbol(userOutputTokenSymbol).mintKey
+            userOutputToken.mintKey,
+            userOutputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
           )
         );
       }
@@ -4595,9 +4645,10 @@ export class PerpetualsClient {
 
 
     let userCollateralTokenAccount =  getAssociatedTokenAddressSync(
-      poolConfig.getTokenFromSymbol(collateralTokenSymbol).mintKey,
+      collateralToken.mintKey,
       publicKey,
-      true
+      true,
+      collateralToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
     );
     if ( !(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
       preInstructions.push(
@@ -4605,9 +4656,16 @@ export class PerpetualsClient {
           publicKey,
           userCollateralTokenAccount,
           publicKey,
-          poolConfig.getTokenFromSymbol(collateralTokenSymbol).mintKey
+          collateralToken.mintKey,
+          collateralToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         )
       );
+    }
+
+    let rebateMintAccount = {
+      pubkey: collateralCustodyConfig.mintKey,
+      isSigner: false,
+      isWritable: false
     }
    
 
@@ -4642,10 +4700,17 @@ export class PerpetualsClient {
           dispensingOracleAccount: this.useExtOracleAccount ? userOutputCustodyConfig.extOracleAccount : userOutputCustodyConfig.intOracleAccount,
           dispensingCustodyTokenAccount: userOutputCustodyConfig.tokenAccount,
 
-          tokenProgram: TOKEN_PROGRAM_ID,
+          // tokenProgram: TOKEN_PROGRAM_ID,
+          
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+
+          receivingMint: userOutputCustodyConfig.mintKey,
+          receivingTokenProgram: userOutputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
+
+          collateralMint: collateralCustodyConfig.mintKey,
+          collateralTokenProgram: collateralToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
 
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
@@ -4773,9 +4838,10 @@ export class PerpetualsClient {
       collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
       collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount, 
       eventAuthority: this.eventAuthority.publicKey,
-      tokenProgram: TOKEN_PROGRAM_ID,
+      fundingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      fundingMint: collateralCustodyConfig.mintKey
     })
     .instruction();
 
@@ -4869,7 +4935,8 @@ export class PerpetualsClient {
       userInputTokenAccount = getAssociatedTokenAddressSync(
         inputCustodyConfig.mintKey,
         publicKey,
-        true
+        true,
+        poolConfig.getTokenFromSymbol(inputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
       // for other tokens check if ATA and balance 
       if (!skipBalanceChecks) {
@@ -4886,7 +4953,8 @@ export class PerpetualsClient {
     let userCollateralTokenAccount = getAssociatedTokenAddressSync(
       collateralCustodyConfig.mintKey,
       publicKey,
-      true
+      true,
+      poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
     );
     if (!(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
       preInstructions.push(
@@ -4894,7 +4962,8 @@ export class PerpetualsClient {
           publicKey,
           userCollateralTokenAccount,
           publicKey,
-          collateralCustodyConfig.mintKey
+          collateralCustodyConfig.mintKey,
+          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         )
       );
     }
@@ -4927,10 +4996,11 @@ export class PerpetualsClient {
       collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
 
       eventAuthority: this.eventAuthority.publicKey,
-      tokenProgram: TOKEN_PROGRAM_ID,
+      fundingTokenProgram: poolConfig.getTokenFromSymbol(inputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       program: this.programId,
 
-      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      fundingMint: poolConfig.getTokenFromSymbol(inputSymbol).mintKey,
     })
     .instruction();
 
@@ -5014,7 +5084,8 @@ export class PerpetualsClient {
       userReceivingTokenAccount =  getAssociatedTokenAddressSync(
         poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
         publicKey,
-        true
+        true,
+        poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID  
       );
 
       if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -5023,7 +5094,8 @@ export class PerpetualsClient {
             publicKey,
             userReceivingTokenAccount,
             publicKey,
-            poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+            poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+            poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
           )
         );
       }
@@ -5051,9 +5123,10 @@ export class PerpetualsClient {
         collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
         collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount,
         eventAuthority : this.eventAuthority.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        receivingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
         program: this.programId,
-        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        receivingMint: collateralCustodyConfig.mintKey
     })
     .instruction()
 
@@ -5147,7 +5220,8 @@ export class PerpetualsClient {
       userReceivingTokenAccount = getAssociatedTokenAddressSync(
         poolConfig.getTokenFromSymbol(outputSymbol).mintKey,
         publicKey,
-        true
+        true,
+        poolConfig.getTokenFromSymbol(outputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       );
 
       if (!(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -5156,7 +5230,8 @@ export class PerpetualsClient {
             publicKey,
             userReceivingTokenAccount,
             publicKey,
-            poolConfig.getTokenFromSymbol(outputSymbol).mintKey
+            poolConfig.getTokenFromSymbol(outputSymbol).mintKey,
+            poolConfig.getTokenFromSymbol(outputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
           )
         );
       }
@@ -5167,7 +5242,8 @@ export class PerpetualsClient {
     let userCollateralTokenAccount = getAssociatedTokenAddressSync(
       poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
       publicKey,
-      true
+      true,
+      poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
     );
     if (!(await checkIfAccountExists(userCollateralTokenAccount, this.provider.connection))) {
       preInstructions.push(
@@ -5175,7 +5251,8 @@ export class PerpetualsClient {
           publicKey,
           userCollateralTokenAccount,
           publicKey,
-          poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+          poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         )
       );
     }
@@ -5213,11 +5290,15 @@ export class PerpetualsClient {
         dispensingOracleAccount: this.useExtOracleAccount ? outputCustodyConfig.extOracleAccount : outputCustodyConfig.intOracleAccount,
         dispensingCustodyTokenAccount: outputCustodyConfig.tokenAccount,
 
-        tokenProgram: TOKEN_PROGRAM_ID,
         eventAuthority: this.eventAuthority.publicKey,
 
         program: this.programId,
-        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        receivingMint: outputCustodyConfig.mintKey,
+        receivingTokenProgram: poolConfig.getTokenFromSymbol(outputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
+        collateralMint: collateralCustodyConfig.mintKey,
+        collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
+
       })
       .instruction()
 
@@ -5281,10 +5362,11 @@ export class PerpetualsClient {
       collateralCustody: collateralCustodyConfig.custodyAccount,
       collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
       collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
-      tokenProgram: TOKEN_PROGRAM_ID,
+      collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       eventAuthority : this.eventAuthority.publicKey,
       program: this.programId,
-      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      collateralMint: collateralCustodyConfig.mintKey
     })
     .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
     .instruction()
@@ -5352,10 +5434,11 @@ export class PerpetualsClient {
       collateralCustody: collateralCustodyConfig.custodyAccount,
       collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
       collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
-      tokenProgram: TOKEN_PROGRAM_ID,
+      collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       eventAuthority : this.eventAuthority.publicKey,
       program: this.programId,
-      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      collateralMint: collateralCustodyConfig.mintKey
     })
     .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
     .instruction()
@@ -5389,19 +5472,21 @@ export class PerpetualsClient {
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
+    const payToken = poolConfig.getTokenFromSymbol(payTokenSymbol);
 
     try {
 
       let userPayingTokenAccount =  getAssociatedTokenAddressSync(
         payTokenCustodyConfig.mintKey,
         publicKey,
-        true
+        true,
+        payToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
 
       let lpTokenAccount = getAssociatedTokenAddressSync(
         poolConfig.stakedLpTokenMint,
         publicKey,
-        true
+        true,
       );
 
       let custodyAccountMetas = [];
@@ -5523,7 +5608,9 @@ export class PerpetualsClient {
           eventAuthority : this.eventAuthority.publicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          fundingMint: payTokenCustodyConfig.mintKey,
+          fundingTokenProgram: payToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
         })
         .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
         .instruction();
@@ -5566,6 +5653,7 @@ export class PerpetualsClient {
       publicKey,
       true
     );
+    const inputToken = poolConfig.getTokenFromSymbol(inputSymbol);
 
     const flpStakeAccount = PublicKey.findProgramAddressSync(
       [Buffer.from("stake"), publicKey.toBuffer(), poolConfig.poolAddress.toBuffer()],
@@ -5637,7 +5725,8 @@ export class PerpetualsClient {
       userInputTokenAccount = getAssociatedTokenAddressSync(
         inputCustodyConfig.mintKey,
         publicKey,
-        true
+        true,
+        inputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
 
       // for other tokens check if ATA and balance 
@@ -5702,7 +5791,9 @@ export class PerpetualsClient {
       tokenProgram: TOKEN_PROGRAM_ID,
       eventAuthority: this.eventAuthority.publicKey,
       program: this.programId,
-      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+      ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+      fundingMint: inputCustodyConfig.mintKey,
+      fundingTokenProgram: inputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID //TODO: tokenType
     })
     .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
     .instruction();
@@ -5740,7 +5831,7 @@ export class PerpetualsClient {
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
-
+    const recieveToken = poolConfig.getTokenFromSymbol(recieveTokenSymbol);
     try { 
       let stakedLpTokenAccount =  getAssociatedTokenAddressSync(
         poolConfig.stakedLpTokenMint,
@@ -5816,9 +5907,10 @@ export class PerpetualsClient {
       } else {
         // OTHER TOKENS including WSOL,USDC,..
         userReceivingTokenAccount = getAssociatedTokenAddressSync(
-          poolConfig.getTokenFromSymbol(recieveTokenSymbol).mintKey,
+          recieveToken.mintKey,
           publicKey,
-          true
+          true,
+          recieveToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
         if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -5827,7 +5919,8 @@ export class PerpetualsClient {
               publicKey,
               userReceivingTokenAccount,
               publicKey,
-              poolConfig.getTokenFromSymbol(recieveTokenSymbol).mintKey
+              recieveToken.mintKey,
+              recieveToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
             )
           );
         }
@@ -5852,7 +5945,9 @@ export class PerpetualsClient {
           eventAuthority : this.eventAuthority.publicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          receivingMint: recieveTokenCustodyConfig.mintKey,
+          receivingTokenProgram: recieveToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID //TODO: tokenType
         })
         .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
         .instruction();
@@ -5917,64 +6012,6 @@ export class PerpetualsClient {
 
   }
 
-  createNftTradingAccount = async (
-    nftMint: PublicKey,
-    owner : PublicKey,
-    poolConfig: PoolConfig
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    let publicKey = this.provider.wallet.publicKey;
-
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-      let nftTradingAccount = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("trading"),
-          nftMint.toBuffer(),
-        ],
-        this.programId
-      )[0];
-
-      const metadataAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("metadata"), METAPLEX_PROGRAM_ID.toBuffer(), nftMint.toBuffer()],
-        METAPLEX_PROGRAM_ID
-      )[0];
-
-      // let nftTokenAccount = getAssociatedTokenAddressSync(
-      //   nftMint,
-      //   owner,
-      //   true
-      // );
-
-      let createNftTradingAccountInstruction = await this.program.methods
-          .createTradingAccount({
-            collectionIndex: 1
-          })
-          .accounts({
-            feePayer: publicKey,
-            perpetuals: poolConfig.perpetuals,
-            nftMint: nftMint,
-            tradingAccount: nftTradingAccount,
-            metadataAccount: metadataAccount,
-            systemProgram: SystemProgram.programId
-          })
-          .instruction();
-        instructions.push(createNftTradingAccountInstruction)
-
-    } catch (err) {
-      console.log("perpClient createNftAccount error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
-      additionalSigners
-    };
-
-  }
 
   updateNftAccount = async (
     nftMint: PublicKey,
@@ -6160,7 +6197,8 @@ export class PerpetualsClient {
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
             eventAuthority: this.eventAuthority.publicKey,
-            program: this.programId
+            program: this.programId,
+            lpTokenMint: poolConfig.stakedLpTokenMint,
           })
           .instruction();
         instructions.push(depositStakeInstruction)
@@ -6556,6 +6594,7 @@ export class PerpetualsClient {
             tokenProgram: TOKEN_PROGRAM_ID,
             eventAuthority: this.eventAuthority.publicKey,
             program: this.program.programId,
+            lpMint: poolConfig.stakedLpTokenMint,
           })
           .instruction();
         instructions.push(withdrawStakeInstruction)
@@ -6646,7 +6685,8 @@ export class PerpetualsClient {
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
             eventAuthority: this.eventAuthority.publicKey,
-            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+            receivingMint: rewardCustodyMint,
           })
           .remainingAccounts([...tokenStakeAccounts])
           .instruction();
@@ -6704,7 +6744,8 @@ export class PerpetualsClient {
     let fundingAccount =  getAssociatedTokenAddressSync(
       inCustodyConfig.mintKey,
       publicKey,
-      true
+      true,
+      poolConfig.getTokenFromSymbol(inTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
     );
 
     let custodyAccountMetas = [];
@@ -6840,7 +6881,9 @@ export class PerpetualsClient {
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          fundingMint: inCustodyConfig.mintKey,
+          fundingTokenProgram: poolConfig.getTokenFromSymbol(inTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
         })
         .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
         .instruction()
@@ -6917,7 +6960,8 @@ export class PerpetualsClient {
       userReceivingTokenAccount =  getAssociatedTokenAddressSync(
         outCustodyConfig.mintKey,
         publicKey,
-        true
+        true,
+        poolConfig.getTokenFromSymbol(outTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
 
       if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -6927,6 +6971,7 @@ export class PerpetualsClient {
             userReceivingTokenAccount,
             publicKey,
             outCustodyConfig.mintKey,
+            poolConfig.getTokenFromSymbol(outTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
           )
         );
       }
@@ -6996,7 +7041,9 @@ export class PerpetualsClient {
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          receivingMint: outCustodyConfig.mintKey,
+          receivingTokenProgram: poolConfig.getTokenFromSymbol(outTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         })
         .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
         .instruction()
@@ -7396,7 +7443,8 @@ export class PerpetualsClient {
           tokenProgram: TOKEN_PROGRAM_ID,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
+          program: this.programId,
+          receivingTokenMint: poolConfig.tokenMint,
         })
         .instruction();
       instructions.push(burnAndClaimInstruction)
@@ -7559,7 +7607,8 @@ export class PerpetualsClient {
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
+          program: this.programId,
+          tokenMint: poolConfig.tokenMint,
         })
         .instruction();
       instructions.push(depositTokenStakeInstruction)
@@ -7668,7 +7717,8 @@ export class PerpetualsClient {
           tokenStakeAccount: tokenStakeAccount,
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
+          program: this.programId,
+          tokenMint: poolConfig.tokenMint,
         })
         .instruction();
       instructions.push(unstakeTokenInstantInstruction)
@@ -7736,7 +7786,8 @@ export class PerpetualsClient {
 
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
+          program: this.programId,
+          tokenMint: poolConfig.tokenMint,
         })
         .instruction();
       instructions.push(withdrawTokenInstruction)
@@ -7848,7 +7899,8 @@ export class PerpetualsClient {
 
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
+          program: this.programId,
+          tokenMint: poolConfig.tokenMint,
         })
         .instruction();
       instructions.push(collectTokenRewardInstruction)
@@ -7916,7 +7968,8 @@ export class PerpetualsClient {
 
           tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId
+          program: this.programId,
+          receivingTokenMint: rewardCustodyMint,
         })
         .instruction();
       instructions.push(collectRevenueInstruction)
@@ -8065,8 +8118,8 @@ export class PerpetualsClient {
     createUserATA = true, //create new ATA for USER in the end 
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
-
-    const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
+    const rewardToken = poolConfig.getTokenFromSymbol(rewardSymbol)
+    const rewardCustodyMint = rewardToken.mintKey
 
     let instructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
@@ -8086,7 +8139,8 @@ export class PerpetualsClient {
       let receivingTokenAccount =  getAssociatedTokenAddressSync(
         rewardCustodyMint,
         publicKey,
-        true
+        true,
+        rewardToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
 
       if (createUserATA && !(await checkIfAccountExists(receivingTokenAccount, this.provider.connection))) {
@@ -8095,7 +8149,8 @@ export class PerpetualsClient {
             publicKey,
             receivingTokenAccount,
             publicKey,
-            rewardCustodyMint
+            rewardCustodyMint,
+            rewardToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
           )
         );
       }
@@ -8135,7 +8190,7 @@ export class PerpetualsClient {
           rewardTokenAccount: rewardTokenAccount,
           transferAuthority: nftTransferAuthority,
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenProgram: rewardToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
         })
         .instruction();
       instructions.push(collectNftReward)
@@ -8159,10 +8214,12 @@ export class PerpetualsClient {
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = this.provider.wallet.publicKey;
 
-    
-    const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
-    const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
+    const rewardToken = poolConfig.getTokenFromSymbol(rewardSymbol);
+    const rewardCustodyMint = rewardToken.mintKey
+    const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(rewardToken.mintKey))!;
 
+
+   
     let preInstructions: TransactionInstruction[] = [];
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
@@ -8179,7 +8236,8 @@ export class PerpetualsClient {
       let receivingTokenAccount = getAssociatedTokenAddressSync(
         rewardCustodyMint,
         publicKey,
-        true
+        true,
+        rewardToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
       );
 
       if (createUserATA && !(await checkIfAccountExists(receivingTokenAccount, this.provider.connection))) {
@@ -8375,10 +8433,11 @@ export class PerpetualsClient {
       // } 
       // else {
         // OTHER TOKENS including WSOL,USDC,..
-        userReceivingTokenAccount = await getAssociatedTokenAddress(
+        userReceivingTokenAccount = getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(collateralSymbol).mintKey, // works for SOL and WSOL
-          positionAccount.owner
-
+          positionAccount.owner,
+          false,
+          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
         if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -8387,7 +8446,8 @@ export class PerpetualsClient {
               payerPubkey,
               userReceivingTokenAccount,
               positionAccount.owner,
-              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
             )
           );
         }
@@ -8412,10 +8472,11 @@ export class PerpetualsClient {
             collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
             collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
           
-            tokenProgram: TOKEN_PROGRAM_ID,
+            tokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
             eventAuthority: this.eventAuthority.publicKey,
             program: this.programId,
-            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+            receivingMint: collateralCustodyConfig.mintKey
           })
           // .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege)])
           .instruction();
@@ -8463,9 +8524,12 @@ export class PerpetualsClient {
 
     const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
 
-    let userReserveTokenAccount = await getAssociatedTokenAddress(
+
+    let userReserveTokenAccount = getAssociatedTokenAddressSync(
       poolConfig.getTokenFromSymbol(reserveSymbol).mintKey,
-      publicKey
+      publicKey,
+      true,
+      poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
     );
 
     let wrappedSolAccount: Keypair | undefined;
@@ -8561,10 +8625,11 @@ export class PerpetualsClient {
           receiveCustody: receiveCustodyConfig.custodyAccount,
 
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          fundingTokenProgram: poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          fundingMint: reserveCustodyConfig.mintKey,
         })
         .instruction();
 
@@ -8650,7 +8715,8 @@ export class PerpetualsClient {
          userReceivingTokenAccount = getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(reserveSymbol).mintKey,
           publicKey,
-          true
+          true,
+          poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
         if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -8659,9 +8725,10 @@ export class PerpetualsClient {
               publicKey,
               userReceivingTokenAccount,
               publicKey,
-              poolConfig.getTokenFromSymbol(reserveSymbol).mintKey
+              poolConfig.getTokenFromSymbol(reserveSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
             )
-          );
+          )
         }      
 
       }
@@ -8693,10 +8760,11 @@ export class PerpetualsClient {
           reserveOracleAccount: this.useExtOracleAccount ? reserveCustodyConfig.extOracleAccount : reserveCustodyConfig.intOracleAccount,
           reserveCustodyTokenAccount: reserveCustodyConfig.tokenAccount,
           receiveCustody: receiveCustodyConfig.custodyAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          receivingTokenProgram: poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          receivingMint: poolConfig.getTokenFromSymbol(reserveSymbol).mintKey
 
         })
         .instruction();
@@ -8766,10 +8834,11 @@ export class PerpetualsClient {
           collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
 
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          collateralMint: collateralCustodyConfig.mintKey,
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
         .instruction();
@@ -8843,10 +8912,11 @@ export class PerpetualsClient {
           collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
 
           systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          collateralMint: collateralCustodyConfig.mintKey,
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
         .instruction();
@@ -9133,7 +9203,8 @@ export class PerpetualsClient {
     let instructions: TransactionInstruction[] = [];
     let postInstructions: TransactionInstruction[] = [];
     const additionalSigners: Signer[] = [];
-
+    const collateralToken = poolConfig.getTokenFromSymbol(collateralSymbol)
+    const receivingToken = poolConfig.getTokenFromSymbol(receivingSymbol);
     try {
       // Create WSOL Token account and not ATA and close it in end 
       if (false) {
@@ -9175,7 +9246,8 @@ export class PerpetualsClient {
         userReceivingTokenAccount = getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(receivingSymbol).mintKey,
           owner,
-          true
+          true,
+          receivingToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
         if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -9192,7 +9264,8 @@ export class PerpetualsClient {
         userReceivingTokenAccountCollateral = getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
           owner,
-          true
+          true,
+          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
         if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccountCollateral, this.provider.connection))) {
@@ -9251,10 +9324,14 @@ export class PerpetualsClient {
           dispensingCustody: receivingCustodyConfig.custodyAccount,
           dispensingOracleAccount: this.useExtOracleAccount ? receivingCustodyConfig.extOracleAccount : receivingCustodyConfig.intOracleAccount,
           dispensingCustodyTokenAccount: receivingCustodyConfig.tokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          // tokenProgram: TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          receivingMint: receivingCustodyConfig.mintKey,
+          receivingTokenProgram: receivingToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
+          collateralMint: collateralCustodyConfig.mintKey,
+          collateralTokenProgram: collateralToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID //TODO: tokenType
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
         .instruction();
@@ -9343,7 +9420,8 @@ export class PerpetualsClient {
         userReceivingTokenAccount = getAssociatedTokenAddressSync(
           poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
           owner,
-          true
+          true,
+          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
         );
 
         if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
@@ -9352,7 +9430,8 @@ export class PerpetualsClient {
               payerPubkey,
               userReceivingTokenAccount,
               owner,
-              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
             )
           );
         }
@@ -9382,11 +9461,11 @@ export class PerpetualsClient {
           collateralCustody: collateralCustodyConfig.custodyAccount,
           collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
           collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          receivingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
           eventAuthority: this.eventAuthority.publicKey,
           program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
-
+          receivingMint: collateralCustodyConfig.mintKey
         })
         .remainingAccounts([...getReferralAccounts(tokenStakeAccount, userReferralAccount, rebateTokenAccount, privilege)])
         .instruction();
@@ -9483,5 +9562,4 @@ export class PerpetualsClient {
   }
 
 }
-
 

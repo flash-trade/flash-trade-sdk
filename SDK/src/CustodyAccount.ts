@@ -35,7 +35,7 @@ export class CustodyAccount implements Custody {
 
       bump: number;
       tokenAccountBump: number;
-      sizeFactorForSpread : number;
+      token22: boolean;
       uid: number;
       reservedAmount: BN;
       minReserveUsd: BN;
