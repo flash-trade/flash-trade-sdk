@@ -1147,7 +1147,7 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": false,
-          "intOracleAddress": "HkbXAhndY1nErJ176ncjSYait341g23mBLcsRpFSM4QP",
+          "intOracleAddress": "3jdC8MKggXxFKPMV5LDNbJz24zGdneTWnuF3MvnjdTX7",
           "extOracleAddress": "HMm3GPbdnqGwbkTnUUqCFsH8AMHDdEC3Lg8gcPD3HJSH",
           "pythTicker": "Crypto.PUMP/USD",
           "pythPriceId": "0x7a01fca212788bba7c5bf8c9efd576a8a722f070d2c17596ff7bb609b8d5c3b9"
