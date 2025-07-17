@@ -9527,6 +9527,63 @@ export class PerpetualsClient {
     };
   }
 
+  setLpTokenPrice = async (
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+
+    try {
+
+      let custodyAccountMetas = [];
+      let custodyOracleAccountMetas = [];
+      let markets = []
+
+      for (const custody of poolConfig.custodies) {
+        custodyAccountMetas.push({
+          pubkey: custody.custodyAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+        custodyOracleAccountMetas.push({
+          pubkey: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+      }
+
+      for (const market of poolConfig.markets) {
+        markets.push({
+          pubkey: market.marketAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+      }
+
+      let setLpTokenPriceInstruction = await this.program.methods
+        .setLpTokenPrice({})
+        .accounts({
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          lpTokenMint: poolConfig.stakedLpTokenMint,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+        .instruction()
+      instructions.push(setLpTokenPriceInstruction)
+
+    } catch (err) {
+      console.log("perpClient setLpTokenPriceInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+
 
   public async sendTransaction(
     ixs: TransactionInstruction[],

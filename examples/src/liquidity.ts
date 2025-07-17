@@ -32,6 +32,28 @@ export const flashClient = new PerpetualsClient(
     }
 )
 
+const setLpTokenPrice = async () => {
+   
+    await flashClient.loadAddressLookupTable(POOL_CONFIG)
+
+   
+    let instructions: TransactionInstruction[] = []
+    let additionalSigners: Signer[] = []
+    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 120_000 }) // setLpTokenPrice
+
+     // flash-sdk version >= "3.1.10"
+     const setLpTokenPriceData = await flashClient.setLpTokenPrice(POOL_CONFIG);
+
+
+    instructions.push(...setLpTokenPriceData.instructions)
+    additionalSigners.push(...setLpTokenPriceData.additionalSigners)
+
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
+
+    console.log('setLpTokenPrice trx :>> ', trxId);
+   
+}
+
 // addLiquidityAndStake 1 USDC 
 const addLiquidityAndStake = async () => {
     const usdcInputAmount = new BN(1_000_000); // 6 Decimals
