@@ -3326,10 +3326,7 @@ export class PerpetualsClient {
 
   getUserClaimableRevenueAmount = async (
     POOL_CONFIG: PoolConfig,
-    userPublicKey: PublicKey,
-    // tokenStakeFafAccount: TokenStakeAccount,
-    // fafTokenVaultAccount:  TokenVaultAccount,
-    enableDebuglogs: boolean = false
+    userPublicKey: PublicKey
   ): Promise<BN> => {
 
         const fafTokenVaultPk = POOL_CONFIG.tokenVault
@@ -3340,11 +3337,6 @@ export class PerpetualsClient {
                 'tokenVault',
                 fafTokenVaultAccountInfo.data
             )
-            // console.log(
-            //     'fafTokenVaultAccount:',
-            //     fafTokenVault?.withdrawInstantFeeEarned.toString(),
-            //     nativeToUiDecimals(fafTokenVault?.withdrawInstantFeeEarned, 6, 2, true)
-            // )
             fafTokenVaultAccount = TokenVaultAccount.from(fafTokenVaultPk , fafTokenVault )
         } else {
             console.log('No account info found for fafTokenVaultPk:', fafTokenVaultPk.toBase58())
@@ -3359,7 +3351,7 @@ export class PerpetualsClient {
                     [Buffer.from('token_stake'), userPublicKey.toBuffer()],
                     POOL_CONFIG.programId
                 )[0]
-       // console.log(tokenStakeAccount.toBase58(), 'checking token stake account mint')
+
 
       const accountInfo = await this.provider.connection.getAccountInfo(tokenStakeAccount)
       if (accountInfo) {
