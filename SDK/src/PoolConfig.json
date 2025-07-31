@@ -404,8 +404,8 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "pythTicker": "Commodities.WTI1M",
-          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880",
+          "pythTicker": "Commodities.WTIU5/USD",
+          "pythPriceId": "0xecd49a99bb0a0f772de2a4b5ce93fdb5b7b83ae7dd7d99c68dadf9cc40ee8fbe",
           "isToken2022": false
         }
       ],
@@ -502,9 +502,9 @@
           "isStable": false,
           "isVirtual": true,
           "intOracleAddress": "5qLQ3BT7JCf4fUxoAH1xZwHCca9fZuuTWTgTsNxLNcoZ",
-          "extOracleAddress": "nt1JuGVRBJNrvMpdZt9RJnxVSxRuoeVx5LRq3R1bS16",
-          "pythTicker": "Commodities.WTI1M",
-          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
+          "extOracleAddress": "Y3XuRL2ZrRnYSxY1vZWpG7k5SWPhbxcsoBZVodS4gUp",
+          "pythTicker": "Commodities.WTIU5/USD",
+          "pythPriceId": "0xecd49a99bb0a0f772de2a4b5ce93fdb5b7b83ae7dd7d99c68dadf9cc40ee8fbe"
         }
       ],
       "markets": [
@@ -1218,7 +1218,7 @@
           "targetCustody": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
           "collateralCustody": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
           "side": "long",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 3,
           "collateralCustodyId": 3,
           "targetMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
@@ -1232,7 +1232,7 @@
           "targetCustody": "GJGqjUBB6QDiHJ5wMfhRR9CCcDRatLdwxsVih3J5uYPx",
           "collateralCustody": "qFFbK8PHbNt4433AUTHHDsmDuQGTQhixc8t4sCzugG4",
           "side": "short",
-          "maxLev": 10,
+          "maxLev": 25,
           "targetCustodyId": 3,
           "collateralCustodyId": 0,
           "targetMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
@@ -2019,8 +2019,8 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "pythTicker": "Commodities.WTI1M",
-          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880",
+          "pythTicker": "Commodities.WTIU5/USD",
+          "pythPriceId": "0xecd49a99bb0a0f772de2a4b5ce93fdb5b7b83ae7dd7d99c68dadf9cc40ee8fbe",
           "isToken2022": false
         }
       ],
@@ -2117,9 +2117,9 @@
           "isStable": false,
           "isVirtual": true,
           "intOracleAddress": "J7XXRCMCrNHFSn6WgSEJREEX74XmGtmvnq3JZusHQ5Kg",
-          "extOracleAddress": "nt1JuGVRBJNrvMpdZt9RJnxVSxRuoeVx5LRq3R1bS16",
-          "pythTicker": "Commodities.WTI1M",
-          "pythPriceId": "0xeca3fb7e6be5be55a01678ee00f6405b9e4986e32d539ccd2a06a57e0c615880"
+          "extOracleAddress": "Y3XuRL2ZrRnYSxY1vZWpG7k5SWPhbxcsoBZVodS4gUp",
+          "pythTicker": "Commodities.WTIU5/USD",
+          "pythPriceId": "0xecd49a99bb0a0f772de2a4b5ce93fdb5b7b83ae7dd7d99c68dadf9cc40ee8fbe"
         }
       ],
       "markets": [
@@ -3168,7 +3168,7 @@
           "isVirtual": false,
           "pythTicker": "Crypto.FARTCOIN/USD",
           "pythPriceId": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608",
-          "isToken2022": true
+          "isToken2022": false
         }
       ],
       "custodies": [
