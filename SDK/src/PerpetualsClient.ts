@@ -35,7 +35,7 @@ import { sha256 } from "js-sha256";
 import { encode } from "bs58";
 import { PoolAccount } from "./PoolAccount";
 import { PositionAccount } from "./PositionAccount";
-import { AddLiquidityAmountAndFee,  BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice } from "./types";
+import { AddLiquidityAmountAndFee, InternalPrice, BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice } from "./types";
 import { OraclePrice } from "./OraclePrice";
 import { CustodyAccount } from "./CustodyAccount";
 import { Perpetuals } from "./idl/perpetuals";
@@ -938,13 +938,13 @@ export class PerpetualsClient {
     }
    
     // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
-    const lockedUsd = targetTokenPrice.getAssetAmountUsd(sizeDeltaAmount, targetTokenCustodyAccount.decimals)
+    const sizeUsd = targetTokenPrice.getAssetAmountUsd(sizeDeltaAmount, targetTokenCustodyAccount.decimals)
     let entryOraclePrice = this.getEntryPriceUsdSync(
       side,
       targetTokenPrice,
       targetTokenEmaPrice,
       targetTokenCustodyAccount,
-      lockedUsd// need sizeDeltaAmountUSDD 
+      sizeUsd// need sizeDeltaAmountUSDD 
     );
 
     let openFeeUsd:BN = BN_ZERO
@@ -1026,13 +1026,13 @@ export class PerpetualsClient {
       }
 
     // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
-    const lockedUsd = targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
+    const sizeUsd = targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
       let entryOraclePrice = this.getEntryPriceUsdSync(
           side,
           targetPrice,
           targetEmaPrice,
           targetCustodyAccount,
-          lockedUsd
+          sizeUsd
       );
 
       // const entryOraclePrice = OraclePrice.from({ price: entryOraclePrice, exponent: new BN(-1 * USD_DECIMALS), confidence: BN_ZERO, timestamp: BN_ZERO })
@@ -1153,13 +1153,13 @@ export class PerpetualsClient {
     }
 
     // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
-    const lockedUsd = targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
+    const sizeUsd = targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
     let entryOraclePrice = this.getEntryPriceUsdSync(
       side,
       targetPrice,
       targetEmaPrice,
       targetCustodyAccount,
-      lockedUsd
+      sizeUsd
     );
 
     // const entryOraclePrice = OraclePrice.from({ price: entryOraclePrice, exponent: new BN(-1 * USD_DECIMALS), confidence: BN_ZERO, timestamp: BN_ZERO })
@@ -1288,12 +1288,11 @@ export class PerpetualsClient {
     targetPrice: OraclePrice,
     targetEmaPrice: OraclePrice,
     targetCustodyAccount: CustodyAccount,
-    lockedUsd : BN
+    sizeUsd : BN
   ): OraclePrice => {
   
     const { min: minPrice, max: maxPrice } = this.getMinAndMaxOraclePriceSync(targetPrice, targetEmaPrice, targetCustodyAccount);
-    const spread = this.getTradeSpread(targetCustodyAccount, lockedUsd)
-    // console.log("SDK : spread:",spread.toString())
+    const spread = this.getTradeSpread(targetCustodyAccount, sizeUsd)
 
     const USD_POWER = (new BN(10)).pow(new BN(USD_DECIMALS))
     const entryPriceBN = isVariant(side, 'long') ?
@@ -1412,13 +1411,13 @@ export class PerpetualsClient {
       throw new Error("cannot remove/close more than collateral/Size")
     }
 
-    const lockedUsd = targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
+    const sizeUsd = targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
     const exitOraclePrice = this.getExitOraclePriceSync(
       side,
       targetPrice,
       targetEmaPrice,
       targetCustodyAccount,
-      lockedUsd
+      sizeUsd
     )
     const { min: collateralTokenMinOraclePrice, max: collateralTokenMaxOraclePrice } = this.getMinAndMaxOraclePriceSync(collateralPrice, collateralEmaPrice, collateralCustodyAccount);
 
@@ -1491,7 +1490,7 @@ export class PerpetualsClient {
   //   return exitPriceBN; // IN PRICE DECIMALS
   // }
 
-  getTradeSpread = ( targetCustodyAccount : CustodyAccount ,lockedUsd : BN) : BN => {
+  getTradeSpread = ( targetCustodyAccount: CustodyAccount, sizeUsd: BN) : BN => {
     // if ( 
     //   targetCustodyAccount.pricing.tradeSpreadMax.eq(BN_ZERO) ||
     //    ( targetCustodyAccount.sizeFactorForSpread !== 0  
@@ -1504,13 +1503,13 @@ export class PerpetualsClient {
     if(
       targetCustodyAccount.pricing.tradeSpreadMax.sub(targetCustodyAccount.pricing.tradeSpreadMin).isZero()
        ||
-       lockedUsd.isZero()
+       sizeUsd.isZero()
      ) {
       return BN_ZERO
      }
     let slope = ( (targetCustodyAccount.pricing.tradeSpreadMax.sub(targetCustodyAccount.pricing.tradeSpreadMin)).mul( new BN(10**(RATE_DECIMALS + BPS_DECIMALS)) ) )
                                 .div(targetCustodyAccount.pricing.maxPositionLockedUsd)
-    let variable = (slope.mul(lockedUsd)).div(new BN(10**(RATE_DECIMALS + BPS_DECIMALS)))
+    let variable = (slope.mul(sizeUsd)).div(new BN(10**(RATE_DECIMALS + BPS_DECIMALS)))
 
     let finalSpread = targetCustodyAccount.pricing.tradeSpreadMin.add(variable)
     // console.log("finalSpread:",finalSpread.toString())
@@ -1522,11 +1521,11 @@ export class PerpetualsClient {
     targetPrice: OraclePrice,
     targetEmaPrice: OraclePrice,
     targetCustodyAccount: CustodyAccount,
-    lockedUsd : BN
+    sizeUsd : BN
   ): OraclePrice => {
     const { min: minPrice, max: maxPrice } = this.getMinAndMaxOraclePriceSync(targetPrice, targetEmaPrice, targetCustodyAccount);
 
-    const spread = this.getTradeSpread(targetCustodyAccount, lockedUsd)
+    const spread = this.getTradeSpread(targetCustodyAccount, sizeUsd)
     // console.log("SDK : spread:",spread.toString())
 
     const USD_POWER = (new BN(10)).pow(new BN(USD_DECIMALS))
@@ -1591,7 +1590,7 @@ export class PerpetualsClient {
 
     const sizeUsdUi = collateralAmtMinUsdUi.multipliedBy(leverage)
                           .dividedBy(
-                            new BigNumber(1).plus( openPosFeeRateUi.multipliedBy(leverage) )
+                            new BigNumber(1).plus( (new BigNumber(2).multipliedBy(openPosFeeRateUi)).multipliedBy(leverage) )
                           )
       // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
       const lockedUsd = uiDecimalsToNative(sizeUsdUi.toString(),USD_DECIMALS) //targetPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
@@ -1662,7 +1661,7 @@ export class PerpetualsClient {
 
       const sizeUsdUi = collateralAmtMinUsdUi.multipliedBy(leverage)
                             .dividedBy(
-                              new BigNumber(1).plus( openPosFeeRateUi.multipliedBy(leverage) )
+                              new BigNumber(1).plus( (new BigNumber(2).multipliedBy(openPosFeeRateUi)).multipliedBy(leverage) )
                             )
       
     // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
@@ -1707,14 +1706,14 @@ export class PerpetualsClient {
     const collateralTokenMinPriceUi = new BigNumber(collateralTokenMinPrice.toString()).dividedBy(10**USD_DECIMALS);
 
         // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
-    const lockedUsd = targetPrice.getAssetAmountUsd(sizeAmount, targetCustodyAccount.decimals)
+    const sizeUsd = targetPrice.getAssetAmountUsd(sizeAmount, targetCustodyAccount.decimals)
     // const lockedUsd= uiDecimalsToNative(sizeUsdUi.toFixed(USD_DECIMALS), USD_DECIMALS)
     const entryOraclePrice = this.getEntryPriceUsdSync(
       side,
       targetPrice,
       targetEmaPrice,
       targetCustodyAccount,
-      lockedUsd
+      sizeUsd
     )
     // const entryPriceUsdUi = new BigNumber(entryPriceUsdBN.toString()).dividedBy(10**USD_DECIMALS);
     const entryPriceUsdUi = new BigNumber(entryOraclePrice.toUiPrice(ORACLE_EXPONENT)); 
@@ -1732,7 +1731,7 @@ export class PerpetualsClient {
     const sizeUsdUi = entryPriceUsdUi.multipliedBy(sizeAmountUi)
 
     const collateralWithFeeUsdUi = sizeUsdUi.multipliedBy(
-                                          new BigNumber(1).plus( openPosFeeRateUi.multipliedBy(leverage) )
+                                          new BigNumber(1).plus( (new BigNumber(2).multipliedBy(openPosFeeRateUi)).multipliedBy(leverage) )
                                         ).dividedBy(leverage)
 
     const collateralAmtWithFeeUi = collateralWithFeeUsdUi.dividedBy(collateralTokenMinPriceUi)
@@ -1770,14 +1769,14 @@ export class PerpetualsClient {
       const collateralTokenMinPriceUi = new BigNumber(collateralTokenMinPrice.toString()).dividedBy(10**USD_DECIMALS);
   
          // NOTE : initially we take the lockedUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
-     const lockedUsd = targetTokenPrice.getAssetAmountUsd(sizeAmount, targetTokenCustodyAccount.decimals)
+     const sizeUsd = targetTokenPrice.getAssetAmountUsd(sizeAmount, targetTokenCustodyAccount.decimals)
      // const lockedUsd= uiDecimalsToNative(sizeUsdUi.toFixed(USD_DECIMALS), USD_DECIMALS)
       const entryOraclePrice = this.getEntryPriceUsdSync(
         side,
         targetTokenPrice,
         targetTokenEmaPrice,
         targetTokenCustodyAccount,
-        lockedUsd
+        sizeUsd
       )
       // const entryPriceUsdUi = new BigNumber(entryPriceUsdBN.toString()).dividedBy(10**USD_DECIMALS);
       const entryPriceUsdUi = new BigNumber(entryOraclePrice.toUiPrice(ORACLE_EXPONENT)); 
@@ -1789,7 +1788,7 @@ export class PerpetualsClient {
       const sizeUsdUi = entryPriceUsdUi.multipliedBy(sizeAmountUi)
   
       const collateralWithFeeUsdUi = sizeUsdUi.multipliedBy(
-                                            new BigNumber(1).plus( openPosFeeRateUi.multipliedBy(leverage) )
+                                            new BigNumber(1).plus( (new BigNumber(2).multipliedBy(openPosFeeRateUi)).multipliedBy(leverage) )
                                           ).dividedBy(leverage)
   
       const collateralAmtWithFeeUi = collateralWithFeeUsdUi.dividedBy(collateralTokenMinPriceUi)
@@ -1850,7 +1849,6 @@ export class PerpetualsClient {
      // const positionDelta = positionAccount.clone() // CHECK : gives error 
      let positionDelta = PositionAccount.from(positionAccount.publicKey ,  { ...positionAccount} as Position) 
 
-     
      const positionEntryOraclePrice = new OraclePrice({
       price: positionAccount.entryPrice.price, exponent: new BN(positionAccount.entryPrice.exponent), confidence: BN_ZERO, timestamp: BN_ZERO
     })
@@ -1865,14 +1863,14 @@ export class PerpetualsClient {
     // console.log("closeRatio:",closeRatio.toString())
 
     positionDelta.sizeUsd = (positionAccount.sizeUsd.mul(closeRatio)).div(decimalPower)
-    // console.log("positionDelta.sizeUsd:",positionDelta.sizeUsd.toString())
     positionDelta.unsettledFeesUsd = (positionAccount.unsettledFeesUsd.mul(closeRatio)).div(decimalPower)
     // positionDelta.unsettledAmount = (positionAccount.unsettledAmount.mul(closeRatio)).div(decimalPower)
     positionDelta.lockedAmount = (positionAccount.lockedAmount.mul(closeRatio)).div(decimalPower)
     positionDelta.lockedUsd = (positionAccount.lockedUsd.mul(closeRatio)).div(decimalPower)
     positionDelta.collateralAmount = (positionAccount.collateralAmount.mul(closeRatio)).div(decimalPower)
+    positionDelta.degenSizeUsd = positionAccount.degenSizeUsd.mul(closeRatio).div(decimalPower)
     //check if the positionDelta needs any other updates? only collateral_usd is not being updated and it is not being used
-    // console.log("first pnl --- ")
+
     const newPnl = this.getPnlSync(positionDelta, targetPrice, targetEmaPrice, targetCustodyAccount, collateralPrice, collateralEmaPrice, collateralCustodyAccount, currentTimestamp, targetCustodyAccount.pricing.delaySeconds, poolConfig)
     // console.log("first pnl : ",newPnl.profitUsd.toString(), newPnl.lossUsd.toString())
     let exitFeeUsd = positionDelta.sizeUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER));
@@ -1929,7 +1927,7 @@ export class PerpetualsClient {
     newPosition.unsettledFeesUsd = positionAccount.unsettledFeesUsd.sub(positionDelta.unsettledFeesUsd)
     // calc new collateralUsd
     newPosition.collateralUsd = collateralMinMaxPrice.min.getAssetAmountUsd(newPosition.collateralAmount, collateralCustodyAccount.decimals)
-
+    newPosition.degenSizeUsd = positionAccount.degenSizeUsd.sub(positionDelta.degenSizeUsd)
 
     let feeUsdWithDiscount = BN_ZERO;
     let feeUsd = sizeDeltaUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER))
@@ -1969,7 +1967,7 @@ export class PerpetualsClient {
       // console.log("newPosition.sizeAmount:",newPosition.sizeAmount.toString())
 
 
-      const maxWithdrawableAmount = this.getMaxWithdrawableAmountSyncInternal(newPosition, targetPrice, targetEmaPrice, targetCustodyAccount, collateralPrice, collateralEmaPrice, collateralCustodyAccount, currentTimestamp, poolConfig, closeAmount)
+      const {maxWithdrawableAmount, diff} = this.getMaxWithdrawableAmountSyncInternal(newPosition, targetPrice, targetEmaPrice, targetCustodyAccount, collateralPrice, collateralEmaPrice, collateralCustodyAccount, currentTimestamp, poolConfig, closeAmount)
       // console.log("collateralAmountReceived USD before ", collateralAmountRecievedUsd.toString())
       // console.log("collateralAmountReceived", collateralAmountReceived.toString())
       // console.log("curr coll ", newPosition.collateralAmount.toString())
@@ -2036,7 +2034,7 @@ export class PerpetualsClient {
         newLev: newLev,
         liquidationPrice: finalLiquidationPrice,
         collateralAmountRecieved: collateralAmountReceived, // remove collateral fee must be subtracted from this to show on UI, as of now we dont have any fee on remove collateral
-        newCollateralAmount : newPosition.collateralAmount,
+        newCollateralAmount : newPosition.collateralAmount.add(diff),
         newPnl: finalPnlUsd
       }
     } else {
@@ -2101,13 +2099,19 @@ export class PerpetualsClient {
     poolConfig: PoolConfig,
     closeAmount = BN_ZERO,
     errorBandwidthPercentageUi = 5, // 5% increase MinCollateral , add 5% decrease in Max_Init_Lev 
-  ) : BN => {
+  ) : {
+    maxWithdrawableAmount: BN,
+    diff: BN
+  } => {
 
     if(errorBandwidthPercentageUi > 100 || errorBandwidthPercentageUi < 0) {
       throw new Error("errorBandwidthPercentageUi cannot be >100 or <0")
     }
     // to keep a calculation slippage of 10% so this will be 100x => 95x
-    const MAX_INIT_LEVERAGE = targetCustodyAccount.pricing.maxInitialLeverage.mul(new BN(100 - errorBandwidthPercentageUi)).div(new BN(100)) 
+    const MAX_INIT_LEVERAGE = positionAccount.isDegenMode() ?   
+      (new BN(targetCustodyAccount.pricing.maxInitDegenLeverage)).mul(new BN(100 - errorBandwidthPercentageUi)).div(new BN(100)) 
+     :  (new BN(targetCustodyAccount.pricing.maxInitLeverage)).mul(new BN(100 - errorBandwidthPercentageUi)).div(new BN(100)) 
+
 
     const profitLoss = this.getPnlSync(
       positionAccount,
@@ -2126,34 +2130,40 @@ export class PerpetualsClient {
       collateralEmaPrice,
       collateralCustodyAccount
     );
+    let exitFeeUsd = positionAccount.sizeUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER));
+    let lockAndUnsettledFeeUsd = this.getLockFeeAndUnsettledUsdForPosition(positionAccount, collateralCustodyAccount, currentTimestamp)
+    let lossUsd = profitLoss.lossUsd.add(exitFeeUsd).add(lockAndUnsettledFeeUsd)
+
     const currentCollateralUsd = collateralMinPrice.getAssetAmountUsd(positionAccount.collateralAmount.add(closeAmount), collateralCustodyAccount.decimals);
 
     let availableInitMarginUsd : BN = BN_ZERO
     // should not include profit in currentCollateral for initial lev 
     if( profitLoss.lossUsd.lt( currentCollateralUsd ) ){
-      availableInitMarginUsd = currentCollateralUsd.sub(profitLoss.lossUsd)
+      availableInitMarginUsd = currentCollateralUsd.sub(lossUsd)
     } else {
       console.log("profitLoss.lossUsd > coll :: should have been liquidated")
-      return BN_ZERO; //should have been liquidated
+      return {maxWithdrawableAmount: BN_ZERO, diff: BN_ZERO}; //should have been liquidated
     }
 
     const maxRemovableCollateralUsd = availableInitMarginUsd.sub( positionAccount.sizeUsd.muln(BPS_POWER).div(MAX_INIT_LEVERAGE))
     if (maxRemovableCollateralUsd.isNeg()){
       // console.log("maxRemovableCollateralUsd < 0 :: cannot withdraw")
-      return BN_ZERO
+      return {maxWithdrawableAmount: BN_ZERO, diff: BN_ZERO};
     }
 
     // now check for MIN Collateral  
-    let maxWithdrawableAmount: BN
+    let maxWithdrawableAmount: BN = BN_ZERO
+    let diff: BN = BN_ZERO
 
+    let remainingCollateralUsd : BN = availableInitMarginUsd.sub(maxRemovableCollateralUsd)
 
-    let remainingCollateralUsd = availableInitMarginUsd.sub(maxRemovableCollateralUsd)
+    const isDegenMode = positionAccount.isDegenMode()
 
-    if (remainingCollateralUsd < targetCustodyAccount.pricing.minCollateralUsd) {
-      let diff = targetCustodyAccount.pricing.minCollateralUsd.sub(remainingCollateralUsd)
+    if (remainingCollateralUsd.lt( new BN( isDegenMode ? targetCustodyAccount.pricing.minDegenCollateralUsd :  targetCustodyAccount.pricing.minCollateralUsd) )) {
+      diff = (new BN( isDegenMode ? targetCustodyAccount.pricing.minDegenCollateralUsd :  targetCustodyAccount.pricing.minCollateralUsd )).sub(remainingCollateralUsd)
       let updatedMaxRemovableCollateralUsd = maxRemovableCollateralUsd.sub(diff)
       if (updatedMaxRemovableCollateralUsd.isNeg()){
-        return BN_ZERO
+        return {maxWithdrawableAmount: BN_ZERO, diff: BN_ZERO};
       }
       else {
         maxWithdrawableAmount = collateralMaxPrice.getTokenAmount(updatedMaxRemovableCollateralUsd, collateralCustodyAccount.decimals)
@@ -2161,7 +2171,7 @@ export class PerpetualsClient {
     } else {
       maxWithdrawableAmount = collateralMaxPrice.getTokenAmount(maxRemovableCollateralUsd, collateralCustodyAccount.decimals)
     }
-    return maxWithdrawableAmount
+    return {maxWithdrawableAmount, diff}
   }
 
   getFinalCloseAmountSync = (
@@ -2248,13 +2258,16 @@ export class PerpetualsClient {
       throw new Error("errorBandwidthPercentageUi cannot be >100 or <0")
     }
     // to keep a calculation slippage of 10% so this will be 100x => 95x
-    const MAX_INIT_LEVERAGE = targetCustodyAccount.pricing.maxInitialLeverage.mul(new BN(100 - errorBandwidthPercentageUi)).div(new BN(100)) 
+    const MAX_INIT_LEVERAGE = positionAccount.isDegenMode() ?   
+      (new BN(targetCustodyAccount.pricing.maxInitDegenLeverage)).mul(new BN(100 - errorBandwidthPercentageUi)).div(new BN(100)) 
+      :  (new BN(targetCustodyAccount.pricing.maxInitLeverage)).mul(new BN(100 - errorBandwidthPercentageUi)).div(new BN(100)) 
+
 
     // taking positionAccount.collateralUsd and not collateralWithPNL because we will not letting user withdraw collateral 
     // without settling position
     // so this will be 10$ => 10.5$
     const maxRemoveableCollateralUsdAfterMinRequired = positionAccount.collateralUsd.sub(
-      targetCustodyAccount.pricing.minCollateralUsd.mul(new BN(100 + errorBandwidthPercentageUi)).div(new BN(100)) 
+      ( positionAccount.isDegenMode() ? new BN(targetCustodyAccount.pricing.minDegenCollateralUsd)  :  new BN(targetCustodyAccount.pricing.minCollateralUsd)  ).mul(new BN(100 + errorBandwidthPercentageUi)).div(new BN(100)) 
     )
 
     if(maxRemoveableCollateralUsdAfterMinRequired.isNeg()){
@@ -2279,12 +2292,16 @@ export class PerpetualsClient {
       collateralEmaPrice,
       collateralCustodyAccount
     );
+    let exitFeeUsd = positionAccount.sizeUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER));
+    let lockAndUnsettledFeeUsd = this.getLockFeeAndUnsettledUsdForPosition(positionAccount, collateralCustodyAccount, currentTimestamp)
+    let lossUsd = profitLoss.lossUsd.add(exitFeeUsd).add(lockAndUnsettledFeeUsd)
+
     const currentCollateralUsd = collateralMinPrice.getAssetAmountUsd(positionAccount.collateralAmount, collateralCustodyAccount.decimals);
 
     let availableInitMarginUsd : BN = BN_ZERO
     // should not include profit in currentCollateral for initial lev 
     if( profitLoss.lossUsd.lt( currentCollateralUsd ) ){
-      availableInitMarginUsd = currentCollateralUsd.sub(profitLoss.lossUsd)
+      availableInitMarginUsd = currentCollateralUsd.sub(lossUsd)
     } else {
       console.log("profitLoss.lossUsd > coll :: should have been liquidated")
       return BN_ZERO; //should have been liquidated
@@ -2335,12 +2352,12 @@ export class PerpetualsClient {
     || (custodyAccount.borrowRate.optimalUtilization.gte(new BN(RATE_POWER)))) {
       borrowRate = (currentUtilization.mul(custodyAccount.borrowRate.slope1))
         .div(custodyAccount.borrowRate.optimalUtilization);
-    } else if(currentUtilization.lt(custodyAccount.pricing.maxUtilization)) {
+    } else if(currentUtilization.lt((new BN(custodyAccount.pricing.maxUtilization)))) {
       borrowRate = custodyAccount.borrowRate.slope1
         .add(
           currentUtilization.sub(custodyAccount.borrowRate.optimalUtilization)
           .mul(custodyAccount.borrowRate.slope2)
-          .div(custodyAccount.pricing.maxUtilization.sub(custodyAccount.borrowRate.optimalUtilization))
+          .div((new BN(custodyAccount.pricing.maxUtilization)).sub(custodyAccount.borrowRate.optimalUtilization))
         )
     } else {
       borrowRate = custodyAccount.borrowRate.slope1.add(custodyAccount.borrowRate.slope2)
@@ -2413,7 +2430,8 @@ export class PerpetualsClient {
     const exitFeeUsd = positionAccount.sizeUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER));
     const unsettledLossUsd = exitFeeUsd.add(lockAndUnsettledFeeUsd);
 
-    const liablitiesUsd = positionAccount.sizeUsd.mul(new BN(BPS_POWER)).div(targetCustodyAccount.pricing.maxLeverage).add(unsettledLossUsd)
+    const liablitiesUsd = positionAccount.sizeUsd.mul(new BN(BPS_POWER)).div(new BN(targetCustodyAccount.pricing.maxLeverage)).add(unsettledLossUsd)
+
     
     const targetMinMaxPriceOracle = this.getMinAndMaxOraclePriceSync(targetPrice, targetEmaPrice, targetCustodyAccount);
     const collateralMinMaxPriceOracle = this.getMinAndMaxOraclePriceSync(collateralPrice, collateralEmaPrice, collateralCustodyAccount);
@@ -2589,7 +2607,7 @@ export class PerpetualsClient {
     const exitFeeUsd = sizeUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER));
     const unsettledLossUsd = exitFeeUsd
 
-    const liablitiesUsd = sizeUsd.mul(new BN(BPS_POWER)).div(targetCustodyAccount.pricing.maxLeverage).add(unsettledLossUsd)
+    const liablitiesUsd = sizeUsd.mul(new BN(BPS_POWER)).div(new BN(targetCustodyAccount.pricing.maxLeverage)).add(unsettledLossUsd)
 
     const targetMinMaxPriceOracle = this.getMinAndMaxOraclePriceSync(targetPrice, targetEmaPrice, targetCustodyAccount);
     const collateralMinMaxPriceOracle = this.getMinAndMaxOraclePriceSync(collateralPrice, collateralEmaPrice, collateralCustodyAccount);
@@ -2742,13 +2760,13 @@ export class PerpetualsClient {
       throw new Error("Delta Amounts cannot be negative.")
     }
 
-    let lockedUsd = targetTokenEmaPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
+    let sizeUsd = targetTokenEmaPrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals)
     let entryOraclePrice = this.getEntryPriceUsdSync(
       side,
       targetTokenPrice,
       targetTokenEmaPrice,
       targetCustodyAccount,
-      lockedUsd
+      sizeUsd
     )
 
     if (positionAccount === null) {
@@ -2951,8 +2969,8 @@ export class PerpetualsClient {
 
   // let exitFee = this.getExitFeeSync(positionAccount, targetCustodyAccount, collateralCustodyAccount, collateralPrice, collateralEmaPrice)
   // let exitOraclePrice = this.getExitPriceSync(side, targetTokenPrice, targetTokenEmaPrice,targetCustodyAccount);
-  const lockedUsd = targetTokenPrice.getAssetAmountUsd(positionAccount.sizeAmount, targetCustodyAccount.decimals)
-  let exitOraclePrice = this.getExitOraclePriceSync(side, targetTokenPrice, targetTokenEmaPrice,targetCustodyAccount, lockedUsd);
+  const sizeUsd = targetTokenPrice.getAssetAmountUsd(positionAccount.sizeAmount, targetCustodyAccount.decimals)
+  let exitOraclePrice = this.getExitOraclePriceSync(side, targetTokenPrice, targetTokenEmaPrice,targetCustodyAccount, sizeUsd);
 
 
   const collateralMinPrice = this.getMinAndMaxOraclePriceSync(
@@ -3326,7 +3344,10 @@ export class PerpetualsClient {
 
   getUserClaimableRevenueAmount = async (
     POOL_CONFIG: PoolConfig,
-    userPublicKey: PublicKey
+    userPublicKey: PublicKey,
+    // tokenStakeFafAccount: TokenStakeAccount,
+    // fafTokenVaultAccount:  TokenVaultAccount,
+    enableDebuglogs: boolean = false
   ): Promise<BN> => {
 
         const fafTokenVaultPk = POOL_CONFIG.tokenVault
@@ -3337,6 +3358,11 @@ export class PerpetualsClient {
                 'tokenVault',
                 fafTokenVaultAccountInfo.data
             )
+            // console.log(
+            //     'fafTokenVaultAccount:',
+            //     fafTokenVault?.withdrawInstantFeeEarned.toString(),
+            //     nativeToUiDecimals(fafTokenVault?.withdrawInstantFeeEarned, 6, 2, true)
+            // )
             fafTokenVaultAccount = TokenVaultAccount.from(fafTokenVaultPk , fafTokenVault )
         } else {
             console.log('No account info found for fafTokenVaultPk:', fafTokenVaultPk.toBase58())
@@ -3351,7 +3377,7 @@ export class PerpetualsClient {
                     [Buffer.from('token_stake'), userPublicKey.toBuffer()],
                     POOL_CONFIG.programId
                 )[0]
-
+       // console.log(tokenStakeAccount.toBase58(), 'checking token stake account mint')
 
       const accountInfo = await this.provider.connection.getAccountInfo(tokenStakeAccount)
       if (accountInfo) {
@@ -4748,7 +4774,8 @@ export class PerpetualsClient {
     let userPayingTokenAccount = getAssociatedTokenAddressSync(
       collateralCustodyConfig.mintKey,
       publicKey,
-      true
+      true,
+      poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
     );
 
     let wrappedSolAccount: Keypair | undefined;
@@ -8299,197 +8326,8 @@ export class PerpetualsClient {
 
   }
 
-  setTriggerPrice = async (
-    targetSymbol: string,
-    collateralSymbol: string,
-    side: Side,
-    triggerPrice: ContractOraclePrice,
-    isStopLoss: boolean,
-    poolConfig: PoolConfig,
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    
-    let publicKey = this.provider.wallet.publicKey;
 
-    const targetCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
-    const collateralCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
 
-    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
-
-    let positionAccount = poolConfig.getPositionFromMarketPk(publicKey, marketAccount)
-
-    let instructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-
-    
-      let setTriggerPrice = await this.program.methods
-          .setTriggerPrice({
-            triggerPrice: triggerPrice,
-            isStopLoss: isStopLoss
-          })
-          .accounts({
-            owner: publicKey,
-            perpetuals: this.perpetuals.publicKey,
-            pool: poolConfig.poolAddress,
-            position: positionAccount,
-            market: marketAccount,
-            targetCustody: targetCustodyConfig.custodyAccount,
-            targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
-            collateralCustody: collateralCustodyConfig.custodyAccount,
-            collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
-            
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.programId,
-            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
-          })
-          .instruction();
-        instructions.push(setTriggerPrice)
-
-    } catch (err) {
-      console.log("perpClient setTriggerPrice error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...instructions ],
-      additionalSigners
-    };
-
-  }
-
-  forceClosePosition = async (
-    positionAccount: PositionAccount,
-    targetSymbol: string,
-    collateralSymbol: string,
-    side: Side,
-    isStopLoss: boolean,
-    poolConfig: PoolConfig,
-    createUserATA = true, //create new ATA for USER in the end 
-    closeUsersWSOLATA = false, // to get back WSOL=>SOL
-    ephemeralSignerPubkey = undefined
-  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
-    
-    let payerPubkey = this.provider.wallet.publicKey;
-
-    const targetCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(targetSymbol).mintKey))!;
-    const collateralCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(collateralSymbol).mintKey))!;
-
-    const marketAccount = poolConfig.getMarketPk(targetCustodyConfig.custodyAccount, collateralCustodyConfig.custodyAccount, side)
-
-    // let positionAccount = poolConfig.getPositionFromMarketPk(publicKey, marketAccount)
-
-    let userReceivingTokenAccount : PublicKey;
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-    
-    try {
-
-      // reason not supporting SOL is 
-      // 1) owner of the WSOL ATA has to be positionAccount.owner CHECK on contract
-      // 2) while closing if we want to retract back the rent of ATA we need to be the owner
-      
-      // let wrappedSolAccount: Keypair | undefined;
-      // if (collateralSymbol == 'SOL') {
-      //   console.log("collateralSymbol === SOL", collateralSymbol);
-
-      //   wrappedSolAccount = new Keypair();
-      //   const lamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
-
-      //   preInstructions = [
-      //     SystemProgram.createAccount({
-      //       fromPubkey: payerPubkey,
-      //       newAccountPubkey: wrappedSolAccount.publicKey,
-      //       lamports: lamports, //will this break for large amounts ??
-      //       space: 165,
-      //       programId: TOKEN_PROGRAM_ID,
-      //     }),
-      //     createInitializeAccount3Instruction(
-      //       wrappedSolAccount.publicKey,
-      //       NATIVE_MINT,
-      //       positionAccount.owner,
-      //     ),
-      //   ];
-      //   postInstructions = [
-      //     createCloseAccountInstruction(
-      //       wrappedSolAccount.publicKey,
-      //       //  the rent SOL should be transferred back to the payer and not the owner of positionAccount
-      //       //  this cannot be done - since the owner has to sign
-      //       payerPubkey, 
-      //       positionAccount.owner,
-      //     ),
-      //   ];
-      //   additionalSigners.push(wrappedSolAccount);
-      // } 
-      // else {
-        // OTHER TOKENS including WSOL,USDC,..
-        userReceivingTokenAccount = getAssociatedTokenAddressSync(
-          poolConfig.getTokenFromSymbol(collateralSymbol).mintKey, // works for SOL and WSOL
-          positionAccount.owner,
-          false,
-          poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
-        );
-
-        if (createUserATA && !(await checkIfAccountExists(userReceivingTokenAccount, this.provider.connection))) {
-          preInstructions.push(
-            createAssociatedTokenAccountInstruction(
-              payerPubkey,
-              userReceivingTokenAccount,
-              positionAccount.owner,
-              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
-              poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
-            )
-          );
-        }
-      // } 
-
-      let forceClosePosition = await this.program.methods
-          .forceClosePosition({
-            privilege: Privilege.None, // currently passing inorder to not have any breakin change , will later remove from program
-            isStopLoss: isStopLoss
-          })
-          .accounts({
-            owner: positionAccount.owner,
-            receivingAccount: userReceivingTokenAccount, //collateralSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userReceivingTokenAccount,
-            transferAuthority: poolConfig.transferAuthority,
-            perpetuals: this.perpetuals.publicKey,
-            pool: poolConfig.poolAddress,
-            position: positionAccount.publicKey,
-            market: marketAccount,
-            targetCustody: targetCustodyConfig.custodyAccount,
-            targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
-            collateralCustody: collateralCustodyConfig.custodyAccount,
-            collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
-            collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
-          
-            tokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.programId,
-            ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
-            receivingMint: collateralCustodyConfig.mintKey
-          })
-          // .remainingAccounts([...getNftAccounts(nftTradingAccount, nftReferralAccount, nftRebateTokenAccount, privilege)])
-          .instruction();
-        instructions.push(forceClosePosition)
-
-        if (collateralSymbol == 'WSOL' && closeUsersWSOLATA) {
-          const closeWsolATAIns = createCloseAccountInstruction(userReceivingTokenAccount, positionAccount.owner, positionAccount.owner);
-          postInstructions.push(closeWsolATAIns);
-        }
-
-    } catch (err) {
-      console.log("perpClient forceClosePosition error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions : [...preInstructions, ...instructions ,...postInstructions],
-      additionalSigners
-    };
-
-  }
 
   placeLimitOrder = async (
     targetSymbol: string,
@@ -9477,104 +9315,7 @@ export class PerpetualsClient {
   }
 
 
-  migrateTriggerOrder = async (
-    owner: PublicKey,
-    marketAccount: PublicKey,
-    poolConfig: PoolConfig,
-  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
 
-    let payerPubkey = this.provider.wallet.publicKey;
-
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-      let positionAccount = poolConfig.getPositionFromMarketPk(owner, marketAccount)
-      let orderAccount = poolConfig.getOrderFromMarketPk(owner, marketAccount)
-
-      let migrateTriggerOrder = await this.program.methods
-        .migrateTriggerOrder()
-        .accounts({
-          owner: owner,
-          feePayer: payerPubkey,
-          position: positionAccount,
-          order: orderAccount,
-          market: marketAccount,
-          systemProgram: SystemProgram.programId,
-        })
-        .instruction();
-
-      instructions.push(migrateTriggerOrder)
-
-    } catch (err) {
-      console.log("perpClient migrateTriggerOrder error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions: [...preInstructions, ...instructions, ...postInstructions],
-      additionalSigners
-    };
-  }
-
-  setLpTokenPrice = async (
-    poolConfig: PoolConfig
-  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
-
-    let instructions: TransactionInstruction[] = [];
-    let additionalSigners: Signer[] = [];
-
-    try {
-
-      let custodyAccountMetas = [];
-      let custodyOracleAccountMetas = [];
-      let markets = []
-
-      for (const custody of poolConfig.custodies) {
-        custodyAccountMetas.push({
-          pubkey: custody.custodyAccount,
-          isSigner: false,
-          isWritable: false,
-        });
-        custodyOracleAccountMetas.push({
-          pubkey: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
-          isSigner: false,
-          isWritable: false,
-        });
-      }
-
-      for (const market of poolConfig.markets) {
-        markets.push({
-          pubkey: market.marketAccount,
-          isSigner: false,
-          isWritable: false,
-        });
-      }
-
-      let setLpTokenPriceInstruction = await this.program.methods
-        .setLpTokenPrice({})
-        .accounts({
-          perpetuals: poolConfig.perpetuals,
-          pool: poolConfig.poolAddress,
-          lpTokenMint: poolConfig.stakedLpTokenMint,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
-        })
-        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
-        .instruction()
-      instructions.push(setLpTokenPriceInstruction)
-
-    } catch (err) {
-      console.log("perpClient setLpTokenPriceInstruction error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions: [...instructions],
-      additionalSigners
-    };
-  };
 
 
   public async sendTransaction(

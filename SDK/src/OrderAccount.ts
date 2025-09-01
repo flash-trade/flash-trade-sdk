@@ -25,7 +25,9 @@ export class OrderAccount implements Order{
     public activeOrders: number;
 
     // extra 
-    public bump: number
+    public bump: number;
+    public referenceTimestamp: BN;
+    public executionCount: BN;
     public padding: BN[];
 
     constructor( publicKey : PublicKey, parseData : Order) {

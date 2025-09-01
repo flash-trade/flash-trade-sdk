@@ -18,7 +18,9 @@ export class PoolAccount implements Pool {
     ratios: TokenRatios[];
     markets:  PublicKey[];
     maxAumUsd: BN;
-    aumUsd: BN; // For persistnace
+    buffer: BN;
+    rawAumUsd: BN; 
+    equityUsd: BN; 
     totalStaked: StakeStats;
     stakingFeeShareBps: BN;
     bump: number;

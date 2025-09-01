@@ -15,7 +15,7 @@ export class MarketAccount implements Market {
     correlation: boolean;
     maxPayoffBps: BN;
     permissions: MarketPermissions;
-    openInterest: BN;
+    degenExposureUsd: BN;
     collectivePosition: PositionStats;
     targetCustodyUid: number;
     padding: number[];

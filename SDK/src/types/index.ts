@@ -83,7 +83,7 @@ export type OpenPositionLog = Events["OpenPositionLog"];
 export type RemoveCollateralLog = Events["RemoveCollateralLog"];
 export type RemoveLiquidityLog = Events["RemoveLiquidityLog"];
 export type SwapLog = Events["SwapLog"];
-export type ForceClosePositionLog = Events["ForceClosePositionLog"];
+
 
 export type AddCollateralLogV2 = Events["AddCollateralLogV2"];
 export type ClosePositionLogV2 = Events["ClosePositionLogV2"];
@@ -92,7 +92,7 @@ export type LiquidateLogV2 = Events["LiquidateLogV2"];
 export type IncreaseSizeLogV2 = Events["IncreaseSizeLogV2"];
 export type OpenPositionLogV2 = Events["OpenPositionLogV2"];
 export type RemoveCollateralLogV2 = Events["RemoveCollateralLogV2"];
-export type ForceClosePositionLogV2 = Events["ForceClosePositionLogV2"];
+
 
 export type AddCollateralLogV3 = Events["AddCollateralLogV3"];
 export type ClosePositionLogV3 = Events["ClosePositionLogV3"];
@@ -101,7 +101,7 @@ export type LiquidateLogV3 = Events["LiquidateLogV3"];
 export type IncreaseSizeLogV3 = Events["IncreaseSizeLogV3"];
 export type OpenPositionLogV3 = Events["OpenPositionLogV3"];
 export type RemoveCollateralLogV3 = Events["RemoveCollateralLogV3"];
-export type ForceClosePositionLogV3 = Events["ForceClosePositionLogV3"];
+
 
 
 export type IncreaseSizeLogV4 = Events["IncreaseSizeLogV4"];
@@ -238,14 +238,15 @@ export const DEFAULT_POSITION : Position = {
 
     cumulativeLockFeeSnapshot: BN_ZERO,
 
-    takeProfitPrice : { price : BN_ZERO, exponent: 0},
-    stopLossPrice : { price : BN_ZERO, exponent: 0},
-    
+    degenSizeUsd: BN_ZERO,
+    buffer: BN_ZERO,
+
     sizeDecimals : 0,
     lockedDecimals : 0,
     collateralDecimals : 0,
 
-    bump: 0
+    bump: 0,
+    padding: []
 }
 
 

@@ -31,8 +31,8 @@ export class PositionAccount implements Position {
 
     public cumulativeLockFeeSnapshot: BN;
 
-    public takeProfitPrice: ContractOraclePrice;
-    public stopLossPrice: ContractOraclePrice;
+    public degenSizeUsd: BN;
+    public buffer: BN;
     
     public sizeDecimals: number;
     public lockedDecimals: number;
@@ -40,6 +40,7 @@ export class PositionAccount implements Position {
 
     // extra 
     public bump: number
+    public padding: number[];
 
     constructor( publicKey : PublicKey, parseData : Position) {
         this.publicKey = publicKey;
@@ -56,6 +57,10 @@ export class PositionAccount implements Position {
 
     updatePositionData(position: Position) {
         Object.assign(this, { ...position })
+    }
+
+    isDegenMode(): boolean {
+        return this.degenSizeUsd.gte(this.sizeUsd);
     }
 
 }
