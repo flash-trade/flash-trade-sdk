@@ -17,6 +17,7 @@ export interface CustodyConfig {
   isVirtual: boolean;
   intOracleAccount: PublicKey;
   extOracleAccount: PublicKey;
+  lazerId: number;
   pythTicker: string;
   pythPriceId: string;
 }
@@ -30,6 +31,8 @@ export interface MarketConfig {
   collateralCustody: PublicKey;
   side: Side;
   maxLev : number;
+  degenMinLev : number;
+  degenMaxLev : number;
   targetCustodyId: number;
   collateralCustodyId: number;
   targetMint: PublicKey;
@@ -44,6 +47,7 @@ export type Token = {
   tokenPrecision : number;
   isStable: boolean;
   isVirtual: boolean;
+  lazerId: number;
   pythTicker: string;
   pythPriceId: string;
   isToken2022: boolean
@@ -292,6 +296,8 @@ export class PoolConfig {
           collateralCustody: new PublicKey(i.collateralCustody),
           side: i.side === 'long' ? Side.Long : Side.Short,
           maxLev : i.maxLev,
+          degenMinLev : i.degenMinLev,
+          degenMaxLev : i.degenMaxLev,
           targetMint: new PublicKey(i.targetMint),
           collateralMint: new PublicKey(i.collateralMint)
         }

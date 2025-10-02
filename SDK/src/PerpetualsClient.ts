@@ -9316,8 +9316,6 @@ export class PerpetualsClient {
 
 
 
-
-
   public async sendTransaction(
     ixs: TransactionInstruction[],
     opts: SendTransactionOpts = {},
@@ -9351,5 +9349,5 @@ export class PerpetualsClient {
     );
   }
 
-}
 
+}
