@@ -78,6 +78,7 @@ export class PoolConfig {
     public protocolTokenAccount: PublicKey,
     public multisig: PublicKey,
     public addressLookupTableAddresses: PublicKey[],
+    public pusherAddressLookupTableAddress: PublicKey,
     public backupOracle: PublicKey,
     public nftCollectionAddress: PublicKey,
     public rewardDistributionProgram: {
@@ -284,6 +285,13 @@ export class PoolConfig {
       console.log("ERROR: buildPoolconfigFromJson  unable to load addressLookupTableAddresses ")
     }
    
+    let pusherAddressLookupTableAddress: PublicKey
+    try {
+          pusherAddressLookupTableAddress = new PublicKey(poolConfig['pusherAddressLookupTableAddress']);
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load pusherAddressLookupTableAddress ")
+    }
+
     let markets: MarketConfig[]
     try {
       markets  = poolConfig['markets'].map(i => {
@@ -330,6 +338,7 @@ export class PoolConfig {
       new PublicKey(poolConfig.protocolTokenAccount),
       new PublicKey(poolConfig.multisig),
       addressLookupTableAddresses,
+      pusherAddressLookupTableAddress,
       new PublicKey(poolConfig.backupOracle),
       new PublicKey(poolConfig.nftCollectionAddress),
       {

@@ -6,6 +6,8 @@ import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connec
 import { getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
 import { PriceData, PythHttpClient, getPythProgramKeyForCluster } from '@pythnetwork/client';
 
+
+// export const POOL_CONFIG = PoolConfig.fromIdsByName('Ore.1', 'mainnet-beta');
 export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
 
 
@@ -419,12 +421,14 @@ const getLiquidationPrice = async (positionPubKey : PublicKey) => {
     console.log(" testing... uncomment below to test");
 
     //  await openPosition('SOL', 'SOL', '0.1', Side.Long)
+    //  await openPosition('ORE', 'ORE', '1', Side.Long)
     //  console.log("openPosition done");
 
     // await closePosition('SOL', Side.Long);
     // console.log("closePosition done");
 
     // NOTE use openPositionWithSwap only when you want to swap and open 
+    // await openPositionWithSwap('USDC', 'ORE', '2', Side.Long)
     // await openPositionWithSwap('USDC', 'SOL', '2', Side.Long)
     // console.log("openPositionWithSwap done");
 
