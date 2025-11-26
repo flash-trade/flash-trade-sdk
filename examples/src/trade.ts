@@ -268,30 +268,12 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
         uiDecimalsToNative(`${5}`, 2)
     )
 
-    const minAmountOut = flashClient.getSwapAmountAndFeesSync(
-        collateralWithFee,
-        BN_ZERO,
-        poolAccount,
-        inputTokenPrice,
-        inputTokenPriceEma,
-        CustodyAccount.from(inputCustody.custodyAccount, custodies[0]!),
-        outputTokenPrice,
-        outputTokenPriceEma,
-        CustodyAccount.from(outputCustody.custodyAccount, custodies[1]!),
-        lpStats.totalPoolValueUsd,
-        POOL_CONFIG
-    ).minAmountOut
-
-    const minAmountOutAfterSlippage = minAmountOut
-        .mul(new BN(10 ** BPS_DECIMALS - slippageBps))
-        .div(new BN(10 ** BPS_DECIMALS))
 
     const openPositionData = await flashClient.swapAndOpen(
         outputToken.symbol,
         outputToken.symbol,
         inputToken.symbol,
         collateralWithFee,
-        minAmountOutAfterSlippage,
         priceAfterSlippage,
         size,
         side,
@@ -345,38 +327,16 @@ const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingT
     const collateralTokenPriceEma = priceMap.get(collateralToken.symbol)!.emaPrice
     const userRecievingTokenPrice = priceMap.get(userRecievingToken.symbol)!.price
 
-    const { closeAmount, feesAmount } = flashClient.getFinalCloseAmountSync(
-        positionAccount,
-        marketConfig.targetCustody.equals(marketConfig.collateralCustody),
-        marketConfig.side,
-        targetTokenPrice,
-        targetTokenPriceEma,
-        targetCustodyAccount,
-        collateralTokenPrice,
-        collateralTokenPriceEma,
-        collateralCustodyAccount,
-        new BN(getUnixTs()),
-        POOL_CONFIG
-    )
-
-    const receiveUsd = collateralTokenPrice.getAssetAmountUsd(closeAmount, collateralToken.decimals)
-
-    const minAmountOut = userRecievingTokenPrice.getTokenAmount(
-        receiveUsd,
-        userRecievingToken.decimals
-    )
+    
 
     const priceAfterSlippage = flashClient.getPriceAfterSlippage(false, new BN(slippageBps), targetTokenPrice, side)
 
-    const minAmountOutWithSlippage = minAmountOut
-        .mul(new BN(100 - Number(0.8)))
-        .div(new BN(100))
+   
     
     const closePositionWithSwapData = await flashClient.closeAndSwap(
         targetToken.symbol,
         userRecievingToken.symbol,
         collateralToken.symbol,
-        minAmountOutWithSlippage,
         priceAfterSlippage,
         side,
         POOL_CONFIG,

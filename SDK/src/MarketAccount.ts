@@ -49,7 +49,7 @@ export class MarketAccount implements Market {
                 sizeUsd: this.collectivePosition.sizeUsd,
 
                 collateralAmount : this.collectivePosition.collateralAmount,
-                collateralUsd: this.collectivePosition.collateralUsd,
+                collateralUsd: this.collectivePosition.collateralLiabilityUsd,
 
                 lockedAmount : this.collectivePosition.lockedAmount,
                 lockedUsd : this.collectivePosition.lockedUsd,

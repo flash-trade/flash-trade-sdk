@@ -18,7 +18,7 @@ export class TokenStakeAccount implements TokenStake {
     rewardTokens: BN
     unclaimedRevenueAmount: BN
     revenueSnapshot: BN
-    padding: BN[]
+    claimableRebateUsd: BN // padding
 
     // Constructor for initializing the object from provided data
     constructor(data: {
@@ -36,7 +36,7 @@ export class TokenStakeAccount implements TokenStake {
         rewardTokens: BN
         unclaimedRevenueAmount: BN
         revenueSnapshot: BN
-        padding: BN[]
+        claimableRebateUsd: BN
     }) {
         this.owner = data.owner
         this.isInitialized = data.isInitialized
@@ -52,8 +52,7 @@ export class TokenStakeAccount implements TokenStake {
         this.lastRewardEpochCount = data.lastRewardEpochCount
         this.unclaimedRevenueAmount = data.unclaimedRevenueAmount
         this.revenueSnapshot = data.revenueSnapshot
-
-        this.padding = data.padding
+        this.claimableRebateUsd = data.claimableRebateUsd
     }
 
     // Static method to create a TokenStakeAccount from decoded data
@@ -74,8 +73,7 @@ export class TokenStakeAccount implements TokenStake {
             lastRewardEpochCount: decodedData.lastRewardEpochCount,
             unclaimedRevenueAmount: decodedData.unclaimedRevenueAmount,
             revenueSnapshot: decodedData.revenueSnapshot,
-
-            padding: decodedData.padding.map((p: string) => new BN(p)), // Convert padding to BN
+            claimableRebateUsd: decodedData.claimableRebateUsd, // Convert padding to BN
         })
     }
 

@@ -43,6 +43,9 @@ export class PoolAccount implements Pool {
     compoundingLpPrice: BN;
     lastUpdatedTimestamp: BN;
     padding2: BN[];
+    feesObligationUsd: BN;
+    rebateObligationUsd: BN;
+    thresholdUsd: BN;
 
     constructor(publicKey: PublicKey, parseData: Pool) {
         this.publicKey = publicKey;

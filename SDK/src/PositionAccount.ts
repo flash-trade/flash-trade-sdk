@@ -26,13 +26,14 @@ export class PositionAccount implements Position {
     public collateralAmount: BN;
     public collateralUsd: BN;
 
-    public unsettledAmount: BN;
+    public unsettledValueUsd: BN;
     public unsettledFeesUsd: BN;
 
     public cumulativeLockFeeSnapshot: BN;
 
     public degenSizeUsd: BN;
-    public buffer: BN;
+    public referencePrice: ContractOraclePrice;
+    public buffer: number;
     
     public sizeDecimals: number;
     public lockedDecimals: number;

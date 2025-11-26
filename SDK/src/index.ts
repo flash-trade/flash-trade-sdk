@@ -2,7 +2,6 @@ export * from './PoolAccount';
 export * from './CustodyAccount';
 export * from './MarketAccount';
 export * from './PositionAccount';
-export * from './TradingAccount';
 export * from './OraclePrice';
 export * from './constants';
 export * from './types';

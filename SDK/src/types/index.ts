@@ -144,8 +144,6 @@ export type CloseAndSwapLog = Events["CloseAndSwapLog"]
 export type SwapAndAddCollateralLog = Events["SwapAndAddCollateralLog"]
 export type RemoveCollateralAndSwapLog = Events["RemoveCollateralAndSwapLog"]
 
-export type BurnAndClaimLog = Events["BurnAndClaimLog"]
-export type BurnAndStakeLog = Events["BurnAndStakeLog"]
 export type CancelUnstakeTokenRequestLog = Events["CancelUnstakeTokenRequestLog"]
 export type DepositTokenStakeLog = Events["DepositTokenStakeLog"]
 export type UnstakeTokenInstantLog = Events["UnstakeTokenInstantLog"]
@@ -157,7 +155,30 @@ export type CollectTokenRewardLog = Events["CollectTokenRewardLog"]
 export type CollectRevenueLog = Events["CollectRevenueLog"]
 export type MoveProtocolFeesLog = Events["MoveProtocolFeesLog"]
 
+
+export type AddCollateralLogUSDv1 = Events["AddCollateralLogUSDv1"]
+export type CloseAndSwapLogUSDv1 = Events["CloseAndSwapLogUSDv1"]
+export type ClosePositionLogUSDv1 = Events["ClosePositionLogUSDv1"]
+export type DecreaseSizeLogUSDv1 = Events["DecreaseSizeLogUSDv1"]
+export type ExecuteLimitOrderLogUSDv1 = Events["ExecuteLimitOrderLogUSDv1"]
+export type ExecuteLimitWithSwapLogUSDv1 = Events["ExecuteLimitWithSwapLogUSDv1"]
+export type ExecuteTriggerOrderLogUSDv1 = Events["ExecuteTriggerOrderLogUSDv1"]
+export type ExecuteTriggerWithSwapLogUSDv1 = Events["ExecuteTriggerWithSwapLogUSDv1"]
+export type IncreaseSizeLogUSDv1 = Events["IncreaseSizeLogUSDv1"]
+export type LiquidateLogUSDv1 = Events["LiquidateLogUSDv1"]
+export type OpenPositionLogUSDv1 = Events["OpenPositionLogUSDv1"]
+export type RemoveCollateralAndSwapLogUSDv1 = Events["RemoveCollateralAndSwapLogUSDv1"]
+export type RemoveCollateralLogUSDv1 = Events["RemoveCollateralLogUSDv1"]
+export type SwapAndAddCollateralLogUSDv1 = Events["SwapAndAddCollateralLogUSDv1"]
+export type SwapAndOpenLogUSDv1 = Events["SwapAndOpenLogUSDv1"]
+
+export type MigratePositionLog = Events["MigratePositionLog"]
+export type SwapFeeInternalLogV3 = Events["SwapFeeInternalLogV3"]
+export type SettleRebatesLog = Events["SettleRebatesLog"]
+export type CollectRebateLog = Events["CollectRebateLog"]
+
 export type VoltagePointsLog = Events["VoltagePointsLog"]
+export type ReferralRebateLog = Events["ReferralRebateLog"]
 
 //  taken from drift 
 export function isVariant(object: any, type: string) {
@@ -233,13 +254,14 @@ export const DEFAULT_POSITION : Position = {
     collateralAmount: BN_ZERO,
     collateralUsd: BN_ZERO,
 
-    unsettledAmount: BN_ZERO,
+    unsettledValueUsd: BN_ZERO,
     unsettledFeesUsd: BN_ZERO,
 
     cumulativeLockFeeSnapshot: BN_ZERO,
 
     degenSizeUsd: BN_ZERO,
-    buffer: BN_ZERO,
+    referencePrice: { price : BN_ZERO, exponent: 0},
+    buffer: 0,
 
     sizeDecimals : 0,
     lockedDecimals : 0,
@@ -276,7 +298,8 @@ export interface EntryPriceAndFee {
 }
 
 export interface EntryPriceAndFeeV2 {
-    entryOraclePrice: OraclePrice
+    entryDeltaOraclePrice: OraclePrice
+    entryAvgOraclePrice: OraclePrice
     feeUsd: BN,
     feeAmount: BN,
     feeUsdAfterDiscount : BN,
@@ -292,8 +315,9 @@ export interface RemoveCollateralData {
     lockAndUnsettledFeeUsd : BN,
     newLev: BN,
     liquidationPrice: OraclePrice,
-    collateralAmountRecieved: BN
-    newCollateralAmount: BN,
+    collateralAmountReceived: BN,
+    collateralAmountReceivedUsd : BN,
+    newCollateralUsd: BN,
     newPnl: BN
 }
 

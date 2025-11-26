@@ -4,14 +4,13 @@ import { Privilege, isVariant } from "../types";
 export const getReferralAccounts = (
     tokenStakeAccount: PublicKey,
     userReferralAccount: PublicKey,
-    rebateTokenAccount: PublicKey,
     privilege: Privilege
 ) => {
     if (isVariant(privilege, 'none')) {
         return [];
     }
 
-    if (tokenStakeAccount.equals(PublicKey.default) || userReferralAccount.equals(PublicKey.default) || rebateTokenAccount.equals(PublicKey.default) ) {
+    if (tokenStakeAccount.equals(PublicKey.default) || userReferralAccount.equals(PublicKey.default) ) {
         console.log("skipping refferals")
         return [];
     }
@@ -28,11 +27,6 @@ export const getReferralAccounts = (
             pubkey: tokenStakeAccount,
             isSigner: false,
             isWritable: true,
-        },
-        {
-            pubkey: rebateTokenAccount,
-            isSigner: false,
-            isWritable: !isStake,
-        },
+        }
     ];
 };
