@@ -96,6 +96,8 @@ export class PoolConfig {
     public custodies: CustodyConfig[],
 
     public markets: MarketConfig[],
+
+    public marketsDeprecated: MarketConfig[],
   ) { }
 
   public getAllTokenMints(): PublicKey[] {
@@ -105,7 +107,11 @@ export class PoolConfig {
   }
 
   public getMarketConfigByPk(marketAccountPk: PublicKey): MarketConfig {
-    const market = this.markets.find(f => f.marketAccount.equals(marketAccountPk));
+    let market = this.markets.find(f => f.marketAccount.equals(marketAccountPk));
+    if(!market) {
+      // check in deprecated markets
+      market = this.marketsDeprecated.find(f => f.marketAccount.equals(marketAccountPk));
+    }
     if(!market) throw new Error(`No such market ${marketAccountPk.toBase58()} exists.`)
     return market
   }
@@ -115,7 +121,11 @@ export class PoolConfig {
     collateralCustody: PublicKey,
     side: Side): MarketConfig | null {
     const marketAccountPk = this.getMarketPk(targetCustody, collateralCustody, side)
-    const market = this.markets.find(f => f.marketAccount.equals(marketAccountPk));
+    let market = this.markets.find(f => f.marketAccount.equals(marketAccountPk));
+    if(!market) {
+      // check in deprecated markets
+      market = this.marketsDeprecated.find(f => f.marketAccount.equals(marketAccountPk));
+    }
     if(!market) return null
     // better to return NULL so that we can handle on UI , since difficult to validate each input
     // if(!market) throw new Error(`No such market : ${marketAccountPk.toBase58()} target:${targetCustody.toBase58()} collateral:${collateralCustody.toBase58()} side:${side} exists.`)
@@ -170,11 +180,25 @@ export class PoolConfig {
     ], this.programId)[0]
   }
 
+  public getOrderFromCustodyPk(
+    owner: PublicKey,
+    targetCustody : PublicKey,
+    collateralCustody : PublicKey,
+    side: Side
+  ): PublicKey {
+    return PublicKey.findProgramAddressSync([
+      Buffer.from("order"),
+      owner.toBuffer(),
+      this.getMarketPk(targetCustody, collateralCustody, side).toBuffer(),
+    ], this.programId)[0]
+  }
+
   public doesMarketExist(pubkey: PublicKey): boolean {
     return 
   }
 
   public getAllMarketPks(): PublicKey[] {
+    // don't return deprecated markets here 
     return this.markets.map(m => m.marketAccount);
   }
 
@@ -316,6 +340,32 @@ export class PoolConfig {
       console.log("ERROR: buildPoolconfigFromJson  unable to load markets ")
     }
 
+    let marketsDeprecated: MarketConfig[]
+    try {
+      if (!poolConfig['marketsDeprecated']) {
+        marketsDeprecated = []
+      } else {
+        marketsDeprecated  = poolConfig['marketsDeprecated'].map(i => {
+          return {
+            ...i,
+            marketAccount: new PublicKey(i.marketAccount),
+            marketCorrelation : i.marketCorrelation,
+            pool: new PublicKey(i.pool),
+            targetCustody: new PublicKey(i.targetCustody),
+            collateralCustody: new PublicKey(i.collateralCustody),
+            side: i.side === 'long' ? Side.Long : Side.Short,
+            maxLev : i.maxLev,
+            degenMinLev : i.degenMinLev,
+            degenMaxLev : i.degenMaxLev,
+            targetMint: new PublicKey(i.targetMint),
+            collateralMint: new PublicKey(i.collateralMint)
+          }
+        });
+      }
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load markets ")
+    }
+
     return new PoolConfig(
       new PublicKey(poolConfig.programId),
       new PublicKey(poolConfig.perpComposibilityProgramId),
@@ -354,7 +404,8 @@ export class PoolConfig {
       },
       tokens,
       custodies,
-      markets
+      markets,
+      marketsDeprecated
     );
   }
 

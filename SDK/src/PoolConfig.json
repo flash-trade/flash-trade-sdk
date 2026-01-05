@@ -502,9 +502,22 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "lazerId": 2315,
-          "pythTicker": "Commodities.WTIF6/USD",
-          "pythPriceId": "0x0f402711648215fd68b3ac1deafc9f7edd072d59fbfd0ac720c723d048e64908",
+          "lazerId": 2691,
+          "pythTicker": "Commodities.WTIG6/USD",
+          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52",
+          "isToken2022": false
+        },
+        {
+          "symbol": "XAUt",
+          "mintKey": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "lazerId": 172,
+          "pythTicker": "Crypto.XAUT/USD",
+          "pythPriceId": "0x44465e17d2e9d390e70c999d5a11fda4f092847fcd2e3e5aa089d96c98a30e67",
           "isToken2022": false
         }
       ],
@@ -606,29 +619,30 @@
           "isStable": false,
           "isVirtual": true,
           "intOracleAddress": "5qLQ3BT7JCf4fUxoAH1xZwHCca9fZuuTWTgTsNxLNcoZ",
-          "extOracleAddress": "4rriGpoRbLXkk7nJBxUCnBT474faTW9q8ACWW2v1Tdif",
-          "lazerId": 2315, 
-          "pythTicker": "Commodities.WTIF6/USD",
-          "pythPriceId": "0x0f402711648215fd68b3ac1deafc9f7edd072d59fbfd0ac720c723d048e64908"
+          "extOracleAddress": "8nMThr5gWoXaoWHR3gMXrz8ZULukjsBgoW83kuYCDzqG",
+          "lazerId": 2691, 
+          "pythTicker": "Commodities.WTIG6/USD",
+          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52"
+        },
+        {
+          "custodyId": 7,
+          "custodyAccount": "HymsKV4bGdSbf4AyaBqCrK1438jZu6ubCqcws516vRXx",
+          "tokenAccount": "551kLmp7X7V9GeuRr1Bcm8fh3LEMeC1mgmdcJeo9tWno",
+          "symbol": "XAUt",
+          "mintKey": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 6,
+          "isStable": false,
+          "isVirtual": false,
+          "intOracleAddress": "F4YkaJozctgfuZwySEZozCsMyGymJDfeKgByYeLEBCnK",
+          "extOracleAddress": "6aLRPrkf5SM4mZdQCbb23YMZirN8bX7pqbbk1mZfb1s9",
+          "lazerId": 172, 
+          "pythTicker": "Crypto.XAUT/USD",
+          "pythPriceId": "0x44465e17d2e9d390e70c999d5a11fda4f092847fcd2e3e5aa089d96c98a30e67"
         }
       ],
       "markets": [
-        {
-          "marketId": 0,
-          "marketAccount": "88zawd3Rw6tknWvgEm8QBgBuf5Y2GTeA18S788qUrSnM",
-          "marketCorrelation" : false,
-          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
-          "targetCustody": "3j1xiP6GckKCzsTm6sni5iy6zrpZX5BWZGbKCq5buk4d",
-          "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
-          "side": "long",
-          "maxLev": 100,
-          "degenMinLev": 1,
-          "degenMaxLev": 100,
-          "targetCustodyId": 1,
-          "collateralCustodyId": 0,
-          "targetMint": "XAUfcdPHmEBnj78YnZ5YxqdwBmgbwoY5VfrRwETnKuQ",
-          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-        },
         {
           "marketId": 1,
           "marketAccount": "G2rj5artQzevbsQtCJ1rkDt3Pd5b6ZYAf8e9AjZPipui",
@@ -643,22 +657,6 @@
           "targetCustodyId": 1,
           "collateralCustodyId": 0,
           "targetMint": "XAUfcdPHmEBnj78YnZ5YxqdwBmgbwoY5VfrRwETnKuQ",
-          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-        },
-        {
-          "marketId": 2,
-          "marketAccount": "Caqzhuj2Hj5MUwQigdtLNokLZbuqs6NrcmwWbMsSqwqH",
-          "marketCorrelation" : false,
-          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
-          "targetCustody": "GMqeFJ8LG5BcrRtVgvfQuA7giBETcY76ikC8h5hPh59h",
-          "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
-          "side": "long",
-          "maxLev": 100,
-          "degenMinLev": 1,
-          "degenMaxLev": 100,
-          "targetCustodyId": 2,
-          "collateralCustodyId": 0,
-          "targetMint": "XAGLictSZUYkCHgBWoPitFCDJECNZx1DVTzV74iM9dP",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         },
         {
@@ -771,6 +769,72 @@
           "targetCustodyId": 6,
           "collateralCustodyId": 0,
           "targetMint": "o1Lw5djE8o6wMbPXU7U8Us8a6DJhWJc9WrWWUc1LHAo",
+          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "marketId": 12,
+          "marketAccount": "AKD5nCQRH2NvBbCD9eGhhu7w1auX1cG8x9XAUNrwQMm1",
+          "marketCorrelation" : true,
+          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
+          "targetCustody": "3j1xiP6GckKCzsTm6sni5iy6zrpZX5BWZGbKCq5buk4d",
+          "collateralCustody": "HymsKV4bGdSbf4AyaBqCrK1438jZu6ubCqcws516vRXx",
+          "side": "long",
+          "maxLev": 100,
+          "degenMinLev": 1,
+          "degenMaxLev": 100,
+          "targetCustodyId": 1,
+          "collateralCustodyId": 7,
+          "targetMint": "XAUfcdPHmEBnj78YnZ5YxqdwBmgbwoY5VfrRwETnKuQ",
+          "collateralMint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P"
+        },
+        {
+          "marketId": 13,
+          "marketAccount": "FVWWPN9HyzYApxJdHhDxFeaLm279XcLaCLBUwhvDE2oS",
+          "marketCorrelation" : false,
+          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
+          "targetCustody": "GMqeFJ8LG5BcrRtVgvfQuA7giBETcY76ikC8h5hPh59h",
+          "collateralCustody": "HymsKV4bGdSbf4AyaBqCrK1438jZu6ubCqcws516vRXx",
+          "side": "long",
+          "maxLev": 100,
+          "degenMinLev": 1,
+          "degenMaxLev": 100,
+          "targetCustodyId": 2,
+          "collateralCustodyId": 7,
+          "targetMint": "XAGLictSZUYkCHgBWoPitFCDJECNZx1DVTzV74iM9dP",
+          "collateralMint": "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P"
+        }
+      ],
+      "marketsDeprecated": [
+        {
+          "marketId": 0,
+          "marketAccount": "88zawd3Rw6tknWvgEm8QBgBuf5Y2GTeA18S788qUrSnM",
+          "marketCorrelation" : false,
+          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
+          "targetCustody": "3j1xiP6GckKCzsTm6sni5iy6zrpZX5BWZGbKCq5buk4d",
+          "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
+          "side": "long",
+          "maxLev": 100,
+          "degenMinLev": 1,
+          "degenMaxLev": 100,
+          "targetCustodyId": 1,
+          "collateralCustodyId": 0,
+          "targetMint": "XAUfcdPHmEBnj78YnZ5YxqdwBmgbwoY5VfrRwETnKuQ",
+          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "marketId": 2,
+          "marketAccount": "Caqzhuj2Hj5MUwQigdtLNokLZbuqs6NrcmwWbMsSqwqH",
+          "marketCorrelation" : false,
+          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
+          "targetCustody": "GMqeFJ8LG5BcrRtVgvfQuA7giBETcY76ikC8h5hPh59h",
+          "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
+          "side": "long",
+          "maxLev": 100,
+          "degenMinLev": 1,
+          "degenMaxLev": 100,
+          "targetCustodyId": 2,
+          "collateralCustodyId": 0,
+          "targetMint": "XAGLictSZUYkCHgBWoPitFCDJECNZx1DVTzV74iM9dP",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         }
       ]
@@ -2374,7 +2438,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "H42QQYehtdnNWpxnr5ZJeZp9bwNZzaQzY79MVA4RTAz4"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",
@@ -2476,6 +2540,19 @@
           "lazerId": 66,
           "pythTicker": "Crypto.ZEC/USD",
           "pythPriceId": "0xbe9b59d178f0d6a97ab4c343bff2aa69caa1eaae3e9048a65788c529b125bb24",
+          "isToken2022": false
+        },
+        {
+          "symbol": "BNB",
+          "mintKey": "bnbm27QuZCjY3pBqBoQF3x7cRGuvvMFQ54iaCbeT4pw",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "lazerId": 15,
+          "pythTicker": "Crypto.BNB/USD",
+          "pythPriceId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f",
           "isToken2022": false
         }
       ],
@@ -2581,6 +2658,23 @@
           "lazerId": 66,
           "pythTicker": "Crypto.ZEC/USD",
           "pythPriceId": "0xbe9b59d178f0d6a97ab4c343bff2aa69caa1eaae3e9048a65788c529b125bb24"
+        },
+        {
+          "custodyId": 6,
+          "custodyAccount": "44SkfMCEp2Vg79J4RJo64dNSRPSgyRj782bYMKCM2tbQ",
+          "tokenAccount": "BCH3TKWuA3JNTkq9Yodb2vb6xnmnxHPZPPsz3BLA86er",
+          "symbol": "BNB",
+          "mintKey": "bnbm27QuZCjY3pBqBoQF3x7cRGuvvMFQ54iaCbeT4pw",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "intOracleAddress": "4TT2ChmUxmYca8b4Dht3QwLWMHcmiLnku28CZCfYQ22w",
+          "extOracleAddress": "A3qp5QG9xGeJR1gexbW9b9eMMsMDLzx3rhud9SnNhwb4",
+          "lazerId": 15,
+          "pythTicker": "Crypto.BNB/USD",
+          "pythPriceId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
         }
       ],
       "markets": [
@@ -2727,6 +2821,38 @@
           "collateralCustodyId": 0,
           "targetMint": "zecrXUjqA7bZdozZkqbh3wgrVGdwCd4jHRBg8Gd8Vrf",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+        },
+        {
+          "marketId": 9,
+          "marketAccount": "41qpoMVQzbP35itdPT6HfPxyYDj6Er2TEaXhWFhUC9nT",
+          "marketCorrelation": false,
+          "pool": "4SR2FJETBR4Q5uhsiT6a5ALF51jQwy4AjDQgGyvacGLi",
+          "targetCustody": "44SkfMCEp2Vg79J4RJo64dNSRPSgyRj782bYMKCM2tbQ",
+          "collateralCustody": "Bd3kFBJd8h1s83znbBPQsz368mnYQfqRgaHzRRe6XbCR",
+          "side": "long",
+          "maxLev": 50,
+          "degenMinLev": 50,
+          "degenMaxLev": 50,
+          "targetCustodyId": 7,
+          "collateralCustodyId": 2,
+          "targetMint": "bnbm27QuZCjY3pBqBoQF3x7cRGuvvMFQ54iaCbeT4pw",
+          "collateralMint": "B8DYqbh57aEPRbUq7reyueY6jaYoN75js5YsiM84tFfP"
+        },
+        {
+          "marketId": 10,
+          "marketAccount": "55sffRYNDQoaaoWWRiasjWNXWTvvJcoKciCmXnKoics1",
+          "marketCorrelation": false,
+          "pool": "4SR2FJETBR4Q5uhsiT6a5ALF51jQwy4AjDQgGyvacGLi",
+          "targetCustody": "44SkfMCEp2Vg79J4RJo64dNSRPSgyRj782bYMKCM2tbQ",
+          "collateralCustody": "BwroR4MpPBFWLocL5CM4kLDAjx1aH3ogma1zYJfbHS1E",
+          "side": "short",
+          "maxLev": 50,
+          "degenMinLev": 50,
+          "degenMaxLev": 50,
+          "targetCustodyId": 7,
+          "collateralCustodyId": 0,
+          "targetMint": "bnbm27QuZCjY3pBqBoQF3x7cRGuvvMFQ54iaCbeT4pw",
+          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         }
       ]
     },
@@ -2757,7 +2883,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "CEeZaEq4wa5swEGdUdikiwYULTdkJXEWYip9pzm9mqVc"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",
@@ -2843,9 +2969,22 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "lazerId": 2315,
-          "pythTicker": "Commodities.WTIF6/USD",
-          "pythPriceId": "0x0f402711648215fd68b3ac1deafc9f7edd072d59fbfd0ac720c723d048e64908",
+          "lazerId": 2691,
+          "pythTicker": "Commodities.WTIG6/USD",
+          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52",
+          "isToken2022": false
+        },
+        {
+          "symbol": "XAUt",
+          "mintKey": "xaut1dB1uihYCwjReVgwZ4mBBJzwkXn4picqqmk4v2H",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "lazerId": 172,
+          "pythTicker": "Crypto.XAUT/USD",
+          "pythPriceId": "0x44465e17d2e9d390e70c999d5a11fda4f092847fcd2e3e5aa089d96c98a30e67",
           "isToken2022": false
         }
       ],
@@ -2947,29 +3086,30 @@
           "isStable": false,
           "isVirtual": true,
           "intOracleAddress": "BeqYMCytDcEJrpikXhz8ZLaBb9ACGDVvmp9ekwbgBgma",
-          "extOracleAddress": "4rriGpoRbLXkk7nJBxUCnBT474faTW9q8ACWW2v1Tdif",
-          "lazerId": 2315,
-          "pythTicker": "Commodities.WTIF6/USD",
-          "pythPriceId": "0x0f402711648215fd68b3ac1deafc9f7edd072d59fbfd0ac720c723d048e64908"
+          "extOracleAddress": "8nMThr5gWoXaoWHR3gMXrz8ZULukjsBgoW83kuYCDzqG",
+          "lazerId": 2691, 
+          "pythTicker": "Commodities.WTIG6/USD",
+          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52"
+        },
+        {
+          "custodyId": 7,
+          "custodyAccount": "8sriDinQT789N7AJrEtQ2Q1jvVm7jGHhkdw4zTLKZxGe",
+          "tokenAccount": "DpnfaMR5kJhVyy5SGk6yB1JHXYuqJhsm53wdewd8gNd1",
+          "symbol": "XAUt",
+          "mintKey": "xaut1dB1uihYCwjReVgwZ4mBBJzwkXn4picqqmk4v2H",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": false,
+          "intOracleAddress": "6fCDXgCYMnY29RENXKE2yGxvtMVUCMU59kkmS212MjMc",
+          "extOracleAddress": "2uPQGpm8X4ZkxMHxrAW1QuhXcse1AHEgPih6Xp9NuEWW",
+          "lazerId": 172,
+          "pythTicker": "Crypto.XAUT/USD",
+          "pythPriceId": "0x44465e17d2e9d390e70c999d5a11fda4f092847fcd2e3e5aa089d96c98a30e67"
         }
       ],
       "markets": [
-        {
-          "marketId": 0,
-          "marketAccount": "6VaKMhU9mtWUVXSj73VMj5RAXfLiE7mRn1myyWEwBC6S",
-          "marketCorrelation" : false,
-          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
-          "targetCustody": "EXumu4qqjXYpv1RUzTGiVJAvjvL3BWzn592SSwxrtZwW",
-          "collateralCustody": "4nkiPSMJb4hpLhpaXbebkYF73Ub5vjeked8mWkPafMBm",
-          "side": "long",
-          "maxLev": 100,
-          "degenMinLev": 1,
-          "degenMaxLev": 100,
-          "targetCustodyId": 1,
-          "collateralCustodyId": 0,
-          "targetMint": "xaucSYSxjZF4EbsLqAGRvPcuD1uXAj9awmsxYkUAavx",
-          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
-        },
         {
           "marketId": 1,
           "marketAccount": "HH56JHJojhexo4eAE6dCC8XAKKoHiUzEg5fkFRmVGh2S",
@@ -2984,22 +3124,6 @@
           "targetCustodyId": 1,
           "collateralCustodyId": 0,
           "targetMint": "xaucSYSxjZF4EbsLqAGRvPcuD1uXAj9awmsxYkUAavx",
-          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
-        },
-        {
-          "marketId": 2,
-          "marketAccount": "F2ro3DdrYJB59JS18wekPKU8yKG5YKFejypPkEX7wYzK",
-          "marketCorrelation" : false,
-          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
-          "targetCustody": "H9KvJwG7qB5hcuqdx5Ac3mVFiSdTsms92NLQnGC9eGkx",
-          "collateralCustody": "4nkiPSMJb4hpLhpaXbebkYF73Ub5vjeked8mWkPafMBm",
-          "side": "long",
-          "maxLev": 100,
-          "degenMinLev": 1,
-          "degenMaxLev": 100,
-          "targetCustodyId": 2,
-          "collateralCustodyId": 0,
-          "targetMint": "xagGMhSCG8WDsf3zFep6sGtvyY1D78roKCHTJtEWg4Z",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         },
         {
@@ -3113,8 +3237,74 @@
           "collateralCustodyId": 0,
           "targetMint": "oi1DkCGa5CVm379ZuznLMevqjg7KGWnDDFB96JXAi7a",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+        },
+        {
+          "marketId": 12,
+          "marketAccount": "HCHwtnbLgZPPkYqrbXF1oF688dxHW6cbhfU7yFLgfCpY",
+          "marketCorrelation" : true,
+          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
+          "targetCustody": "EXumu4qqjXYpv1RUzTGiVJAvjvL3BWzn592SSwxrtZwW",
+          "collateralCustody": "8sriDinQT789N7AJrEtQ2Q1jvVm7jGHhkdw4zTLKZxGe",
+          "side": "long",
+          "maxLev": 50,
+          "degenMinLev": 1,
+          "degenMaxLev": 50,
+          "targetCustodyId": 1,
+          "collateralCustodyId": 7,
+          "targetMint": "xaucSYSxjZF4EbsLqAGRvPcuD1uXAj9awmsxYkUAavx",
+          "collateralMint": "xaut1dB1uihYCwjReVgwZ4mBBJzwkXn4picqqmk4v2H"
+        },
+        {
+          "marketId": 13,
+          "marketAccount": "6L3TrWrCSVq46N6zyTufVV6hpmMaLQgohkXntkf2fkzc",
+          "marketCorrelation" : false,
+          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
+          "targetCustody": "H9KvJwG7qB5hcuqdx5Ac3mVFiSdTsms92NLQnGC9eGkx",
+          "collateralCustody": "8sriDinQT789N7AJrEtQ2Q1jvVm7jGHhkdw4zTLKZxGe",
+          "side": "long",
+          "maxLev": 50,
+          "degenMinLev": 1,
+          "degenMaxLev": 50,
+          "targetCustodyId": 2,
+          "collateralCustodyId": 7,
+          "targetMint": "xagGMhSCG8WDsf3zFep6sGtvyY1D78roKCHTJtEWg4Z",
+          "collateralMint": "xaut1dB1uihYCwjReVgwZ4mBBJzwkXn4picqqmk4v2H"
         }
-      ]
+      ],
+      "marketsDeprecated": [
+        {
+          "marketId": 0,
+          "marketAccount": "6VaKMhU9mtWUVXSj73VMj5RAXfLiE7mRn1myyWEwBC6S",
+          "marketCorrelation" : false,
+          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
+          "targetCustody": "EXumu4qqjXYpv1RUzTGiVJAvjvL3BWzn592SSwxrtZwW",
+          "collateralCustody": "4nkiPSMJb4hpLhpaXbebkYF73Ub5vjeked8mWkPafMBm",
+          "side": "long",
+          "maxLev": 100,
+          "degenMinLev": 1,
+          "degenMaxLev": 100,
+          "targetCustodyId": 1,
+          "collateralCustodyId": 0,
+          "targetMint": "xaucSYSxjZF4EbsLqAGRvPcuD1uXAj9awmsxYkUAavx",
+          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+        },
+        {
+          "marketId": 2,
+          "marketAccount": "F2ro3DdrYJB59JS18wekPKU8yKG5YKFejypPkEX7wYzK",
+          "marketCorrelation" : false,
+          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
+          "targetCustody": "H9KvJwG7qB5hcuqdx5Ac3mVFiSdTsms92NLQnGC9eGkx",
+          "collateralCustody": "4nkiPSMJb4hpLhpaXbebkYF73Ub5vjeked8mWkPafMBm",
+          "side": "long",
+          "maxLev": 100,
+          "degenMinLev": 1,
+          "degenMaxLev": 100,
+          "targetCustodyId": 2,
+          "collateralCustodyId": 0,
+          "targetMint": "xagGMhSCG8WDsf3zFep6sGtvyY1D78roKCHTJtEWg4Z",
+          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+      }
+    ]
     },
     {
       "programId": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4",
@@ -3143,7 +3333,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "Hh9mQwbiMXre2khSDMuZSX7ju8xsSSgPimkipq26zgGK"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",
@@ -3653,7 +3843,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "CCLGoA1ty74FpW1SREBw8RMAfcvi3qFexrYe8ciFfSuV"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",
@@ -3915,7 +4105,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "7QJrbYYXLQYZe3C8j8WSjqbVVw44K8JmSqLNadACX8RX"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",
@@ -4053,7 +4243,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "Hm9zTZtS9y6RC2ajG1p7X1UJEYPD54R5Njw75yVLn7va"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",
@@ -4577,7 +4767,7 @@
       "protocolTokenAccount": "4US73S8pPe3rGJ44iUuTRATeB8PA2Jindwf11D3B3C37",
       "multisig": "8DieAFUfaUZNSQzzzux9c7LAxsd9XQQuM9kvrZupnJ4Q",
       "addressLookupTableAddresses": [
-        "DRmr8HVj6oKY9pmxbBzwqDfeFmJpNoaLJQrydxqG1xoz"
+        "Gi13onis2Ujt4RCJ9rU7VBVzqsr6ph3Tupz1kosvT55o"
       ],
       "pusherAddressLookupTableAddress" : "3CUaTZz7yEXZQxCqAKkdbrn7qHzfdU4BVrUH1CnYN8vt",
       "backupOracle": "AHaKsRB4tsGSzFfFqAxUpfRRmsUj5EhwHSxSXK2UGRp5",

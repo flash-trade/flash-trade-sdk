@@ -15,7 +15,6 @@ import {
   Signer,
   AddressLookupTableAccount,
   SYSVAR_INSTRUCTIONS_PUBKEY,
-  Ed25519Program,
   VersionedTransaction,
   ComputeBudgetProgram,
 } from "@solana/web3.js";
@@ -36,28 +35,19 @@ import { sha256 } from "js-sha256";
 import { encode } from "bs58";
 import { PoolAccount } from "./PoolAccount";
 import { PositionAccount } from "./PositionAccount";
-import { AddLiquidityAmountAndFee, InternalPrice, BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice } from "./types";
+import { AddLiquidityAmountAndFee, InternalPrice, BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice, Whitelist } from "./types";
 import { OraclePrice } from "./OraclePrice";
 import { CustodyAccount } from "./CustodyAccount";
 import { Perpetuals } from "./idl/perpetuals";
-import { PerpComposability } from "./idl/perp_composability";
-import { FbnftRewards } from "./idl/fbnft_rewards";
-import { RewardDistribution } from "./idl/reward_distribution";
 
 import { IDL } from './idl/perpetuals';
-import { IDL as PerpComposabilityIDL } from './idl/perp_composability';
-import { IDL as FbNftIDL } from './idl/fbnft_rewards';
-import { IDL as RewardDistributionIDL } from './idl/reward_distribution';
 
 import { SendTransactionOpts, sendTransaction, sendTransactionV3 } from "./utils/rpc";
 import { MarketConfig, PoolConfig, Token } from "./PoolConfig";
 import { checkIfAccountExists, checkedDecimalCeilMul, checkedDecimalMul, getUnixTs, nativeToUiDecimals, scaleToExponent, uiDecimalsToNative } from "./utils";
 import { BPS_DECIMALS, BPS_POWER, LP_DECIMALS, RATE_DECIMALS, USD_DECIMALS, BN_ZERO, RATE_POWER, METAPLEX_PROGRAM_ID, BN_ONE, ORACLE_EXPONENT, DAY_SECONDS, FAF_DECIMALS } from "./constants";
 import BigNumber from "bignumber.js";
-import { max } from "bn.js";
 import { createBackupOracleInstruction } from "./backupOracle";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import * as nacl from "tweetnacl";
 import { MarketAccount } from "./MarketAccount";
 import { getReferralAccounts } from "./utils/getReferralAccounts";
 import { ViewHelper } from "./ViewHelper";
@@ -73,13 +63,9 @@ export type PerpClientOptions = {
 export class PerpetualsClient {
   provider: AnchorProvider;
   program: Program<Perpetuals>;
-  programPerpComposability: Program<PerpComposability>;
-  programFbnftReward: Program<FbnftRewards>;
-  programRewardDistribution: Program<RewardDistribution>;
 
   admin: PublicKey;
   programId: PublicKey;
-  composabilityProgramId: PublicKey;
 
   // pdas
   multisig: { publicKey: PublicKey; bump: number };
@@ -87,9 +73,13 @@ export class PerpetualsClient {
   perpetuals: { publicKey: PublicKey; bump: number };
   addressLookupTables: AddressLookupTableAccount[] = [];
   pusherAddressLookupTables: AddressLookupTableAccount;
+  
+  // Maps to store address lookup tables by table address
+  private poolAddressLookupTables: Map<string, AddressLookupTableAccount> = new Map();
+  private poolPusherAddressLookupTables: Map<string, AddressLookupTableAccount | null> = new Map();
+
 
   eventAuthority : { publicKey: PublicKey; bump: number };
-  eventAuthorityRewardDistribution: { publicKey: PublicKey; bump: number };
 
   prioritizationFee: number;
   minimumBalanceForRentExemptAccountLamports: number;
@@ -99,23 +89,19 @@ export class PerpetualsClient {
   private txConfirmationCommitment: Commitment;
   private viewHelper: ViewHelper;
 
+  // just keeping composabilityProgramId , fbNftRewardProgramId etc for backwards compatibility
   constructor(provider: AnchorProvider, programId: PublicKey, composabilityProgramId: PublicKey, fbNftRewardProgramId: PublicKey, rewardDistributionProgramId: PublicKey, opts: PerpClientOptions, useExtOracleAccount = false) {
    
     this.provider = provider;
     setProvider(provider);
 
     this.program = new Program(IDL, programId);
-    this.programPerpComposability = new Program(PerpComposabilityIDL, composabilityProgramId);
-    this.programFbnftReward = new Program(FbNftIDL, fbNftRewardProgramId);
-    this.programRewardDistribution = new Program(RewardDistributionIDL, rewardDistributionProgramId);
     this.programId = programId;
-    this.composabilityProgramId = composabilityProgramId;
     this.admin = this.provider.wallet.publicKey;
     this.multisig = this.findProgramAddress("multisig");
     this.authority = this.findProgramAddress("transfer_authority");
     this.perpetuals = this.findProgramAddress("perpetuals");
     this.eventAuthority = this.findProgramAddress("__event_authority");
-    this.eventAuthorityRewardDistribution = this.findProgramAddressFromProgramId("__event_authority", null, this.programRewardDistribution.programId)
 
     this.minimumBalanceForRentExemptAccountLamports = 2_039_280;
     this.prioritizationFee = opts?.prioritizationFee || 0;
@@ -152,6 +138,45 @@ export class PerpetualsClient {
      if(accCreationLamports){
        this.minimumBalanceForRentExemptAccountLamports = accCreationLamports
      }
+  }
+
+  getOrLoadAddressLookupTable = async (
+    poolConfig: PoolConfig,
+  ): Promise<{
+    addressLookupTables: AddressLookupTableAccount[];
+  }> => {
+    const addresses: AddressLookupTableAccount[] = [];
+    const addressesToLoad: PublicKey[] = [];
+
+    for (const address of poolConfig.addressLookupTableAddresses) {
+      const addressKey = address.toBase58();
+      const cached = this.poolAddressLookupTables.get(addressKey);
+      
+      if (cached) {
+        addresses.push(cached);
+      } else {
+        addressesToLoad.push(address);
+      }
+    }
+
+    for (const address of addressesToLoad) {
+      const addressLookupTable = (await this.provider.connection.getAddressLookupTable(address)).value;
+      if (addressLookupTable) {
+        addresses.push(addressLookupTable);
+        this.poolAddressLookupTables.set(address.toBase58(), addressLookupTable);
+      }
+    }
+
+    if (!this.minimumBalanceForRentExemptAccountLamports) {
+      const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection));
+      if (accCreationLamports) {
+        this.minimumBalanceForRentExemptAccountLamports = accCreationLamports;
+      }
+    }
+
+    return {
+      addressLookupTables: addresses,
+    };
   }
 
   findProgramAddress = (label: string, extraSeeds: any = null) => {
@@ -263,13 +288,13 @@ export class PerpetualsClient {
     //   Buffer.from('market'),
     //   targetCustody.toBuffer(),
     //   collateralCustody.toBuffer(),
-    //   Buffer.from([isVariant(side, 'long') ? 1 : 0])
+    //   Buffer.from([isVariant(side, 'long') ? 1 : 2])
     // ],  this.program.programId)[0]
 
     return this.findProgramAddress("market", [
       targetCustody,
       collateralCustody,
-      side === 'long' ? [1] : [2], // short
+      isVariant(side, 'long') ? [1] : [2], // short
     ]).publicKey;
   }
 
@@ -2382,6 +2407,7 @@ export class PerpetualsClient {
     marketCorrelation : boolean,
     side : Side,
     collateralPrice: OraclePrice,
+    collateralDecimals: number,
     positionAccount: PositionAccount,
   ) : OraclePrice => { //returns the maxProfitPrice in OraclePrice
     const zeroOraclePrice = OraclePrice.from({
@@ -2395,7 +2421,7 @@ export class PerpetualsClient {
     }
 
     const priceDiffProfit = OraclePrice.from({
-      price: (collateralPrice.price.mul(positionAccount.lockedAmount)).mul(new BN(10).pow(new BN(positionAccount.sizeDecimals+3)))
+      price: (collateralPrice.getAssetAmountUsd(positionAccount.lockedAmount, collateralDecimals)).mul(new BN(10).pow(new BN(positionAccount.sizeDecimals+3)))
         .div(positionAccount.sizeAmount),
       exponent: new BN(-1*RATE_DECIMALS),
       confidence: BN_ZERO,
@@ -2758,7 +2784,8 @@ export class PerpetualsClient {
     outputTokenEmaPrice: OraclePrice,
     outputTokenCustodyAccount: CustodyAccount,
     poolAumUsdMax: BN, //always pass the updated poolAumUsdMax 
-    poolConfig: PoolConfig
+    poolConfig: PoolConfig,
+    whitelistedUserAccount : Whitelist | null = null,
   ): {
     minAmountOut: BN, // this is the amount for output custody
     minAmountIn: BN, // this is the amount for input custody
@@ -2774,6 +2801,13 @@ export class PerpetualsClient {
         minAmountOut: BN_ZERO,
         feeIn: BN_ZERO,
         feeOut: BN_ZERO,
+      }
+    }
+
+    let isWhitelistedUser: boolean = false;
+    if(whitelistedUserAccount && whitelistedUserAccount.isSwapFeeExempt) {
+      if (whitelistedUserAccount.pool.equals(poolAccount.publicKey) || whitelistedUserAccount.pool.equals(PublicKey.default)) {
+        isWhitelistedUser = true;
       }
     }
 
@@ -2834,8 +2868,10 @@ export class PerpetualsClient {
       // console.log(" OUT => IN inputTokenAmount :", inputTokenAmount.toString())
 
       //todo: check for stable swap
-      feeIn = this.getFeeHelper(FeesAction.SwapIn, inputTokenAmount, BN_ZERO, inputTokenCustodyAccount, inputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount
-      feeOut = this.getFeeHelper(FeesAction.SwapOut, BN_ZERO, amountOut, outputTokenCustodyAccount, outputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount
+      feeIn =  isWhitelistedUser ?  BN_ZERO
+       : this.getFeeHelper(FeesAction.SwapIn, inputTokenAmount, BN_ZERO, inputTokenCustodyAccount, inputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
+      feeOut =  isWhitelistedUser ?  BN_ZERO
+       : this.getFeeHelper(FeesAction.SwapOut, BN_ZERO, amountOut, outputTokenCustodyAccount, outputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
 
       let swapAmount = checkedDecimalMul(amountOut.add(feeOut), new BN(-1 * outputTokenCustodyAccount.decimals), swapPrice, inputMinMaxPrice.min.exponent, new BN(-1 * inputTokenCustodyAccount.decimals)).add(feeIn)
       // console.log(" OUT => IN swapAmount :", swapAmount.toString())
@@ -2869,8 +2905,10 @@ export class PerpetualsClient {
       // console.log("  IN => OUT outputTokenAmount :", outputTokenAmount.toString())
 
       //todo: check for stable swap
-      feeIn = this.getFeeHelper(FeesAction.SwapIn, amountIn, BN_ZERO, inputTokenCustodyAccount, inputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount
-      feeOut = this.getFeeHelper(FeesAction.SwapOut, BN_ZERO, outputTokenAmount, outputTokenCustodyAccount, outputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount
+      feeIn = isWhitelistedUser ? BN_ZERO
+        : this.getFeeHelper(FeesAction.SwapIn, amountIn, BN_ZERO, inputTokenCustodyAccount, inputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
+      feeOut = isWhitelistedUser ?  BN_ZERO
+      : this.getFeeHelper(FeesAction.SwapOut, BN_ZERO, outputTokenAmount, outputTokenCustodyAccount, outputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
 
       let swapAmount = checkedDecimalMul(amountIn.sub(feeIn), new BN(-1 * inputTokenCustodyAccount.decimals), swapPrice, inputMinMaxPrice.min.exponent, new BN(-1 * outputTokenCustodyAccount.decimals)).sub(feeOut)
       // console.log("  IN => OUT swapAmount :", swapAmount.toString())
@@ -3214,7 +3252,8 @@ export class PerpetualsClient {
     depositCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
     userPublicKey: PublicKey | undefined = undefined,
-    enableBackupOracle: boolean = false
+    enableBackupOracle: boolean = false,
+    whitelist: PublicKey | undefined = undefined
   ): Promise<{
     amount: BN | undefined
     fee: BN | undefined
@@ -3247,6 +3286,12 @@ export class PerpetualsClient {
       })
     }
 
+    const whitelistMeta = {
+       pubkey: whitelist,
+        isSigner: false,
+        isWritable: false,
+    }
+
     const depositCustodyConfig = custodies.find((i) => i.custodyAccount.equals(depositCustodyKey))!
 
     let transaction = await this.program.methods
@@ -3261,7 +3306,7 @@ export class PerpetualsClient {
         lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       })
-      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .remainingAccounts([...custodyMetas, ...marketMetas, ...(whitelist ? [whitelistMeta] : [])  ])
       .transaction()
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 450_000 })
@@ -3296,7 +3341,8 @@ export class PerpetualsClient {
     removeTokenCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
     userPublicKey: PublicKey | undefined = undefined,
-    enableBackupOracle: boolean = false
+    enableBackupOracle: boolean = false,
+    whitelist: PublicKey  = PublicKey.default,
   ): Promise<{
     amount: BN
     fee: BN
@@ -3330,6 +3376,12 @@ export class PerpetualsClient {
       })
     }
 
+    const whitelistMeta = {
+       pubkey: whitelist,
+        isSigner: false,
+        isWritable: false,
+    }
+
     const removeCustodyConfig = custodies.find((i) => i.custodyAccount.equals(removeTokenCustodyKey))!
 
     let transaction = await this.program.methods
@@ -3344,7 +3396,7 @@ export class PerpetualsClient {
         lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       })
-      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .remainingAccounts([...custodyMetas, ...marketMetas, ...(whitelist ? [whitelistMeta] : [])])
       .transaction()
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 450_000 })
@@ -3437,7 +3489,8 @@ export class PerpetualsClient {
     depositCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
     userPublicKey: PublicKey | undefined = undefined,
-    enableBackupOracle: boolean = false
+    enableBackupOracle: boolean = false,
+    whitelist: PublicKey = PublicKey.default,
   ): Promise<{
     amount: BN
     fee: BN
@@ -3469,6 +3522,12 @@ export class PerpetualsClient {
       })
     }
 
+    const whitelistMeta = {
+       pubkey: whitelist,
+        isSigner: false,  
+        isWritable: false,
+    }
+
     const depositCustodyConfig = custodies.find((i) => i.custodyAccount.equals(depositCustodyKey))!
     const rewardCustody = POOL_CONFIG.custodies.find((f) => f.symbol == 'USDC')!
 
@@ -3487,7 +3546,7 @@ export class PerpetualsClient {
         compoundingTokenMint: POOL_CONFIG.compoundingTokenMint,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       })
-      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .remainingAccounts([...custodyMetas, ...marketMetas,  ...(whitelist ? [whitelistMeta] : []) ])
       .transaction()
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 450_000 })
@@ -3514,7 +3573,8 @@ export class PerpetualsClient {
     removeTokenCustodyKey: PublicKey,
     POOL_CONFIG: PoolConfig,
     userPublicKey: PublicKey | undefined = undefined,
-    enableBackupOracle: boolean = false
+    enableBackupOracle: boolean = false,
+    whitelist: PublicKey  = PublicKey.default,
   ): Promise<{
     amount: BN
     fee: BN
@@ -3547,6 +3607,12 @@ export class PerpetualsClient {
       })
     }
 
+    const whitelistMeta = {
+       pubkey: whitelist,
+        isSigner: false,  
+        isWritable: false,
+    }
+
     const removeCustodyConfig = custodies.find((i) => i.custodyAccount.equals(removeTokenCustodyKey))!
     const rewardCustody = POOL_CONFIG.custodies.find((f) => f.symbol == 'USDC')!
 
@@ -3565,7 +3631,7 @@ export class PerpetualsClient {
         lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       })
-      .remainingAccounts([...custodyMetas, ...marketMetas])
+      .remainingAccounts([...custodyMetas, ...marketMetas, ...(whitelist ? [whitelistMeta] : [])])
       .transaction()
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 450_000 })
@@ -5185,7 +5251,8 @@ export class PerpetualsClient {
     minLpAmountOut: BN, // give this value based on slippage 
     poolConfig: PoolConfig,
     skipBalanceChecks = false, // calling this with true will skip balance checks, which is suitable for UI to be quick
-    ephemeralSignerPubkey = undefined // for Squads wallet
+    ephemeralSignerPubkey = undefined , // for Squads wallet
+    isWhitelistedUser = false
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
 
     let publicKey = this.provider.wallet.publicKey;
@@ -5314,7 +5381,16 @@ export class PerpetualsClient {
           }
         }
     }//else
-      
+
+      const whitelistPda = this.findProgramAddress("whitelist", [publicKey]).publicKey;
+      // const whitelistExists = await checkIfAccountExists(whitelistPda, this.provider.connection);
+      const whitelistMeta = {
+        pubkey: whitelistPda,
+        isSigner: false,  
+        isWritable: false,
+      }
+
+
 
       let instruction = await this.program.methods
         .addLiquidity({
@@ -5337,9 +5413,9 @@ export class PerpetualsClient {
           program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           fundingMint: payTokenCustodyConfig.mintKey,
-          fundingTokenProgram: payToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
+          fundingTokenProgram: payToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
         })
-        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets, ...( isWhitelistedUser ?  [whitelistMeta] : []) ])
         .instruction();
 
         instructions.push(instruction);
@@ -5361,7 +5437,8 @@ export class PerpetualsClient {
     poolConfig: PoolConfig,
     skipBalanceChecks = false,
     ephemeralSignerPubkey = undefined, // for Squads wallet
-    userPublicKey: PublicKey | undefined = undefined
+    userPublicKey: PublicKey | undefined = undefined,
+    isWhitelistedUser = false
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = userPublicKey ?? this.provider.wallet.publicKey;
 
@@ -5494,6 +5571,17 @@ export class PerpetualsClient {
     }
 
 
+
+    const whitelistPda = this.findProgramAddress("whitelist", [publicKey]).publicKey;
+    // const whitelistExists = await checkIfAccountExists(whitelistPda, this.provider.connection);
+    const whitelistMeta = {
+         pubkey: whitelistPda,
+        isSigner: false,  
+        isWritable: false,
+    }
+
+
+
     let instruction = await this.program.methods.addLiquidityAndStake({
       amountIn: amountIn,
       minLpAmountOut: minLpAmountOut,
@@ -5520,9 +5608,9 @@ export class PerpetualsClient {
       program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       fundingMint: inputCustodyConfig.mintKey,
-      fundingTokenProgram: inputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID //TODO: tokenType
+      fundingTokenProgram: inputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
     })
-    .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+    .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets,  ...( isWhitelistedUser ?  [whitelistMeta] : [])])
     .instruction();
 
     instructions.push(instruction);
@@ -5543,7 +5631,8 @@ export class PerpetualsClient {
     createUserATA = true, //create new ATA for USER in the end 
     closeUsersWSOLATA = false, // to get back WSOL=>SOL
     ephemeralSignerPubkey = undefined, // for Squads wallet
-    userPublicKey: PublicKey | undefined = undefined
+    userPublicKey: PublicKey | undefined = undefined,
+    isWhitelistedUser = false
   ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
 
     const recieveTokenCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(recieveTokenSymbol).mintKey))!;
@@ -5653,6 +5742,15 @@ export class PerpetualsClient {
         }
       } // else
 
+      const whitelistPda = this.findProgramAddress("whitelist", [publicKey]).publicKey;
+      // const whitelistExists = await checkIfAccountExists(whitelistPda, this.provider.connection);
+      const whitelistMeta = {
+        pubkey: whitelistPda,
+        isSigner: false,  
+        isWritable: false,
+      }
+
+
       let removeLiquidityTx = await this.program.methods
         .removeLiquidity({
           lpAmountIn: liquidityAmountIn,
@@ -5674,9 +5772,9 @@ export class PerpetualsClient {
           program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: recieveTokenCustodyConfig.mintKey,
-          receivingTokenProgram: recieveToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID //TODO: tokenType
-        })
-        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+          receivingTokenProgram: recieveToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID ,
+      })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets, ...( isWhitelistedUser ?  [whitelistMeta] : [])])
         .instruction();
       instructions.push(removeLiquidityTx)
 
@@ -6305,7 +6403,7 @@ export class PerpetualsClient {
     ephemeralSignerPubkey = undefined, // for Squads wallet
     userPublicKey: PublicKey | undefined = undefined,
     enableHeapSizeIx = true, // this is required for adding liquidity with compounding where more heap size is needed (marginV2 data size is large)
-    enableDebugLogs = false
+    isWhitelistedUser = false,
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = userPublicKey ?? this.provider.wallet.publicKey;
 
@@ -6453,43 +6551,49 @@ export class PerpetualsClient {
           const heapSizeIx = ComputeBudgetProgram.requestHeapFrame({
             bytes: 64 * 1024, // Multiple of 1024
         });
-        if(enableDebugLogs){
-          console.log("SDK: adding 64 liq Data heapSizeIx for addCompoundingLiquidity")
-        }
         preInstructions.push(heapSizeIx)
       }
 
+      const whitelistPda = this.findProgramAddress("whitelist", [publicKey]).publicKey;
+      // const whitelistExists = await checkIfAccountExists(whitelistPda, this.provider.connection);
+      const whitelistMeta = {
+          pubkey: whitelistPda,
+          isSigner: false,  
+          isWritable: false,
+      }
 
+
+     
       let addCompoundingLiquidity = await this.program.methods
         .addCompoundingLiquidity({
           amountIn: amountIn,
           minCompoundingAmountOut: minCompoundingAmountOut
         })
         .accounts({
-          owner: publicKey,
-          fundingAccount: inTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : fundingAccount,
-          compoundingTokenAccount: compoundingTokenAccount,
-          poolCompoundingLpVault: poolConfig.compoundingLpVault,
-          transferAuthority: poolConfig.transferAuthority,
-          perpetuals: poolConfig.perpetuals,
-          pool: poolConfig.poolAddress,
-          inCustody: inCustodyConfig.custodyAccount,
-          inCustodyOracleAccount: this.useExtOracleAccount ? inCustodyConfig.extOracleAccount: inCustodyConfig.intOracleAccount,
-          inCustodyTokenAccount: inCustodyConfig.tokenAccount,
+        owner: publicKey,
+        fundingAccount: inTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : fundingAccount,
+        compoundingTokenAccount: compoundingTokenAccount,
+        poolCompoundingLpVault: poolConfig.compoundingLpVault,
+        transferAuthority: poolConfig.transferAuthority,
+        perpetuals: poolConfig.perpetuals,
+        pool: poolConfig.poolAddress,
+        inCustody: inCustodyConfig.custodyAccount,
+        inCustodyOracleAccount: this.useExtOracleAccount ? inCustodyConfig.extOracleAccount: inCustodyConfig.intOracleAccount,
+        inCustodyTokenAccount: inCustodyConfig.tokenAccount,
 
-          rewardCustody: rewardCustody.custodyAccount,
-          rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount: rewardCustody.intOracleAccount,
-          lpTokenMint: lpTokenMint,
-          compoundingTokenMint: compoundingTokenMint,
-          
-          tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.program.programId,
-          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
-          fundingMint: inCustodyConfig.mintKey,
-          fundingTokenProgram: poolConfig.getTokenFromSymbol(inTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-        })
-        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+        rewardCustody: rewardCustody.custodyAccount,
+        rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount: rewardCustody.intOracleAccount,
+        lpTokenMint: lpTokenMint,
+        compoundingTokenMint: compoundingTokenMint,
+        
+        tokenProgram: TOKEN_PROGRAM_ID,
+        eventAuthority: this.eventAuthority.publicKey,
+        program: this.program.programId,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        fundingMint: inCustodyConfig.mintKey,
+        fundingTokenProgram: poolConfig.getTokenFromSymbol(inTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
+      })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets,  ...( isWhitelistedUser ?  [whitelistMeta] : [])])
         .instruction()
       instructions.push(addCompoundingLiquidity)
 
@@ -6515,7 +6619,7 @@ export class PerpetualsClient {
     ephemeralSignerPubkey = undefined, // for Squads wallet
     userPublicKey: PublicKey | undefined = undefined,
     enableHeapSizeIx = true, // this is required for adding liquidity with compounding where more heap size is needed (marginV2 data size is large)
-    enableDebugLogs = false
+    isWhitelistedUser = false
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let publicKey = userPublicKey ?? this.provider.wallet.publicKey;
 
@@ -6629,11 +6733,18 @@ export class PerpetualsClient {
           const heapSizeIx = ComputeBudgetProgram.requestHeapFrame({
             bytes: 64 * 1024, // Multiple of 1024
         });
-        if(enableDebugLogs){
-          console.log("SDK: adding 64 liq Data heapSizeIx for addCompoundingLiquidity")
-        }
         preInstructions.push(heapSizeIx)
       }
+
+      const whitelistPda = this.findProgramAddress("whitelist", [publicKey]).publicKey;
+      // const whitelistExists = await checkIfAccountExists(whitelistPda, this.provider.connection);
+      const whitelistMeta = {
+          pubkey: whitelistPda,
+          isSigner: false,  
+          isWritable: false,
+      }
+
+
 
       let removeCompoundingLiquidity = await this.program.methods
         .removeCompoundingLiquidity({
@@ -6662,9 +6773,9 @@ export class PerpetualsClient {
           program: this.program.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: outCustodyConfig.mintKey,
-          receivingTokenProgram: poolConfig.getTokenFromSymbol(outTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
-        })
-        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+          receivingTokenProgram: poolConfig.getTokenFromSymbol(outTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
+      })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets,  ...( isWhitelistedUser ?  [whitelistMeta] : [])])
         .instruction()
       instructions.push(removeCompoundingLiquidity)
 
@@ -8542,5 +8653,6 @@ export class PerpetualsClient {
       },
     );
   }
+
 
 }

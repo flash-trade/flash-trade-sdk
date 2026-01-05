@@ -2,7 +2,6 @@ import { PublicKey } from "@solana/web3.js";
 import { BN_ZERO } from "../constants";
 import { MethodsNamespace, IdlTypes, IdlAccounts, BN, IdlEvents } from "@coral-xyz/anchor";
 import { Perpetuals } from "../idl/perpetuals";
-import { FbnftRewards } from "../idl/fbnft_rewards";
 import { OraclePrice } from "../OraclePrice";
 
 export type PositionSide = "long" | "short";
@@ -12,7 +11,6 @@ export type Accounts = IdlAccounts<Perpetuals>;
 export type Types = IdlTypes<Perpetuals>;
 export type Events = IdlEvents<Perpetuals>;
 
-export type FbnftRewardsAccounts = IdlAccounts<FbnftRewards>;
 
 export type OpenPositionParams = Types["OpenPositionParams"];
 export type InitParams = Types["InitParams"];
@@ -63,6 +61,8 @@ export type Order = Accounts["order"];
 export type PerpetualsAccount = Accounts["perpetuals"];
 export type Referral = Accounts["referral"];
 export type Trading = Accounts["trading"];
+export type Whitelist = Accounts["whitelist"];
+
 export type FlpStake = Accounts["flpStake"];
 
 export type TokenVault = Accounts["tokenVault"];
@@ -70,8 +70,8 @@ export type TokenStake = Accounts["tokenStake"];
 export type ProtocolVault = Accounts["protocolVault"];
 
 
-export type RewardRecord = FbnftRewardsAccounts["rewardRecord"];
-export type RewardVault = FbnftRewardsAccounts["rewardVault"];
+// export type RewardRecord = FbnftRewardsAccounts["rewardRecord"];
+// export type RewardVault = FbnftRewardsAccounts["rewardVault"];
 
 export type AddCollateralLog = Events["AddCollateralLog"];
 export type AddLiquidityLog = Events["AddLiquidityLog"];

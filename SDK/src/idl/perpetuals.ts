@@ -897,35 +897,6 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setFlpStakeConfig",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "flpStakeAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "SetFlpStakeConfigParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
       "name": "setTokenReward",
       "accounts": [
         {
@@ -1243,79 +1214,6 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawSolFeesParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "updateCustody",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "UpdateCustodyParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "updateTokenRatios",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "UpdateTokenRatiosParams"
           }
         }
       ],
@@ -1873,6 +1771,305 @@ export type Perpetuals = {
         }
       ],
       "returns": "u8"
+    },
+    {
+      "name": "createWhitelist",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CreateWhitelistParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setWhitelistConfig",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetWhitelistConfigParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "migrateXauPosition",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oldPosition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCollateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCollateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newPosition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newCollateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newCollateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MigrateXauPositionParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "migrateXauOrder",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "oldOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MigrateXauOrderParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "swapRemainingFee",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapRemainingFeeParams"
+          }
+        }
+      ]
     },
     {
       "name": "testInit",
@@ -4084,12 +4281,12 @@ export type Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "custody",
+          "name": "rewardCustody",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "custodyTokenAccount",
+          "name": "rewardCustodyTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -8184,6 +8381,51 @@ export type Perpetuals = {
           }
         ]
       }
+    },
+    {
+      "name": "whitelist",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "isSwapFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isDepositFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isWithdrawalFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "buffer",
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          },
+          {
+            "name": "pool",
+            "type": "publicKey"
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -8544,6 +8786,30 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "CreateWhitelistParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isSwapFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isDepositFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isWithdrawalFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "poolAddress",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "DecreaseSizeParams",
       "type": {
         "kind": "struct",
@@ -8895,10 +9161,6 @@ export type Perpetuals = {
           {
             "name": "amountIn",
             "type": "u64"
-          },
-          {
-            "name": "useFeePool",
-            "type": "bool"
           }
         ]
       }
@@ -9097,6 +9359,20 @@ export type Perpetuals = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "MigrateXauOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "MigrateXauPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -9443,18 +9719,6 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "SetFlpStakeConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "feeShareBps",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SetInternalCurrentPriceParams",
       "type": {
         "kind": "struct",
@@ -9752,6 +10016,30 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "SetWhitelistConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isSwapFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isDepositFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isWithdrawalFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "poolAddress",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "SwapAndAddCollateralParams",
       "type": {
         "kind": "struct",
@@ -9793,6 +10081,13 @@ export type Perpetuals = {
     },
     {
       "name": "SwapFeeInternalParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "SwapRemainingFeeParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -9876,38 +10171,6 @@ export type Perpetuals = {
           {
             "name": "unstakeAmount",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateCustodyParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "minReserveUsd",
-            "type": "u64"
-          },
-          {
-            "name": "limitPriceBufferBps",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateTokenRatiosParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "ratios",
-            "type": {
-              "vec": {
-                "defined": "TokenRatios"
-              }
-            }
           }
         ]
       }
@@ -11055,6 +11318,12 @@ export type Perpetuals = {
           },
           {
             "name": "InitRebateVault"
+          },
+          {
+            "name": "CreateWhitelist"
+          },
+          {
+            "name": "SetWhitelistConfig"
           }
         ]
       }
@@ -15204,6 +15473,66 @@ export type Perpetuals = {
         {
           "name": "compoundingPriceUsd",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MigrateXauPositionLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "position",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
           "index": false
         }
       ]
@@ -18907,35 +19236,6 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setFlpStakeConfig",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "flpStakeAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "SetFlpStakeConfigParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
       "name": "setTokenReward",
       "accounts": [
         {
@@ -19253,79 +19553,6 @@ export const IDL: Perpetuals = {
           "name": "params",
           "type": {
             "defined": "WithdrawSolFeesParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "updateCustody",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "UpdateCustodyParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "updateTokenRatios",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "multisig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "UpdateTokenRatiosParams"
           }
         }
       ],
@@ -19883,6 +20110,305 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": "u8"
+    },
+    {
+      "name": "createWhitelist",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CreateWhitelistParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "setWhitelistConfig",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetWhitelistConfigParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "migrateXauPosition",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oldPosition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCollateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCollateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newPosition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newCollateralCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newCollateralOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MigrateXauPositionParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "migrateXauOrder",
+      "accounts": [
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "oldOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MigrateXauOrderParams"
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "swapRemainingFee",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "perpetuals",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rewardCustodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custody",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "custodyOracleAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "custodyTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ixSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SwapRemainingFeeParams"
+          }
+        }
+      ]
     },
     {
       "name": "testInit",
@@ -22094,12 +22620,12 @@ export const IDL: Perpetuals = {
           "isSigner": false
         },
         {
-          "name": "custody",
+          "name": "rewardCustody",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "custodyTokenAccount",
+          "name": "rewardCustodyTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -26194,6 +26720,51 @@ export const IDL: Perpetuals = {
           }
         ]
       }
+    },
+    {
+      "name": "whitelist",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "isSwapFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isDepositFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isWithdrawalFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "buffer",
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          },
+          {
+            "name": "pool",
+            "type": "publicKey"
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -26554,6 +27125,30 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "CreateWhitelistParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isSwapFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isDepositFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isWithdrawalFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "poolAddress",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "DecreaseSizeParams",
       "type": {
         "kind": "struct",
@@ -26905,10 +27500,6 @@ export const IDL: Perpetuals = {
           {
             "name": "amountIn",
             "type": "u64"
-          },
-          {
-            "name": "useFeePool",
-            "type": "bool"
           }
         ]
       }
@@ -27107,6 +27698,20 @@ export const IDL: Perpetuals = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "MigrateXauOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "MigrateXauPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -27453,18 +28058,6 @@ export const IDL: Perpetuals = {
       }
     },
     {
-      "name": "SetFlpStakeConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "feeShareBps",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "SetInternalCurrentPriceParams",
       "type": {
         "kind": "struct",
@@ -27762,6 +28355,30 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "SetWhitelistConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isSwapFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isDepositFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "isWithdrawalFeeExempt",
+            "type": "bool"
+          },
+          {
+            "name": "poolAddress",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "SwapAndAddCollateralParams",
       "type": {
         "kind": "struct",
@@ -27803,6 +28420,13 @@ export const IDL: Perpetuals = {
     },
     {
       "name": "SwapFeeInternalParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "SwapRemainingFeeParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -27886,38 +28510,6 @@ export const IDL: Perpetuals = {
           {
             "name": "unstakeAmount",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateCustodyParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "minReserveUsd",
-            "type": "u64"
-          },
-          {
-            "name": "limitPriceBufferBps",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateTokenRatiosParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "ratios",
-            "type": {
-              "vec": {
-                "defined": "TokenRatios"
-              }
-            }
           }
         ]
       }
@@ -29065,6 +29657,12 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "InitRebateVault"
+          },
+          {
+            "name": "CreateWhitelist"
+          },
+          {
+            "name": "SetWhitelistConfig"
           }
         ]
       }
@@ -33214,6 +33812,66 @@ export const IDL: Perpetuals = {
         {
           "name": "compoundingPriceUsd",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MigrateXauPositionLog",
+      "fields": [
+        {
+          "name": "owner",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "position",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "entryPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "entryPriceExponent",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "sizeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "sizeUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "collateralPriceExponent",
+          "type": "i32",
           "index": false
         }
       ]
