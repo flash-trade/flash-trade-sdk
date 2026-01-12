@@ -136,6 +136,19 @@
           "pythTicker": "Crypto.ZEC/USD",
           "pythPriceId": "0xbe9b59d178f0d6a97ab4c343bff2aa69caa1eaae3e9048a65788c529b125bb24",
           "isToken2022": false
+        },
+        {
+          "symbol": "BNB",
+          "mintKey": "BNBXenUbd8ixdDBJWs56yBFEapFvY9LHp8J1mwY3de5",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "lazerId": 15,
+          "pythTicker": "Crypto.BNB/USD",
+          "pythPriceId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -240,6 +253,23 @@
           "lazerId": 66,
           "pythTicker": "Crypto.ZEC/USD",
           "pythPriceId": "0xbe9b59d178f0d6a97ab4c343bff2aa69caa1eaae3e9048a65788c529b125bb24"
+        },
+        {
+          "custodyId": 6,
+          "custodyAccount": "6bthDsp8pcGBGKVKCKZjV5JfuSUNRo62RG4hQHj1u4CK",
+          "tokenAccount": "8t9wKz9D4tWTBTdhfA4dtrFbAn9cP5tRQnPzRn5iFEGY",
+          "symbol": "BNB",
+          "mintKey": "BNBXenUbd8ixdDBJWs56yBFEapFvY9LHp8J1mwY3de5",
+          "decimals": 6,
+          "usdPrecision": 2,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "intOracleAddress": "HUAssJN77yC5uZRuKFkJdT5BRaEvsaECKX7jdPfVyL8C",
+          "extOracleAddress": "A3qp5QG9xGeJR1gexbW9b9eMMsMDLzx3rhud9SnNhwb4",
+          "lazerId": 15,
+          "pythTicker": "Crypto.BNB/USD",
+          "pythPriceId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
         }
       ],
       "markets": [
@@ -385,6 +415,38 @@
           "targetCustodyId": 5,
           "collateralCustodyId": 0,
           "targetMint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "marketId": 9,
+          "marketAccount": "9wSuoUP3jht5R8vk7zFys4fCAkA6mWDThuiCb2vg972T",
+          "marketCorrelation" : false,
+          "pool": "HfF7GCcEc76xubFCHLLXRdYcgRzwjEPdfKWqzRS8Ncog",
+          "targetCustody": "6bthDsp8pcGBGKVKCKZjV5JfuSUNRo62RG4hQHj1u4CK",
+          "collateralCustody": "Ghi8YvZeDEzPAGvve7we3Rthquk84CULra6ERkGQF1Rv",
+          "side": "long",
+          "maxLev": 50,
+          "degenMinLev": 50,
+          "degenMaxLev": 50,
+          "targetCustodyId": 6,
+          "collateralCustodyId": 2,
+          "targetMint": "BNBXenUbd8ixdDBJWs56yBFEapFvY9LHp8J1mwY3de5",
+          "collateralMint": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh"
+        },
+        {
+          "marketId": 10,
+          "marketAccount": "7UkGiRwUmmFhQBB7uLgHzJC4oTZZ5CDZqaYqNYo1LCPn",
+          "marketCorrelation" : false,
+          "pool": "HfF7GCcEc76xubFCHLLXRdYcgRzwjEPdfKWqzRS8Ncog",
+          "targetCustody": "6bthDsp8pcGBGKVKCKZjV5JfuSUNRo62RG4hQHj1u4CK",
+          "collateralCustody": "5N2St2e1BdgWsJiXxfetwWKkHS1BYochAp1ruPFJUfgY",
+          "side": "short",
+          "maxLev": 50,
+          "degenMinLev": 50,
+          "degenMaxLev": 50,
+          "targetCustodyId": 6,
+          "collateralCustodyId": 0,
+          "targetMint": "BNBXenUbd8ixdDBJWs56yBFEapFvY9LHp8J1mwY3de5",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         }
       ]
@@ -2833,7 +2895,7 @@
           "maxLev": 50,
           "degenMinLev": 50,
           "degenMaxLev": 50,
-          "targetCustodyId": 7,
+          "targetCustodyId": 6,
           "collateralCustodyId": 2,
           "targetMint": "bnbm27QuZCjY3pBqBoQF3x7cRGuvvMFQ54iaCbeT4pw",
           "collateralMint": "B8DYqbh57aEPRbUq7reyueY6jaYoN75js5YsiM84tFfP"
@@ -2849,7 +2911,7 @@
           "maxLev": 50,
           "degenMinLev": 50,
           "degenMaxLev": 50,
-          "targetCustodyId": 7,
+          "targetCustodyId": 6,
           "collateralCustodyId": 0,
           "targetMint": "bnbm27QuZCjY3pBqBoQF3x7cRGuvvMFQ54iaCbeT4pw",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
