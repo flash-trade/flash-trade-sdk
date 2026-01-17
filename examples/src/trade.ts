@@ -177,7 +177,6 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
     const outputTokenPrice = priceMap.get(outputToken.symbol)!.price
     const outputTokenPriceEma = priceMap.get(outputToken.symbol)!.emaPrice
 
-    // await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
     const priceAfterSlippage = flashClient.getPriceAfterSlippage(
         true,
@@ -307,7 +306,6 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
     const outputTokenPrice = priceMap.get(outputToken.symbol)!.price
     const outputTokenPriceEma = priceMap.get(outputToken.symbol)!.emaPrice
 
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
     const priceAfterSlippage = flashClient.getPriceAfterSlippage(
         true,
@@ -389,7 +387,8 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
     ).addressLookupTables
 
     const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions] ,{ 
-        alts : addresslookupTables
+        alts : addresslookupTables,
+        additionalSigners: additionalSigners
     })
 
      console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
@@ -460,6 +459,7 @@ const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingT
 
     const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], { 
         alts : addresslookupTables
+        
     })
 
     console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
