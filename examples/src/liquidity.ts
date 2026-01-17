@@ -1,13 +1,28 @@
 import dotenv from 'dotenv';
-import { BN_ZERO, BPS_DECIMALS, CustodyAccount, getUnixTs, OraclePrice, PerpetualsClient, PoolAccount, PoolConfig, PoolDataClient, PositionAccount, Privilege, Side, uiDecimalsToNative } from 'flash-sdk';
+import { BN_ZERO, BPS_DECIMALS, PerpetualsClient, PoolConfig } from 'flash-sdk';
 dotenv.config();
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
-import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connection } from '@solana/web3.js';
-import { getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
-
+import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, AddressLookupTableAccount } from '@solana/web3.js';
+import { getAssociatedTokenAddressSync } from '@solana/spl-token';
 
 export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
-
+// NOTE: choose the correct POOL_CONFIG based on the pool you want to interact 
+// flp.1
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1','mainnet-beta')
+// flp.2
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Virtual.1','mainnet-beta')
+// flp.3
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Governance.1','mainnet-beta')
+// flp.4
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Community.1','mainnet-beta')
+// flp.5
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Community.2','mainnet-beta')
+// flp.7
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Trump.1','mainnet-beta')
+// flp.8
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Ore.1','mainnet-beta')
+// flp.r
+// const POOL_CONFIG = PoolConfig.fromIdsByName('Remora.1','mainnet-beta')
 
 export const RPC_URL = process.env.RPC_URL;
 console.log("RPC_URL:>> ", RPC_URL);
@@ -33,17 +48,15 @@ export const flashClient = new PerpetualsClient(
 )
 
 const setLpTokenPrice = async () => {
-   
+
     await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
-   
     let instructions: TransactionInstruction[] = []
     let additionalSigners: Signer[] = []
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 120_000 }) // setLpTokenPrice
 
-     // flash-sdk version >= "3.1.10"
-     const setLpTokenPriceData = await flashClient.setLpTokenPrice(POOL_CONFIG);
-
+    // flash-sdk version >= "3.1.10"
+    const setLpTokenPriceData = await flashClient.setLpTokenPrice(POOL_CONFIG);
 
     instructions.push(...setLpTokenPriceData.instructions)
     additionalSigners.push(...setLpTokenPriceData.additionalSigners)
@@ -51,7 +64,6 @@ const setLpTokenPrice = async () => {
     const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
 
     console.log('setLpTokenPrice trx :>> ', trxId);
-   
 }
 
 // addLiquidityAndStake 1 USDC 
@@ -61,9 +73,6 @@ const addLiquidityAndStake = async () => {
     const slippageBps: number = 800 // 0.8%
     let instructions: TransactionInstruction[] = []
     let additionalSigners: Signer[] = []
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
-
 
     // flash-sdk version >= 2.31.6
     const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFeeView(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
@@ -87,7 +96,14 @@ const addLiquidityAndStake = async () => {
 
     instructions.push(refreshStakeInstruction)
 
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
+    let addresslookupTables: AddressLookupTableAccount[] = (
+        await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], {
+        additionalSigners: additionalSigners,
+        alts: addresslookupTables
+    })
 
     console.log('addLiquidityAndStake trx :>> ', trxId);
 }
@@ -98,8 +114,6 @@ const addCompoundingLiquidity = async () => {
     const slippageBps: number = 700 // 0.7%
     let instructions: TransactionInstruction[] = []
     let additionalSigners: Signer[] = []
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
     // flash-sdk version >= 2.31.6
     const { amount: minLpAmountOut, fee } = await flashClient.getAddLiquidityAmountAndFeeView(usdcInputAmount, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
@@ -121,18 +135,23 @@ const addCompoundingLiquidity = async () => {
             POOL_CONFIG,
             false
         )
-    
+
         instructions.push(...addCompoundingLiquidityData.instructions)
         additionalSigners.push(...addCompoundingLiquidityData.additionalSigners)
-    
-        const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-    
+
+        let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+        ).addressLookupTables
+
+        const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], {
+            additionalSigners: additionalSigners,
+            alts: addresslookupTables
+        })
+
         console.log('addCompoundingLiquidity trx :>> ', trxId);
-        
     } catch (error) {
         console.log('error :>> ', error);
     }
-  
 }
 
 const removeSflpLiquidity = async () => {
@@ -140,8 +159,6 @@ const removeSflpLiquidity = async () => {
     const slippageBps: number = 800 // 0.8%
     let instructions: TransactionInstruction[] = []
     let additionalSigners: Signer[] = []
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
     const flpStakeAccountPK = PublicKey.findProgramAddressSync(
         [Buffer.from('stake'), flashClient.provider.publicKey.toBuffer(), POOL_CONFIG.poolAddress.toBuffer()],
@@ -155,10 +172,9 @@ const removeSflpLiquidity = async () => {
         flpStakeAccount?.stakeStats.activeAmount.add(flpStakeAccount?.stakeStats.pendingActivation) ??
         BN_ZERO
 
-
     // flash-sdk version >= 2.31.6
     const { amount: minTokenAmountOut, fee } = await flashClient.getRemoveLiquidityAmountAndFeeView(flpWithPendingAndActive, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
-    console.log( 'minTokenAmountOut :>> ', minTokenAmountOut.toString());
+    console.log('minTokenAmountOut :>> ', minTokenAmountOut.toString());
 
     const { instructions: unstakeInstantInstructions, additionalSigners: unstakeInstantAdditionalSigners } =
         await flashClient.unstakeInstant('USDC', flpWithPendingAndActive, POOL_CONFIG)
@@ -189,20 +205,25 @@ const removeSflpLiquidity = async () => {
             minTokenAmountOutAfterSlippage,
             POOL_CONFIG
         )
-    
+
         instructions.push(...removeLiquidityData.instructions)
         additionalSigners.push(...removeLiquidityData.additionalSigners)
-    
+
         const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }) // addLiquidity
-    
-        const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-    
+
+        let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+        ).addressLookupTables
+
+        const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], {
+            additionalSigners: additionalSigners,
+            alts: addresslookupTables
+        })
+
         console.log('trx :>> ', trxId);
-        
     } catch (error) {
         console.log('removeLiquidity error :>> ', error);
     }
-   
 }
 
 const removeFlpLiquidity = async () => {
@@ -211,8 +232,6 @@ const removeFlpLiquidity = async () => {
     let instructions: TransactionInstruction[] = []
     let additionalSigners: Signer[] = []
     const usdcToken = POOL_CONFIG.tokens.find(t => t.symbol === 'USDC')!;
-
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
     const account = getAssociatedTokenAddressSync(POOL_CONFIG.compoundingTokenMint, flashClient.provider.publicKey, true)
     console.log('compoundingTokenMint account :>> ', account.toBase58());
@@ -227,7 +246,6 @@ const removeFlpLiquidity = async () => {
         throw new Error(`Account ${account.toBase58()} not sufficient balance`)
     }
     const compoundingTokenBalance = new BN(walletBalance.value.amount)
-
 
     // const { amount: minTokenAmountOut, fee } = await flashClient.getSFLPRemoveLiquidityAmountAndFee(compoundingTokenBalance, POOL_CONFIG.poolAddress, usdcCustody.custodyAccount, POOL_CONFIG);
     // flash-sdk version >= 2.31.6
@@ -249,9 +267,16 @@ const removeFlpLiquidity = async () => {
     instructions.push(...removeCompoundingLiquidityData.instructions)
     additionalSigners.push(...removeCompoundingLiquidityData.additionalSigners)
 
+    let addresslookupTables: AddressLookupTableAccount[] = (
+        await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }) // addLiquidity
 
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], {
+        additionalSigners: additionalSigners,
+        alts: addresslookupTables
+    })
 
     console.log('trx :>> ', trxId);
 }
