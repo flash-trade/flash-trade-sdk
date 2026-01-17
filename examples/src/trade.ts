@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
-import { BN_ZERO, BPS_DECIMALS, CustodyAccount, getUnixTs, OraclePrice, PerpetualsClient, PoolAccount, PoolConfig, PoolDataClient, PositionAccount, Privilege, Side, uiDecimalsToNative } from 'flash-sdk';
+import { BN_ZERO, BPS_DECIMALS, createComputeBudgetIx, CustodyAccount, getUnixTs, OraclePrice, PerpetualsClient, PoolAccount, PoolConfig, PoolDataClient, PositionAccount, Privilege, SendTransactionOpts, Side, uiDecimalsToNative } from 'flash-sdk';
 dotenv.config();
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
-import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connection, AddressLookupTableAccount } from '@solana/web3.js';
+import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connection, AddressLookupTableAccount, MessageV0, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
 import { PriceData, PythHttpClient, getPythProgramKeyForCluster } from '@pythnetwork/client';
+import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 
 
 // NOTE: choose the correct POOL_CONFIG based on the pool you want to interact 
@@ -99,6 +100,66 @@ const getPrices = async () => {
 }
 
 
+export async function sendTransaction(
+    provider: AnchorProvider,
+    ixs: TransactionInstruction[],
+    opts: SendTransactionOpts = {},
+  ): Promise<string> {
+    const connection = provider.connection;
+    const latestBlockhash =
+      opts.latestBlockhash ??
+      (await connection.getLatestBlockhash(
+        opts.preflightCommitment ??
+        provider.opts.preflightCommitment ??
+        'finalized',
+      ));
+  
+    const payer = (provider as AnchorProvider).wallet;
+  
+    if (opts.prioritizationFee) {
+      ixs = [...ixs, createComputeBudgetIx(opts.prioritizationFee)];
+    }
+  
+    const message = MessageV0.compile({
+      payerKey: (provider as AnchorProvider).wallet.publicKey,
+      instructions: ixs,
+      recentBlockhash: latestBlockhash.blockhash,
+      addressLookupTableAccounts: opts.alts,
+    });
+  
+    let vtx = new VersionedTransaction(message);
+    if (opts?.additionalSigners?.length) {
+      vtx.sign([...opts?.additionalSigners]);
+    }
+  
+    if (
+      typeof payer.signTransaction === 'function' &&
+      !(payer instanceof NodeWallet || payer.constructor.name == 'NodeWallet')
+    ) {
+      vtx = (await payer.signTransaction(
+        vtx as any,
+      )) as unknown as VersionedTransaction;
+    } else {
+      // Maybe this path is only correct for NodeWallet?
+      vtx.sign([(payer as any).payer as Signer]);
+    }
+  
+    //  way-1
+    // const signature = await connection.sendRawTransaction(vtx.serialize(), {
+    //   skipPreflight: true, // mergedOpts.skipPreflight,
+    // });
+  
+    //  way-2
+    const signature = await connection.sendTransaction(vtx, {
+      skipPreflight: true, // mergedOpts.skipPreflight,
+      // maxRetries : 0
+    });
+  
+    return signature;
+  }
+  
+
+
 const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string, inputAmount: string, side: Side) => {
 
     const slippageBps: number = 800 // 0.8%
@@ -116,7 +177,7 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
     const outputTokenPrice = priceMap.get(outputToken.symbol)!.price
     const outputTokenPriceEma = priceMap.get(outputToken.symbol)!.emaPrice
 
-    await flashClient.loadAddressLookupTable(POOL_CONFIG)
+    // await flashClient.loadAddressLookupTable(POOL_CONFIG)
 
     const priceAfterSlippage = flashClient.getPriceAfterSlippage(
         true,
@@ -174,8 +235,9 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
             await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
     ).addressLookupTables
 
-    const trxId = await flashClient.sendTransaction([setCULimitIx, setCUPriceIx, ...instructions], { 
-        alts : addresslookupTables
+    const trxId = await sendTransaction(provider, [setCULimitIx, setCUPriceIx, ...instructions], { 
+        alts : addresslookupTables,
+        additionalSigners: additionalSigners
     })
 
     console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
@@ -432,9 +494,9 @@ const getLiquidationPrice = async (positionPubKey : PublicKey) => {
 
   // NOTE: choose the correct POOL_CONFIG based on the pool you want to interact (check readme)
 
-     await openPosition('SOL', 'SOL', '0.3', Side.Long)
+     await openPosition('SOL', 'SOL', '0.1', Side.Long)
     //  await openPosition('ORE', 'ORE', '1', Side.Long)
-     console.log("openPosition done");
+    //  console.log("openPosition done");
 
     // await closePosition('SOL', Side.Long);
     // console.log("closePosition done");
