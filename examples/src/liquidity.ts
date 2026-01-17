@@ -83,7 +83,7 @@ const addLiquidityAndStake = async () => {
         POOL_CONFIG.programId
     )[0]
 
-    const refreshStakeInstruction = await flashClient.refreshStake('USDC', POOL_CONFIG, [flpStakeAccountPK])
+    const refreshStakeInstruction = await flashClient.refreshStakeWithTokenStake('USDC', POOL_CONFIG, flpStakeAccountPK)
 
     instructions.push(refreshStakeInstruction)
 
