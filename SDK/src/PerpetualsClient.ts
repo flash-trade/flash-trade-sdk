@@ -60,6 +60,20 @@ export type PerpClientOptions = {
   txConfirmationCommitment?: Commitment;
 };
 
+export interface PositionMetrics {
+  pnl: {
+    profitUsd: BN;
+    lossUsd: BN;
+  };
+  leverage: BN;
+  liquidationPrice: OraclePrice;
+  fees: {
+    exitFeeUsd: BN;
+    exitFeeAmount: BN;
+    lockAndUnsettledFeeUsd: BN;
+  };
+}
+
 export class PerpetualsClient {
   provider: AnchorProvider;
   program: Program<Perpetuals>;
@@ -2727,9 +2741,13 @@ export class PerpetualsClient {
           priceDiffProfit = new OraclePrice({ price: exitOraclePrice.price.sub(positionEntryPrice.price), exponent: exitOraclePrice.exponent, confidence: exitOraclePrice.confidence, timestamp: BN_ZERO });
           priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
         } else {
-          priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-
+          if (positionAccount.referencePrice.price.gt(positionEntryPrice.price)){
+            priceDiffProfit = new OraclePrice({ price: positionAccount.referencePrice.price.sub(positionEntryPrice.price), exponent: positionEntryPrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          } else {
+            priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          }
         }
       } else {
         priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
@@ -2741,10 +2759,14 @@ export class PerpetualsClient {
         if (currentTimestamp.gt(positionAccount.updateTime.add(delay))) {
           priceDiffProfit = new OraclePrice({ price: positionEntryPrice.price.sub(exitOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
           priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-
         } else {
-          priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          if (positionEntryPrice.price.gt(positionAccount.referencePrice.price)){
+            priceDiffProfit = new OraclePrice({ price: positionEntryPrice.price.sub(positionAccount.referencePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          } else {
+            priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          }
         }
       } else {
         priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
@@ -2770,8 +2792,229 @@ export class PerpetualsClient {
       }
     }
   }
-  
-  // ** SYNC  
+
+  /**
+   * Computes all position metrics in a single pass for UI display.
+   * This method consolidates 5 separate SDK calls into one, reducing redundant computation:
+   * - getLockFeeAndUnsettledUsdForPosition()
+   * - getExitFeeSync()
+   * - getPnlSync()
+   * - getLiquidationPriceSync()
+   * - getLeverageSync()
+   *
+   * Key optimizations:
+   * - Single entry/exit price computation (reused across PnL and liquidation)
+   * - No position cloning (pass by reference since we don't modify)
+   * - Side computed once (used by PnL and liquidation)
+   * - Shared fee calculations (lockAndUnsettledFeeUsd used by both PnL display and liquidation)
+   */
+  getPositionMetrics = (
+    positionAccount: PositionAccount,
+    targetTokenPrice: OraclePrice,
+    targetTokenEmaPrice: OraclePrice,
+    targetCustodyAccount: CustodyAccount,
+    collateralPrice: OraclePrice,
+    collateralEmaPrice: OraclePrice,
+    collateralCustodyAccount: CustodyAccount,
+    currentTimestamp: BN,
+    poolConfig: PoolConfig
+  ): PositionMetrics => {
+    // 1. Early return for empty positions
+    if (positionAccount.sizeUsd.isZero() || positionAccount.entryPrice.price.isZero()) {
+      const zeroOraclePrice = OraclePrice.from({
+        price: BN_ZERO,
+        exponent: BN_ZERO,
+        confidence: BN_ZERO,
+        timestamp: BN_ZERO
+      });
+      return {
+        pnl: { profitUsd: BN_ZERO, lossUsd: BN_ZERO },
+        leverage: BN_ZERO,
+        liquidationPrice: zeroOraclePrice,
+        fees: { exitFeeUsd: BN_ZERO, exitFeeAmount: BN_ZERO, lockAndUnsettledFeeUsd: BN_ZERO }
+      };
+    }
+
+    // 2. Get side once (used by multiple calculations)
+    const { side } = poolConfig.getMarketConfigByPk(positionAccount.market);
+
+    // 3. Compute entry oracle price once (used by PnL and liquidation)
+    const entryOraclePrice = OraclePrice.from({
+      price: positionAccount.entryPrice.price,
+      exponent: new BN(positionAccount.entryPrice.exponent),
+      confidence: BN_ZERO,
+      timestamp: BN_ZERO
+    });
+
+    // 4. Compute exit oracle price once (used by PnL calculation)
+    const exitOraclePrice = this.getExitOraclePriceSync(
+      side,
+      targetTokenPrice,
+      targetTokenEmaPrice,
+      targetCustodyAccount,
+      positionAccount.sizeUsd
+    );
+
+    // 5. Compute lock and unsettled fees (used by liquidation and display)
+    const lockAndUnsettledFeeUsd = this.getLockFeeAndUnsettledUsdForPosition(
+      positionAccount,
+      collateralCustodyAccount,
+      currentTimestamp
+    );
+
+    // 6. Compute exit fee
+    const { exitFeeAmount, exitFeeUsd } = this.getExitFeeSync(
+      positionAccount,
+      targetCustodyAccount,
+      collateralCustodyAccount,
+      collateralPrice,
+      collateralEmaPrice
+    );
+
+    // 7. Compute PnL (inline to reuse exitOraclePrice and entryOraclePrice)
+    let pnl: { profitUsd: BN; lossUsd: BN };
+
+    if (!exitOraclePrice.exponent.eq(entryOraclePrice.exponent)) {
+      throw new Error("exponent mismatch");
+    }
+
+    let priceDiffProfit: OraclePrice, priceDiffLoss: OraclePrice;
+    const delay = targetCustodyAccount.pricing.delaySeconds;
+
+    if (isVariant(side, 'long')) {
+      if (exitOraclePrice.price.gt(entryOraclePrice.price)) {
+        if (currentTimestamp.gt(positionAccount.updateTime.add(delay))) {
+          priceDiffProfit = new OraclePrice({ price: exitOraclePrice.price.sub(entryOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: exitOraclePrice.confidence, timestamp: BN_ZERO });
+          priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+        } else {
+          if (positionAccount.referencePrice.price.gt(entryOraclePrice.price)){
+            priceDiffProfit = new OraclePrice({ price: positionAccount.referencePrice.price.sub(entryOraclePrice.price), exponent: entryOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          } else {
+            priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          }
+        }
+      } else {
+        priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+        priceDiffLoss = new OraclePrice({ price: entryOraclePrice.price.sub(exitOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+      }
+    } else {
+      // SHORT
+      if (exitOraclePrice.price.lt(entryOraclePrice.price)) {
+        if (currentTimestamp.gt(positionAccount.updateTime.add(delay))) {
+          priceDiffProfit = new OraclePrice({ price: entryOraclePrice.price.sub(exitOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+        } else {
+          if (entryOraclePrice.price.gt(positionAccount.referencePrice.price)){
+            priceDiffProfit = new OraclePrice({ price: entryOraclePrice.price.sub(positionAccount.referencePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          } else {
+            priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+          }
+        }
+      } else {
+        priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+        priceDiffLoss = new OraclePrice({ price: exitOraclePrice.price.sub(entryOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
+      }
+    }
+
+    if (priceDiffProfit.price.gt(BN_ZERO)) {
+      pnl = {
+        profitUsd: priceDiffProfit.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals),
+        lossUsd: BN_ZERO,
+      };
+    } else {
+      pnl = {
+        profitUsd: BN_ZERO,
+        lossUsd: priceDiffLoss.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals),
+      };
+    }
+
+    // 8. Compute liquidation price (reuse entryOraclePrice, lockAndUnsettledFeeUsd)
+    const liquidationPrice = this.getLiquidationPriceContractHelper(
+      entryOraclePrice,
+      lockAndUnsettledFeeUsd,
+      side,
+      targetCustodyAccount,
+      positionAccount  // Don't clone - we're not modifying
+    );
+
+    // 9. Compute leverage (inline computation to avoid redundant calls)
+    // This reuses pnl and fee values already computed above
+    const unsettledFeesUsd = exitFeeUsd.add(lockAndUnsettledFeeUsd);
+    const lossUsd = pnl.lossUsd.add(unsettledFeesUsd);
+
+    // For existing positions (not initial), we include profit
+    const currentMarginUsd = positionAccount.collateralUsd.add(pnl.profitUsd).sub(lossUsd);
+
+    let leverage: BN;
+    if (currentMarginUsd.gt(BN_ZERO)) {
+      leverage = positionAccount.sizeUsd.mul(new BN(BPS_POWER)).div(currentMarginUsd);
+    } else {
+      leverage = new BN(Number.MAX_SAFE_INTEGER);
+    }
+
+    return {
+      pnl,
+      leverage,
+      liquidationPrice,
+      fees: {
+        exitFeeUsd,
+        exitFeeAmount,
+        lockAndUnsettledFeeUsd
+      }
+    };
+  }
+
+  /**
+   * Batch computation of position metrics for multiple positions.
+   * Useful when updating multiple positions at once to reduce overhead.
+   */
+  getPositionsMetricsBatch = (
+    positions: Array<{
+      positionAccount: PositionAccount;
+      targetCustodyAccount: CustodyAccount;
+      collateralCustodyAccount: CustodyAccount;
+      poolConfig: PoolConfig;
+    }>,
+    priceMap: Map<string, { price: OraclePrice; emaPrice: OraclePrice }>,
+    currentTimestamp: BN
+  ): Map<string, PositionMetrics> => {
+    const results = new Map<string, PositionMetrics>();
+
+    for (const { positionAccount, targetCustodyAccount, collateralCustodyAccount, poolConfig } of positions) {
+      const positionKey = positionAccount.publicKey.toBase58();
+
+      // Get target token prices from map
+      const targetPrices = priceMap.get(targetCustodyAccount.publicKey.toBase58());
+      const collateralPrices = priceMap.get(collateralCustodyAccount.publicKey.toBase58());
+
+      if (!targetPrices || !collateralPrices) {
+        // Skip positions with missing prices
+        continue;
+      }
+
+      const metrics = this.getPositionMetrics(
+        positionAccount,
+        targetPrices.price,
+        targetPrices.emaPrice,
+        targetCustodyAccount,
+        collateralPrices.price,
+        collateralPrices.emaPrice,
+        collateralCustodyAccount,
+        currentTimestamp,
+        poolConfig
+      );
+
+      results.set(positionKey, metrics);
+    }
+
+    return results;
+  }
+
+  // ** SYNC
   // todo: optimise this logic with a boolean for output custody amount
   getSwapAmountAndFeesSync = (
     amountIn: BN,
@@ -8653,6 +8896,5 @@ export class PerpetualsClient {
       },
     );
   }
-
 
 }

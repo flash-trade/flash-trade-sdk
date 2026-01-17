@@ -26,6 +26,7 @@ yarn add flash-sdk
   });
   const perpClient = new PerpetualsClient(provider, programId);
 
+  // NOTE: choose the correct POOL_CONFIG based on the pool you want to interact 
   // flp.1
   const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1','mainnet-beta')
   // flp.2
@@ -34,9 +35,17 @@ yarn add flash-sdk
   // const POOL_CONFIG = PoolConfig.fromIdsByName('Governance.1','mainnet-beta')
   // flp.4
   // const POOL_CONFIG = PoolConfig.fromIdsByName('Community.1','mainnet-beta')
+  // flp.5
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Community.2','mainnet-beta')
+  // flp.7
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Trump.1','mainnet-beta')
+  // flp.8
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Ore.1','mainnet-beta')
+  // flp.r
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Remora.1','mainnet-beta')
 
   const poolAddress = POOL_CONFIG.poolAddress.toBase58()
-  const backupOracleData: any = await (await fetch(`https://beast.flash.trade/api/backup-oracle?poolAddress=${poolAddress}`)).json()
+  const backupOracleData: any = await (await fetch(`https://flash.trade/api/backup-oracle?poolAddress=${poolAddress}`)).json()
   const backUpOracleInstruction = new TransactionInstruction({
       keys: backupOracleData.keys,
       programId: new PublicKey(backupOracleData.programId),
@@ -65,9 +74,13 @@ yarn add flash-sdk
           )
         const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
 
+   let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
     const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...addLiqInstructions ], {
             addLiqAdditionalSigners,
-            alts: perpClient.addressLookupTables,
+            alts: addresslookupTables,
       })
 
     <!--addCompoundingLiquidity (USDC -> FLP.1 )  -->
@@ -99,9 +112,14 @@ yarn add flash-sdk
               true
        )
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
+
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
     const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...removeCompLiqInstructions ], {
             removeCompLiqAdditionalSigners,
-            alts: perpClient.addressLookupTables,
+            alts: addresslookupTables,
       })
 
       <!-- remove Liquidity (sFLP -> USDC) -->
@@ -113,6 +131,11 @@ yarn add flash-sdk
             POOL_CONFIG
        )
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
+    
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
     const txid =  perpClient.sendTransaction([backUpOracleInstruction, setCULimitIx, ...removeLiqInstructions ], {
             removeLiqAdditionalSigners,
             alts: perpClient.addressLookupTables,
@@ -123,6 +146,9 @@ yarn add flash-sdk
     const { instructions: depositStakeInstructions, additionalSigners: depositStakeAdditionalSigners } =
               await perpClient.depositStake(.provider.wallet.publicKey, provider.wallet.publicKey, flpDepositAmount, POOL_CONFIG)
 
+   let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
     const txid =  perpClient.sendTransaction([...depositStakeInstructions ], {
             depositStakeAdditionalSigners,
             alts: perpClient.addressLookupTables,
@@ -135,6 +161,10 @@ yarn add flash-sdk
 
   const { instructions: withdrawStakeInstructions } = await perpClient.withdrawStake(POOL_CONFIG, false)
 
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
   const txid =  perpClient.sendTransaction([...unstakeInstantInstructions, ...withdrawStakeInstructions ], {
           unstakeInstantAdditionalSigners,
           alts: perpClient.addressLookupTables,
@@ -144,6 +174,10 @@ yarn add flash-sdk
   <!-- collect fees -->
 
     const { instructions, additionalSigners } = await perpClient.collectStakeFees('USDC',POOL_CONFIG)
+
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
 
     const txid =  perpClient.sendTransaction([...instructions ], {
               additionalSigners,

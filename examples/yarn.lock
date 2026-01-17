@@ -128,7 +128,7 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@pythnetwork/client@^2.19.0", "@pythnetwork/client@^2.22.0":
+"@pythnetwork/client@^2.22.0":
   version "2.22.0"
   resolved "https://registry.yarnpkg.com/@pythnetwork/client/-/client-2.22.0.tgz#826d349bd24f809b5f3baf59b035fb7a13035172"
   integrity sha512-Cyv23YqewKUL1pcm99jfmdetUa2aaUXjyRF9jvSeFcY895FddRu7uSWftYiaevsnx7vn4WbJgQR6ExxH+aONow==
@@ -841,13 +841,12 @@ file-uri-to-path@1.0.0:
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
   integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
 
-flash-sdk@9.9.0-alpha.0:
-  version "9.9.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-9.9.0-alpha.0.tgz#d772d29390223a8389136f7c3cc1d960df76829e"
-  integrity sha512-mweb+iNmb3wWayGjUHpS5YZK274tkPHdT+pkiyrs5AkxfrJWmIm1bSAXnuocL6l5xTNQNy0p/s3FCY8WpV4g3w==
+flash-sdk@^11.8.1:
+  version "11.8.1"
+  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-11.8.1.tgz#e8e3d0f56dba3d5f475746c17fd04e2aa1132345"
+  integrity sha512-riRUl/vHcvxI2v+/dDglst650BnPaA3q8CqR8vXLC1DZNIwNDQSL+Wjw261Kmx/E83DEHS6tRocUOUAiuP6NoA==
   dependencies:
     "@coral-xyz/anchor" "=0.27.0"
-    "@pythnetwork/client" "^2.19.0"
     "@pythnetwork/price-service-client" "^1.8.2"
     "@solana/spl-token" "^0.4.13"
     "@solana/web3.js" "=1.98.2"
@@ -855,29 +854,6 @@ flash-sdk@9.9.0-alpha.0:
     bignumber.js "^9.1.2"
     bs58 "^5.0.0"
     dotenv "^16.3.1"
-    fs "^0.0.1-security"
-    js-sha256 "^0.9.0"
-    jsbi "^4"
-    node-fetch "^3.3.0"
-    rimraf "^5.0.1"
-    ts-node "^10.9.1"
-    tweetnacl "^1.0.3"
-
-flash-sdk@^11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-11.1.1.tgz#e3f05c94f99de3055a16955fbc856f6fcbb1d6cd"
-  integrity sha512-M55HYPgYVWGVcwlM/bDPemqJqf5jAS4uOrBJC2jcqejUtVpl+AHLfT6XxPlWIhKMqoC+ONpX4kzFAXXJQ+Tlbw==
-  dependencies:
-    "@coral-xyz/anchor" "=0.27.0"
-    "@pythnetwork/client" "^2.19.0"
-    "@pythnetwork/price-service-client" "^1.8.2"
-    "@solana/spl-token" "^0.4.13"
-    "@solana/web3.js" "=1.98.2"
-    "@types/node" "^20.0.0"
-    bignumber.js "^9.1.2"
-    bs58 "^5.0.0"
-    dotenv "^16.3.1"
-    flash-sdk "9.9.0-alpha.0"
     fs "^0.0.1-security"
     js-sha256 "^0.9.0"
     jsbi "^4"

@@ -2,10 +2,28 @@ import dotenv from 'dotenv';
 import { BN_ZERO, BPS_DECIMALS, CustodyAccount, getUnixTs, OraclePrice, PerpetualsClient, PoolAccount, PoolConfig, PoolDataClient, PositionAccount, Privilege, Side, uiDecimalsToNative } from 'flash-sdk';
 dotenv.config();
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
-import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connection } from '@solana/web3.js';
+import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, Connection, AddressLookupTableAccount } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
 import { PriceData, PythHttpClient, getPythProgramKeyForCluster } from '@pythnetwork/client';
 
+
+// NOTE: choose the correct POOL_CONFIG based on the pool you want to interact 
+  // flp.1
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1','mainnet-beta')
+  // flp.2
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Virtual.1','mainnet-beta')
+  // flp.3
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Governance.1','mainnet-beta')
+  // flp.4
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Community.1','mainnet-beta')
+  // flp.5
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Community.2','mainnet-beta')
+  // flp.7
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Trump.1','mainnet-beta')
+  // flp.8
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Ore.1','mainnet-beta')
+  // flp.r
+  // const POOL_CONFIG = PoolConfig.fromIdsByName('Remora.1','mainnet-beta')
 
 // export const POOL_CONFIG = PoolConfig.fromIdsByName('Ore.1', 'mainnet-beta');
 export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
@@ -127,7 +145,7 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
         inputTokenPrice,
         inputTokenPriceEma,
         CustodyAccount.from(inputCustody.custodyAccount, custodies[0]!),
-        uiDecimalsToNative(`5`, 2)
+        BN_ZERO // discountBps
     )
 
     const openPositionData = await flashClient.openPosition(
@@ -147,14 +165,21 @@ const openPosition = async (inputTokenSymbol: string, outputTokenSymbol: string,
     instructions.push(...openPositionData.instructions)
     additionalSigners.push(...openPositionData.additionalSigners)
 
-    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) // addLiquidity
+    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) // open position
     const setCUPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: 20
+        microLamports: 50
     })
 
-    const trxId = await flashClient.sendTransaction([setCULimitIx, setCUPriceIx, ...instructions])
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
 
-    console.log('trx :>> ', trxId);
+    const trxId = await flashClient.sendTransaction([setCULimitIx, setCUPriceIx, ...instructions], { 
+        alts : addresslookupTables
+    })
+
+    console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
+    // console.log('trx dev:>> ',  `: https://explorer.solana.com/tx/${trxId}?cluster=devnet`);
 }
 
 // openPosition('SOL', 'SOL', '0.1', Side.Long)
@@ -189,8 +214,16 @@ const closePosition = async (targetTokenSymbol: string, side: Side) => {
     additionalSigners.push(...openPositionData.additionalSigners)
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) // addLiquidity
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
-    console.log('trxId :>> ', trxId);
+
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+    
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], { 
+        alts : addresslookupTables
+    })
+    console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
+    // console.log('trx dev:>> ',  `: https://explorer.solana.com/tx/${trxId}?cluster=devnet`);
 }
 
 // closePosition('BTC', Side.Long);
@@ -265,7 +298,7 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
         ouputCustodyAccount,
         lpStats.totalPoolValueUsd,
         POOL_CONFIG,
-        uiDecimalsToNative(`${5}`, 2)
+         BN_ZERO // discountBps //uiDecimalsToNative(`${5}`, 2)
     )
 
 
@@ -287,10 +320,18 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
     instructions.push(...openPositionData.instructions)
     additionalSigners.push(...openPositionData.additionalSigners)
 
-    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) // addLiquidity
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
+    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) 
+    
+    let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
 
-    console.log('trx :>> ', trxId);
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions] ,{ 
+        alts : addresslookupTables
+    })
+
+     console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
+    // console.log('trx dev:>> ',  `: https://explorer.solana.com/tx/${trxId}?cluster=devnet`);
 }
 
 const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingTokenSymbol: string) => {  
@@ -350,9 +391,17 @@ const closePositionWithSwap = async ( positionPubKey : PublicKey, userRecievingT
     additionalSigners.push(...closePositionWithSwapData.additionalSigners)
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) // addLiquidity
-    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions])
 
-    console.log('trx :>> ', trxId);
+     let addresslookupTables: AddressLookupTableAccount[] = (
+            await flashClient.getOrLoadAddressLookupTable(POOL_CONFIG)
+    ).addressLookupTables
+
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], { 
+        alts : addresslookupTables
+    })
+
+    console.log('trx main :>> ',  `: https://explorer.solana.com/tx/${trxId}`);
+    // console.log('trx dev:>> ',  `: https://explorer.solana.com/tx/${trxId}?cluster=devnet`);
 }
 
 
@@ -380,9 +429,12 @@ const getLiquidationPrice = async (positionPubKey : PublicKey) => {
 
     console.log(" testing... uncomment below to test");
 
-    //  await openPosition('SOL', 'SOL', '0.1', Side.Long)
+
+  // NOTE: choose the correct POOL_CONFIG based on the pool you want to interact (check readme)
+
+     await openPosition('SOL', 'SOL', '0.3', Side.Long)
     //  await openPosition('ORE', 'ORE', '1', Side.Long)
-    //  console.log("openPosition done");
+     console.log("openPosition done");
 
     // await closePosition('SOL', Side.Long);
     // console.log("closePosition done");
