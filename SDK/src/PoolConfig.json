@@ -564,9 +564,9 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "lazerId": 2691,
-          "pythTicker": "Commodities.WTIG6/USD",
-          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52",
+          "lazerId": 2692,
+          "pythTicker": "Commodities.WTIH6/USD",
+          "pythPriceId": "0x0058c6f03fd28b18083d00fcdc3baaed2f11edef8b981f6b74130b85be474b17",
           "isToken2022": false
         },
         {
@@ -681,10 +681,10 @@
           "isStable": false,
           "isVirtual": true,
           "intOracleAddress": "5qLQ3BT7JCf4fUxoAH1xZwHCca9fZuuTWTgTsNxLNcoZ",
-          "extOracleAddress": "8nMThr5gWoXaoWHR3gMXrz8ZULukjsBgoW83kuYCDzqG",
-          "lazerId": 2691, 
-          "pythTicker": "Commodities.WTIG6/USD",
-          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52"
+          "extOracleAddress": "Gf9Cg2NS2xfsxLXixjsfAsQkeH1UxN2WVA7dRzKoacYk",
+          "lazerId": 2692, 
+          "pythTicker": "Commodities.WTIH6/USD",
+          "pythPriceId": "0x0058c6f03fd28b18083d00fcdc3baaed2f11edef8b981f6b74130b85be474b17"
         },
         {
           "custodyId": 7,
@@ -3031,9 +3031,9 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": true,
-          "lazerId": 2691,
-          "pythTicker": "Commodities.WTIG6/USD",
-          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52",
+          "lazerId": 2692,
+          "pythTicker": "Commodities.WTIH6/USD",
+          "pythPriceId": "0x0058c6f03fd28b18083d00fcdc3baaed2f11edef8b981f6b74130b85be474b17",
           "isToken2022": false
         },
         {
@@ -3148,10 +3148,10 @@
           "isStable": false,
           "isVirtual": true,
           "intOracleAddress": "BeqYMCytDcEJrpikXhz8ZLaBb9ACGDVvmp9ekwbgBgma",
-          "extOracleAddress": "8nMThr5gWoXaoWHR3gMXrz8ZULukjsBgoW83kuYCDzqG",
-          "lazerId": 2691, 
-          "pythTicker": "Commodities.WTIG6/USD",
-          "pythPriceId": "0x7e91242dfd2cea64715b26edaa3e51bafc712a56ac4228a77bd53b51fd66db52"
+          "extOracleAddress": "Gf9Cg2NS2xfsxLXixjsfAsQkeH1UxN2WVA7dRzKoacYk",
+          "lazerId": 2692, 
+          "pythTicker": "Commodities.WTIH6/USD",
+          "pythPriceId": "0x0058c6f03fd28b18083d00fcdc3baaed2f11edef8b981f6b74130b85be474b17"
         },
         {
           "custodyId": 7,
