@@ -283,6 +283,8 @@ const removeFlpLiquidity = async () => {
 
 
 const getLpTokenPrices = async () => {
+    await flashClient.loadAddressLookupTable(POOL_CONFIG)
+    
     const stakedLpPrice = await flashClient.getStakedLpTokenPrice(POOL_CONFIG.poolAddress, POOL_CONFIG); // sFLP price
     const compoundingLPTokenPrice = await flashClient.getCompoundingLPTokenPrice(POOL_CONFIG.poolAddress, POOL_CONFIG); // FLP price
 
@@ -306,6 +308,6 @@ const getLpTokenPrices = async () => {
     // await removeFlpLiquidity()
     //  console.log("removeFlpLiquidity done");
 
-    //  await getLpTokenPrices()
-    // console.log("getLpTokenPrices done");
+     await getLpTokenPrices()
+    console.log("getLpTokenPrices done");
 })()
