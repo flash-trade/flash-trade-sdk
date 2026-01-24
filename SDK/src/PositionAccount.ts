@@ -23,7 +23,7 @@ export class PositionAccount implements Position {
     public lockedAmount: BN;
     public lockedUsd: BN;
 
-    public collateralAmount: BN;
+    public priceImpactUsd: BN;
     public collateralUsd: BN;
 
     public unsettledValueUsd: BN;
@@ -33,13 +33,15 @@ export class PositionAccount implements Position {
 
     public degenSizeUsd: BN;
     public referencePrice: ContractOraclePrice;
-    public buffer: number;
-    
+
+    public buffer: number[];
+    public priceImpactSet: boolean;
+
     public sizeDecimals: number;
     public lockedDecimals: number;
     public collateralDecimals: number;
 
-    // extra 
+    // extra
     public bump: number
     public padding: number[];
 

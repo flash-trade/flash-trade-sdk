@@ -21,6 +21,7 @@ export type Fees = Types["Fees"];
 export type BorrowRateParams = Types["BorrowRateParams"];
 export type TokenRatios = Types["TokenRatios"];
 export type SetCustomOraclePriceParams = Types["SetCustomOraclePriceParams"];
+export type SetPositionPriceImpactParams = Types["SetPositionPriceImpactParams"];
 export type AmountAndFee = Types["AmountAndFee"];
 export type NewPositionPricesAndFee = Types["NewPositionPricesAndFee"];
 export type PriceAndFee = Types["PriceAndFee"];
@@ -251,7 +252,7 @@ export const DEFAULT_POSITION : Position = {
     lockedAmount: BN_ZERO,
     lockedUsd: BN_ZERO,
 
-    collateralAmount: BN_ZERO,
+    priceImpactUsd: BN_ZERO,
     collateralUsd: BN_ZERO,
 
     unsettledValueUsd: BN_ZERO,
@@ -261,7 +262,9 @@ export const DEFAULT_POSITION : Position = {
 
     degenSizeUsd: BN_ZERO,
     referencePrice: { price : BN_ZERO, exponent: 0},
-    buffer: 0,
+
+    buffer: [0, 0, 0],
+    priceImpactSet: false,
 
     sizeDecimals : 0,
     lockedDecimals : 0,

@@ -1711,6 +1711,39 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setPositionPriceImpact",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetPositionPriceImpactParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "setLpTokenPrice",
       "accounts": [
         {
@@ -1849,227 +1882,6 @@ export type Perpetuals = {
         }
       ],
       "returns": "u8"
-    },
-    {
-      "name": "migrateXauPosition",
-      "accounts": [
-        {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oldPosition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldMarket",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldCollateralCustody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldCollateralOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "newPosition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newMarket",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newCollateralCustody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newCollateralOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ixSysvar",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "MigrateXauPositionParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "migrateXauOrder",
-      "accounts": [
-        {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "oldOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "newOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ixSysvar",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "MigrateXauOrderParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "swapRemainingFee",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardCustody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardCustodyOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rewardCustodyTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custodyOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "custodyTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ixSysvar",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "SwapRemainingFeeParams"
-          }
-        }
-      ]
     },
     {
       "name": "testInit",
@@ -7923,7 +7735,7 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "collateralAmount",
+            "name": "priceImpactUsd",
             "type": "u64"
           },
           {
@@ -7954,7 +7766,16 @@ export type Perpetuals = {
           },
           {
             "name": "buffer",
-            "type": "u32"
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          },
+          {
+            "name": "priceImpactSet",
+            "type": "bool"
           },
           {
             "name": "sizeDecimals",
@@ -9362,20 +9183,6 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "MigrateXauOrderParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "MigrateXauPositionParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "OpenPositionParams",
       "type": {
         "kind": "struct",
@@ -9933,6 +9740,18 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "SetPositionPriceImpactParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceImpactUsd",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SetProtocolFeeShareParams",
       "type": {
         "kind": "struct",
@@ -10081,13 +9900,6 @@ export type Perpetuals = {
     },
     {
       "name": "SwapFeeInternalParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "SwapRemainingFeeParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -12176,11 +11988,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -12511,11 +12328,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -13071,11 +12893,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -14376,11 +14203,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -14681,11 +14513,16 @@ export type Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -15473,66 +15310,6 @@ export type Perpetuals = {
         {
           "name": "compoundingPriceUsd",
           "type": "u64",
-          "index": false
-        }
-      ]
-    },
-    {
-      "name": "MigrateXauPositionLog",
-      "fields": [
-        {
-          "name": "owner",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "market",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "position",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "entryPrice",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "entryPriceExponent",
-          "type": "i32",
-          "index": false
-        },
-        {
-          "name": "sizeAmount",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "sizeUsd",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralAmount",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralUsd",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralPrice",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralPriceExponent",
-          "type": "i32",
           "index": false
         }
       ]
@@ -16663,6 +16440,36 @@ export type Perpetuals = {
         {
           "name": "tokenOutPriceExponent",
           "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SetPositionPriceImpactLog",
+      "fields": [
+        {
+          "name": "position",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
           "index": false
         }
       ]
@@ -18333,6 +18140,11 @@ export type Perpetuals = {
       "code": 6061,
       "name": "InsufficientRebateReserves",
       "msg": "Insufficient rebate reserves"
+    },
+    {
+      "code": 6062,
+      "name": "OraclePenaltyAlreadySet",
+      "msg": "Oracle penalty already set on this position"
     }
   ]
 };
@@ -20050,6 +19862,39 @@ export const IDL: Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setPositionPriceImpact",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "position",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "program",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "SetPositionPriceImpactParams"
+          }
+        }
+      ]
+    },
+    {
       "name": "setLpTokenPrice",
       "accounts": [
         {
@@ -20188,227 +20033,6 @@ export const IDL: Perpetuals = {
         }
       ],
       "returns": "u8"
-    },
-    {
-      "name": "migrateXauPosition",
-      "accounts": [
-        {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oldPosition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldMarket",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldCollateralCustody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldCollateralOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "newPosition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newMarket",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newCollateralCustody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newCollateralOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ixSysvar",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "MigrateXauPositionParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "migrateXauOrder",
-      "accounts": [
-        {
-          "name": "feePayer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "oldOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oldMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "newOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ixSysvar",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "MigrateXauOrderParams"
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "swapRemainingFee",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpetuals",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardCustody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rewardCustodyOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rewardCustodyTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custody",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "custodyOracleAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "custodyTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ixSysvar",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "SwapRemainingFeeParams"
-          }
-        }
-      ]
     },
     {
       "name": "testInit",
@@ -26262,7 +25886,7 @@ export const IDL: Perpetuals = {
             "type": "u64"
           },
           {
-            "name": "collateralAmount",
+            "name": "priceImpactUsd",
             "type": "u64"
           },
           {
@@ -26293,7 +25917,16 @@ export const IDL: Perpetuals = {
           },
           {
             "name": "buffer",
-            "type": "u32"
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          },
+          {
+            "name": "priceImpactSet",
+            "type": "bool"
           },
           {
             "name": "sizeDecimals",
@@ -27701,20 +27334,6 @@ export const IDL: Perpetuals = {
       }
     },
     {
-      "name": "MigrateXauOrderParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "MigrateXauPositionParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "OpenPositionParams",
       "type": {
         "kind": "struct",
@@ -28272,6 +27891,18 @@ export const IDL: Perpetuals = {
       }
     },
     {
+      "name": "SetPositionPriceImpactParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceImpactUsd",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SetProtocolFeeShareParams",
       "type": {
         "kind": "struct",
@@ -28420,13 +28051,6 @@ export const IDL: Perpetuals = {
     },
     {
       "name": "SwapFeeInternalParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "SwapRemainingFeeParams",
       "type": {
         "kind": "struct",
         "fields": []
@@ -30515,11 +30139,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -30850,11 +30479,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -31410,11 +31044,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -32715,11 +32354,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -33020,11 +32664,16 @@ export const IDL: Perpetuals = {
           "index": false
         },
         {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "padding",
           "type": {
             "array": [
               "u64",
-              4
+              3
             ]
           },
           "index": false
@@ -33812,66 +33461,6 @@ export const IDL: Perpetuals = {
         {
           "name": "compoundingPriceUsd",
           "type": "u64",
-          "index": false
-        }
-      ]
-    },
-    {
-      "name": "MigrateXauPositionLog",
-      "fields": [
-        {
-          "name": "owner",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "market",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "position",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "entryPrice",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "entryPriceExponent",
-          "type": "i32",
-          "index": false
-        },
-        {
-          "name": "sizeAmount",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "sizeUsd",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralAmount",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralUsd",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralPrice",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "collateralPriceExponent",
-          "type": "i32",
           "index": false
         }
       ]
@@ -35002,6 +34591,36 @@ export const IDL: Perpetuals = {
         {
           "name": "tokenOutPriceExponent",
           "type": "i32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "SetPositionPriceImpactLog",
+      "fields": [
+        {
+          "name": "position",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "market",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "priceImpactUsd",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "padding",
+          "type": {
+            "array": [
+              "u64",
+              4
+            ]
+          },
           "index": false
         }
       ]
@@ -36672,6 +36291,11 @@ export const IDL: Perpetuals = {
       "code": 6061,
       "name": "InsufficientRebateReserves",
       "msg": "Insufficient rebate reserves"
+    },
+    {
+      "code": 6062,
+      "name": "OraclePenaltyAlreadySet",
+      "msg": "Oracle penalty already set on this position"
     }
   ]
 };

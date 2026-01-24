@@ -64,6 +64,9 @@ export interface PositionMetrics {
   pnl: {
     profitUsd: BN;
     lossUsd: BN;
+    priceImpactUsd: BN;  // Price impact deducted from profit (direct USD amount)
+    maxPriceImpactUsd: BN; // Max possible price impact (direct USD amount)
+    netProfitUsd: BN;
   };
   leverage: BN;
   liquidationPrice: OraclePrice;
@@ -942,7 +945,8 @@ export class PerpetualsClient {
     if (isInitial){
       currentMarginUsd = positionAccount.collateralUsd.sub(lossUsd);
     } else {
-      currentMarginUsd = positionAccount.collateralUsd.add(pnl.profitUsd).sub(lossUsd);
+      // Use netProfitUsd (profit after oracle penalty) for margin calculation
+      currentMarginUsd = positionAccount.collateralUsd.add(pnl.netProfitUsd).sub(lossUsd);
     }
     
 
@@ -1362,7 +1366,7 @@ export class PerpetualsClient {
       throw new Error("Delta Amounts cannot be negative ")
     }
 
-    if (resultingPositionAccount.collateralAmount.isNeg() || resultingPositionAccount.sizeAmount.isNeg()) {
+    if (resultingPositionAccount.collateralUsd.isNeg() || resultingPositionAccount.sizeAmount.isNeg()) {
       throw new Error("cannot remove/close more than collateral/Size")
     }
 
@@ -1764,8 +1768,9 @@ export class PerpetualsClient {
 
     const currentCollateralUsd = positionDelta.collateralUsd
     const liabilityUsd = newPnl.lossUsd.add(totalFeesUsd)
+    // Use netProfitUsd (profit after oracle penalty) for decrease size calculation
     const assetsUsd = BN.min(
-      newPnl.profitUsd.add(currentCollateralUsd),
+      newPnl.netProfitUsd.add(currentCollateralUsd),
       collateralMinMaxPrice.max.getAssetAmountUsd(positionDelta.lockedAmount, collateralCustodyAccount.decimals)
     )
 
@@ -1989,10 +1994,12 @@ export class PerpetualsClient {
     const newPnl = this.getPnlSync(position, targetPrice, targetEmaPrice, targetCustodyAccount, collateralPrice, collateralEmaPrice, collateralCustodyAccount, currentTimestamp, targetCustodyAccount.pricing.delaySeconds, poolConfig)
 
     // includes exit fee, borrow fee and unsettled fee
+    // Compute collateral amount from collateral USD since collateralAmount field was removed
+    const collateralAmount = collateralPrice.getTokenAmount(positionAccount.collateralUsd, collateralCustodyAccount.decimals);
     const exitPriceAndFee: ExitPriceAndFee = this.getExitPriceAndFeeSync(
       positionAccount,
       marketCorrelation,
-      positionAccount.collateralAmount,
+      collateralAmount,
       positionAccount.sizeAmount,
       side,
       targetPrice,
@@ -2006,7 +2013,8 @@ export class PerpetualsClient {
 
     const totalFeesUsd = (exitPriceAndFee.exitFeeUsd.add(exitPriceAndFee.borrowFeeUsd))
     const liabilityUsd = newPnl.lossUsd.add(totalFeesUsd)
-    const assetsUsd = BN.min(newPnl.profitUsd.add(positionAccount.collateralUsd), collateralMinMaxPrice.max.getAssetAmountUsd(positionAccount.lockedAmount, collateralCustodyAccount.decimals))
+    // Use netProfitUsd (profit after oracle penalty) for close amount calculation
+    const assetsUsd = BN.min(newPnl.netProfitUsd.add(positionAccount.collateralUsd), collateralMinMaxPrice.max.getAssetAmountUsd(positionAccount.lockedAmount, collateralCustodyAccount.decimals))
 
     let closeAmountUsd: BN, feesAmountUsd: BN
     if (assetsUsd.gt(liabilityUsd)) {
@@ -2671,7 +2679,7 @@ export class PerpetualsClient {
     currentTimestamp: BN,
     delay: BN,
     poolConfig: PoolConfig
-  ): { profitUsd: BN, lossUsd: BN } => {
+  ): { profitUsd: BN, lossUsd: BN, priceImpactUsd: BN, maxPriceImpactUsd: BN, netProfitUsd: BN } => {
     return this.getPnlContractHelper(
       positionAccount,
       targetTokenPrice,
@@ -2698,13 +2706,19 @@ export class PerpetualsClient {
     delay: BN,
     poolConfig: PoolConfig
   ): {
-    profitUsd: BN,
+    profitUsd: BN,        // Gross profit (before price impact)
     lossUsd: BN,
+    priceImpactUsd: BN,   // Price impact deducted from profit (direct USD amount, capped to profit)
+    maxPriceImpactUsd : BN,    // Maximum possible price impact based on position (for informational purposes)
+    netProfitUsd: BN,     // Profit after price impact (profitUsd - priceImpactUsd)
   } => {
     if (positionAccount.sizeUsd.isZero() || positionAccount.entryPrice.price.isZero()) {
       return {
         profitUsd: BN_ZERO,
         lossUsd: BN_ZERO,
+        priceImpactUsd: BN_ZERO,
+        maxPriceImpactUsd: BN_ZERO,
+        netProfitUsd: BN_ZERO
       }
     }
 
@@ -2779,16 +2793,35 @@ export class PerpetualsClient {
       throw new Error("exponent mistach")
     }
 
+    const maxPriceImpactUsd = positionAccount.priceImpactUsd
 
+    // Apply price impact to profit
+    // priceImpactUsd is stored directly on position (no BPS calculation needed)
     if (priceDiffProfit.price.gt(BN_ZERO)) {
+      const grossProfitUsd = priceDiffProfit.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals);
+
+      // Cap price impact to profit amount (can't lose more than profit)
+      const priceImpactUsd = positionAccount.priceImpactUsd.gt(BN_ZERO)
+        ? BN.min(positionAccount.priceImpactUsd, grossProfitUsd)
+        : BN_ZERO;
+
+      const netProfitUsd = grossProfitUsd.sub(priceImpactUsd);
+
       return {
-        profitUsd: priceDiffProfit.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals),
+        profitUsd: grossProfitUsd,
         lossUsd: BN_ZERO,
+        priceImpactUsd,
+        maxPriceImpactUsd,
+        netProfitUsd,
       }
     } else {
+      // loss
       return {
         profitUsd: BN_ZERO,
         lossUsd: priceDiffLoss.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals),
+        priceImpactUsd: BN_ZERO,
+        maxPriceImpactUsd,
+        netProfitUsd: BN_ZERO,
       }
     }
   }
@@ -2828,7 +2861,7 @@ export class PerpetualsClient {
         timestamp: BN_ZERO
       });
       return {
-        pnl: { profitUsd: BN_ZERO, lossUsd: BN_ZERO },
+        pnl: { profitUsd: BN_ZERO, lossUsd: BN_ZERO, priceImpactUsd: BN_ZERO, maxPriceImpactUsd: BN_ZERO, netProfitUsd: BN_ZERO },
         leverage: BN_ZERO,
         liquidationPrice: zeroOraclePrice,
         fees: { exitFeeUsd: BN_ZERO, exitFeeAmount: BN_ZERO, lockAndUnsettledFeeUsd: BN_ZERO }
@@ -2872,65 +2905,32 @@ export class PerpetualsClient {
     );
 
     // 7. Compute PnL (inline to reuse exitOraclePrice and entryOraclePrice)
-    let pnl: { profitUsd: BN; lossUsd: BN };
+    let pnl: { profitUsd: BN; lossUsd: BN; priceImpactUsd: BN; maxPriceImpactUsd: BN; netProfitUsd: BN };
 
     if (!exitOraclePrice.exponent.eq(entryOraclePrice.exponent)) {
       throw new Error("exponent mismatch");
     }
 
-    let priceDiffProfit: OraclePrice, priceDiffLoss: OraclePrice;
-    const delay = targetCustodyAccount.pricing.delaySeconds;
-
-    if (isVariant(side, 'long')) {
-      if (exitOraclePrice.price.gt(entryOraclePrice.price)) {
-        if (currentTimestamp.gt(positionAccount.updateTime.add(delay))) {
-          priceDiffProfit = new OraclePrice({ price: exitOraclePrice.price.sub(entryOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: exitOraclePrice.confidence, timestamp: BN_ZERO });
-          priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-        } else {
-          if (positionAccount.referencePrice.price.gt(entryOraclePrice.price)){
-            priceDiffProfit = new OraclePrice({ price: positionAccount.referencePrice.price.sub(entryOraclePrice.price), exponent: entryOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          } else {
-            priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          }
-        }
-      } else {
-        priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-        priceDiffLoss = new OraclePrice({ price: entryOraclePrice.price.sub(exitOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-      }
-    } else {
-      // SHORT
-      if (exitOraclePrice.price.lt(entryOraclePrice.price)) {
-        if (currentTimestamp.gt(positionAccount.updateTime.add(delay))) {
-          priceDiffProfit = new OraclePrice({ price: entryOraclePrice.price.sub(exitOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-        } else {
-          if (entryOraclePrice.price.gt(positionAccount.referencePrice.price)){
-            priceDiffProfit = new OraclePrice({ price: entryOraclePrice.price.sub(positionAccount.referencePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          } else {
-            priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-            priceDiffLoss = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-          }
-        }
-      } else {
-        priceDiffProfit = new OraclePrice({ price: BN_ZERO, exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-        priceDiffLoss = new OraclePrice({ price: exitOraclePrice.price.sub(entryOraclePrice.price), exponent: exitOraclePrice.exponent, confidence: BN_ZERO, timestamp: BN_ZERO });
-      }
-    }
-
-    if (priceDiffProfit.price.gt(BN_ZERO)) {
-      pnl = {
-        profitUsd: priceDiffProfit.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals),
-        lossUsd: BN_ZERO,
-      };
-    } else {
-      pnl = {
-        profitUsd: BN_ZERO,
-        lossUsd: priceDiffLoss.getAssetAmountUsd(positionAccount.sizeAmount, positionAccount.sizeDecimals),
-      };
-    }
+    const pnlResult = this.getPnlContractHelper(
+      positionAccount,
+      targetTokenPrice,
+      targetTokenEmaPrice,    
+      targetCustodyAccount,
+      collateralPrice,
+      collateralEmaPrice,
+      collateralCustodyAccount,
+      currentTimestamp,
+      targetCustodyAccount.pricing.delaySeconds,
+      poolConfig
+    );
+    
+    pnl = {
+      profitUsd: pnlResult.profitUsd,
+      lossUsd: pnlResult.lossUsd,
+      priceImpactUsd: pnlResult.priceImpactUsd,
+      maxPriceImpactUsd: pnlResult.maxPriceImpactUsd,
+      netProfitUsd: pnlResult.netProfitUsd
+    };
 
     // 8. Compute liquidation price (reuse entryOraclePrice, lockAndUnsettledFeeUsd)
     const liquidationPrice = this.getLiquidationPriceContractHelper(
@@ -2946,8 +2946,8 @@ export class PerpetualsClient {
     const unsettledFeesUsd = exitFeeUsd.add(lockAndUnsettledFeeUsd);
     const lossUsd = pnl.lossUsd.add(unsettledFeesUsd);
 
-    // For existing positions (not initial), we include profit
-    const currentMarginUsd = positionAccount.collateralUsd.add(pnl.profitUsd).sub(lossUsd);
+    // For existing positions (not initial), we include net profit (after price impact)
+    const currentMarginUsd = positionAccount.collateralUsd.add(pnl.netProfitUsd).sub(lossUsd);
 
     let leverage: BN;
     if (currentMarginUsd.gt(BN_ZERO)) {
@@ -8895,6 +8895,2109 @@ export class PerpetualsClient {
         ...opts,
       },
     );
+  }
+
+
+  ///////
+  // admin instruction
+
+  swap = async (
+    userInputTokenSymbol: string,
+    userOutputTokenSymbol: string,
+    amountIn: BN,
+    minAmountOut: BN,
+    poolConfig: PoolConfig,
+    useFeesPool = false,
+    createUserATA = true, //create new ATA for USER in the end
+    unWrapSol = false,
+    skipBalanceChecks = false,
+    ephemeralSignerPubkey = undefined, // for Squads wallet
+    isWhitelistedUser = false
+  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+
+
+    const userInputCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(userInputTokenSymbol).mintKey))!;
+    if (!userInputCustodyConfig) {
+      throw "userInputCustodyConfig not found";
+    }
+    const userOutputCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(userOutputTokenSymbol).mintKey))!;
+    if (!userOutputCustodyConfig) {
+      throw "userOutputCustodyConfig not found";
+    }
+    let publicKey = this.provider.wallet.publicKey;
+    let wrappedSolAccount: Keypair | undefined;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    let userOutputTokenAccount : PublicKey;
+    let userInputTokenAccount : PublicKey;
+
+    // SIMPLE WRAP AND UNWRAP
+      if (userInputTokenSymbol == 'SOL' && userOutputTokenSymbol == 'WSOL') {
+          // way one : wrap all SOl 
+          const wsolAssociatedTokenAccount = await getAssociatedTokenAddress(
+            NATIVE_MINT,
+            publicKey,
+            true
+          );
+          const wsolATAExist = await checkIfAccountExists(wsolAssociatedTokenAccount, this.provider.connection)
+          if (!wsolATAExist) {
+            instructions.push(
+              createAssociatedTokenAccountInstruction(
+                publicKey,
+                wsolAssociatedTokenAccount,
+                publicKey,
+                NATIVE_MINT
+              )
+            );
+          }
+
+          if(!skipBalanceChecks){
+            let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
+            if (unWrappedSolBalance.lt(amountIn)) {
+              throw "Insufficient SOL Funds"
+            }
+          }
+            instructions.push(
+              SystemProgram.transfer({
+                fromPubkey: publicKey,
+                toPubkey: wsolAssociatedTokenAccount,
+                lamports: amountIn.toNumber(), // IS IT SAFE TO PUT AS NUMBER ?
+              }),
+              createSyncNativeInstruction(wsolAssociatedTokenAccount)
+            );
+            // return
+            return {
+              instructions: [...preInstructions, ...instructions, ...postInstructions],
+              additionalSigners
+            };
+      }
+      if (userInputTokenSymbol == 'WSOL' && userOutputTokenSymbol == 'SOL') {
+        // SOL is only retrievable by closing the token account and choosing the desired address to send the token account's lamports.
+        //  NOTE : ONLY WAY HERE TO CLOSE THE WSOL ATA and GET ALL SOL 
+        console.log("WSOL=> SOL : NOTE : ONLY WAY IS TO CLOSE THE WSOL ATA and GET ALL SOL ")
+        const wsolAssociatedTokenAccount =  getAssociatedTokenAddressSync(
+          NATIVE_MINT,
+          publicKey,
+          true
+        );
+        const closeWsolATAIns = createCloseAccountInstruction(wsolAssociatedTokenAccount, publicKey, publicKey);
+        instructions.push(closeWsolATAIns);
+        // return
+        return {
+          instructions: [...preInstructions, ...instructions, ...postInstructions],
+          additionalSigners
+        };
+      }
+    
+      // ========================================================
+    // COMPLEX SWAP PART
+    try {
+
+      // ======= CHECK FOR INPUT TOKENS 
+
+      // handle Wrapping of SOL if user input token is SOL
+      if (userInputTokenSymbol == 'SOL') {
+        console.log("userInputTokenSymbol === sol", userInputTokenSymbol);
+
+        const accCreationLamports = (await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+        console.log("accCreationLamports:", accCreationLamports)
+        const lamports = amountIn.add(new BN(accCreationLamports)); // for account creation
+
+        // CHECK BASIC SOL BALANCE
+        let unWrappedSolBalance = new BN(await this.provider.connection.getBalance(publicKey));
+        if (unWrappedSolBalance.lt(amountIn)) {
+          throw "Insufficient SOL Funds"
+        }
+
+        if(!ephemeralSignerPubkey){
+          wrappedSolAccount = new Keypair();
+          additionalSigners.push(wrappedSolAccount);
+        };
+
+        preInstructions = [
+          SystemProgram.createAccount({
+            fromPubkey: publicKey,
+            newAccountPubkey: (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey),
+            lamports: lamports.toNumber(), //will this break for large amounts ??
+            space: 165,
+            programId: TOKEN_PROGRAM_ID,
+          }),
+          createInitializeAccount3Instruction(
+            (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey),
+            NATIVE_MINT,
+            publicKey,
+          ),
+        ];
+        postInstructions = [
+          createCloseAccountInstruction(
+            (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey),
+            publicKey,
+            publicKey,
+          ),
+        ];
+        
+      } else {
+         userInputTokenAccount =  getAssociatedTokenAddressSync(
+          poolConfig.getTokenFromSymbol(userInputTokenSymbol).mintKey,
+          publicKey,
+          true,
+          poolConfig.getTokenFromSymbol(userInputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
+        );
+        if (!(await checkIfAccountExists(userInputTokenAccount, this.provider.connection))) {
+          throw "Insufficient Funds , Token Account doesn't exist"
+        }
+        if (!skipBalanceChecks) {
+          const tokenAccountBalance = new BN((await this.provider.connection.getTokenAccountBalance(userInputTokenAccount)).value.amount);
+          if (tokenAccountBalance.lt(amountIn)) {
+            throw `Insufficient Funds need more ${amountIn.sub(tokenAccountBalance)} tokens`
+          }
+        }
+      }//else
+
+      // ====== CHECK FOR OUTPUT TOKEN
+
+      if (userOutputTokenSymbol == 'SOL') {
+        const lamports = (this.minimumBalanceForRentExemptAccountLamports) //(await getMinimumBalanceForRentExemptAccount(this.provider.connection)); // for account creation
+        
+        if(!ephemeralSignerPubkey){
+          wrappedSolAccount = new Keypair();
+          additionalSigners.push(wrappedSolAccount);
+        };
+        preInstructions = [
+          SystemProgram.createAccount({
+            fromPubkey: publicKey,
+            newAccountPubkey: (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey),
+            lamports: lamports, //will this break for large amounts ??
+            space: 165,
+            programId: TOKEN_PROGRAM_ID,
+          }),
+          createInitializeAccount3Instruction(
+            (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey),
+            NATIVE_MINT,
+            publicKey,
+          ),
+        ];
+        postInstructions = [
+          createCloseAccountInstruction(
+            (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey),
+            publicKey,
+            publicKey,
+          ),
+        ];
+      } else {
+        // OTHER TOKENS including WSOL,USDC,..
+        userOutputTokenAccount = await getAssociatedTokenAddress(
+          poolConfig.getTokenFromSymbol(userOutputTokenSymbol).mintKey,
+          publicKey,
+          true,
+          poolConfig.getTokenFromSymbol(userOutputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
+        );
+
+        if (createUserATA && !(await checkIfAccountExists(userOutputTokenAccount, this.provider.connection))) {
+          preInstructions.push(
+            createAssociatedTokenAccountInstruction(
+              publicKey,
+              userOutputTokenAccount,
+              publicKey,
+              poolConfig.getTokenFromSymbol(userOutputTokenSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(userOutputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
+            )
+          );
+        }
+      } // else
+
+
+      let custodyAccountMetas = [];
+      let custodyOracleAccountMetas = [];
+      // let custodyCustomOracles = []
+      for (const custody of poolConfig.custodies) {
+        custodyAccountMetas.push({
+          pubkey: custody.custodyAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+  
+        custodyOracleAccountMetas.push({
+          pubkey: this.useExtOracleAccount ? custody.extOracleAccount: custody.intOracleAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+        // custodyCustomOracles.push({
+        //   pubkey: poolConfig.backupOracle,
+        //   isSigner: false,
+        //   isWritable: false,
+        // })
+      }
+
+      // Optional whitelist PDA for fee exemption
+
+      const whitelistPda = this.findProgramAddress("whitelist", [publicKey]).publicKey;
+      // const whitelistExists = await checkIfAccountExists(whitelistPda, this.provider.connection);
+      const whitelistMeta = {
+          pubkey: whitelistPda,
+          isSigner: false,  
+          isWritable: false,
+      }
+
+      const params = {
+        amountIn,
+        minAmountOut,
+        useFeesPool
+      };
+      let inx = await this.program.methods
+        .swap(params)
+        .accounts({
+        owner: publicKey,
+        fundingAccount: userInputTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userInputTokenAccount,
+        receivingAccount: userOutputTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey)  : userOutputTokenAccount,
+        transferAuthority: poolConfig.transferAuthority,
+        perpetuals: poolConfig.perpetuals,
+        pool: poolConfig.poolAddress,
+
+        receivingCustody: userInputCustodyConfig.custodyAccount,
+        receivingCustodyOracleAccount: this.useExtOracleAccount ? userInputCustodyConfig.extOracleAccount: userInputCustodyConfig.intOracleAccount,
+        receivingCustodyTokenAccount: userInputCustodyConfig.tokenAccount,
+
+        dispensingCustody: userOutputCustodyConfig.custodyAccount,
+        dispensingCustodyOracleAccount: this.useExtOracleAccount ? userOutputCustodyConfig.extOracleAccount: userOutputCustodyConfig.intOracleAccount,
+        dispensingCustodyTokenAccount: userOutputCustodyConfig.tokenAccount,
+
+        eventAuthority : this.eventAuthority.publicKey,
+
+        program: this.programId,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+
+        // need to rename
+        fundingMint: userInputCustodyConfig.mintKey,
+        fundingTokenProgram: poolConfig.getTokenFromSymbol(userInputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
+
+        receivingMint: userOutputCustodyConfig.mintKey,
+        receivingTokenProgram: poolConfig.getTokenFromSymbol(userOutputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
+      })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas,  ...( isWhitelistedUser ?  [whitelistMeta] : [])])
+        .instruction();
+
+      instructions.push(inx)
+
+       // SOL is only retrievable by closing the token account and choosing the desired address to send the token account's lamports.
+       if (userOutputTokenSymbol == 'SOL' && unWrapSol) {
+        // await closeAccount()
+        const closeWsolATAIns = createCloseAccountInstruction(userOutputTokenAccount, publicKey, publicKey);
+        instructions.push(closeWsolATAIns);
+       }
+
+    } catch (err) {
+      console.error("perpClient Swap error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  swapFeeInternal = async (
+    rewardTokenSymbol: string,
+    swapTokenSymbol: string,
+    poolConfig: PoolConfig,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    // const rewardCustody = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardTokenSymbol).mintKey))!;
+    const rewardCustody =  poolConfig.custodies.find((f) => f.symbol == 'USDC')! //poolConfig.custodies.find(i => i.mintKey.equals(rewardTokenMint))!;
+    if (!rewardCustody) {
+      throw "rewardCustody not found";
+    }
+    const custody = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(swapTokenSymbol).mintKey))!;
+    if (!custody) {
+      throw "custody not found";
+    }
+    let publicKey = this.provider.wallet.publicKey;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+
+    try {
+
+      let custodyAccountMetas = [];
+      let custodyOracleAccountMetas = [];
+      for (const custody of poolConfig.custodies) {
+        custodyAccountMetas.push({
+          pubkey: custody.custodyAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+        custodyOracleAccountMetas.push({
+          pubkey: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+      }
+
+
+      const params = {}
+      let inx = await this.program.methods
+        .swapFeeInternal(params)
+        .accounts({
+          owner: publicKey,
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+
+          rewardCustody: rewardCustody.custodyAccount,
+          rewardCustodyOracleAccount: this.useExtOracleAccount ? rewardCustody.extOracleAccount : rewardCustody.intOracleAccount,
+          rewardCustodyTokenAccount: rewardCustody.tokenAccount,
+
+          // custody: custody.custodyAccount,
+          // custodyOracleAccount: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
+          // custodyTokenAccount: custody.tokenAccount,
+          // tokenProgram: TOKEN_PROGRAM_ID,
+
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.programId,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
+        })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas])
+        .instruction();
+
+      instructions.push(inx)
+
+    } catch (err) {
+      console.error("perpClient Swap error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  setLpTokenPrice = async (
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+
+    try {
+
+      let custodyAccountMetas = [];
+      let custodyOracleAccountMetas = [];
+      let markets = []
+
+      for (const custody of poolConfig.custodies) {
+        custodyAccountMetas.push({
+          pubkey: custody.custodyAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+        custodyOracleAccountMetas.push({
+          pubkey: this.useExtOracleAccount ? custody.extOracleAccount : custody.intOracleAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+      }
+
+      for (const market of poolConfig.markets) {
+        markets.push({
+          pubkey: market.marketAccount,
+          isSigner: false,
+          isWritable: false,
+        });
+      }
+
+      let setLpTokenPriceInstruction = await this.program.methods
+        .setLpTokenPrice({})
+        .accounts({
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          lpTokenMint: poolConfig.stakedLpTokenMint,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+        .instruction()
+      instructions.push(setLpTokenPriceInstruction)
+
+    } catch (err) {
+      console.log("perpClient setLpTokenPriceInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+
+  //admin instruction
+  init = async (admins: PublicKey[], config: any) => {
+    let perpetualsProgramData = PublicKey.findProgramAddressSync(
+      [this.program.programId.toBuffer()],
+      new PublicKey("BPFLoaderUpgradeab1e11111111111111111111111")
+    )[0];
+
+    let adminMetas = [];
+    for (const admin of admins) {
+      adminMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: admin,
+      });
+    }
+
+    await this.program.methods
+      .init(config)
+      .accounts({
+        upgradeAuthority: this.provider.wallet.publicKey,
+        multisig: this.multisig.publicKey,
+        transferAuthority: this.authority.publicKey,
+        perpetuals: this.perpetuals.publicKey,
+        perpetualsProgram: this.program.programId,
+        perpetualsProgramData,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .remainingAccounts(adminMetas)
+      .rpc()
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  };
+
+  //admin instruction
+  setAdminSigners = async (admins: PublicKey[], minSignatures: number) => {
+    let adminMetas = [];
+    for (const admin of admins) {
+      adminMetas.push({
+        isSigner: false,
+        isWritable: false,
+        pubkey: admin,
+      });
+    }
+    try {
+      await this.program.methods
+        .setAdminSigners({
+          minSignatures,
+        })
+        .accounts({
+          admin: this.admin,
+          multisig: this.multisig.publicKey,
+        })
+        .remainingAccounts(adminMetas)
+        // .signers([this.admin])
+        .rpc();
+    } catch (err) {
+      // @ts-ignore
+      if (this.printErrors) {
+        console.error("setAdminSigners err:",err);
+      }
+      throw err;
+    }
+  };
+
+  //admin instruction
+  addPool = async (
+    name: string, 
+    maxAumUsd: BN, 
+    permissions: Permissions,
+    metadataSymbol: string,
+    metadataTitle: string,
+    metadataUri: string,
+    stakingFeeShareBps : BN,
+    vpVolumeFactor : number,
+    stakingFeeBoostBps : BN[],
+    minLpPriceUsd : BN,
+    maxLpPriceUsd : BN,
+    thresholdUsd : BN
+    ) => {
+    await this.program.methods
+      .addPool({
+        name,
+        maxAumUsd,
+        permissions,
+        metadataSymbol,
+        metadataTitle,
+        metadataUri,
+        stakingFeeShareBps,
+        vpVolumeFactor,
+        stakingFeeBoostBps,
+        minLpPriceUsd,
+        maxLpPriceUsd,
+        thresholdUsd
+      })
+      .accounts({
+        admin: this.provider.wallet.publicKey,
+        multisig: this.multisig.publicKey,
+        transferAuthority: this.authority.publicKey,
+        perpetuals: this.perpetuals.publicKey,
+        pool: this.getPoolKey(name),
+        lpTokenMint: this.getPoolLpTokenKey(name),
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: SYSVAR_RENT_PUBKEY,
+      })
+      // .signers([this.admin])
+      .rpc()
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  };
+
+  //admin instruction
+  removePool = async (name: string) => {
+    await this.program.methods
+      .removePool({})
+      .accounts({
+        admin: this.admin,
+        multisig: this.multisig.publicKey,
+        transferAuthority: this.authority.publicKey,
+        perpetuals: this.perpetuals.publicKey,
+        pool: this.getPoolKey(name),
+        systemProgram: SystemProgram.programId,
+      })
+      // .signers([this.admin])
+      .rpc()
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  };
+
+  //admin instruction
+  addCustody = async (
+    poolName: string,
+    tokenMint: PublicKey,
+    isToken222: boolean,
+    isStable: boolean,
+    isVirtual: boolean,
+    oracle: OracleParams,
+    pricing: PricingParams,
+    permissions: Permissions,
+    fees: Fees,
+    borrowRate: BorrowRateParams,
+    ratios: TokenRatios[],
+    depegAdjustment: boolean,
+    rewardThreshold: BN,
+    minReserveUsd: BN,
+    limitPriceBufferBps: BN
+  ) => {
+
+    try {
+      const trx_id = await this.program.methods
+        .addCustody({
+          isStable,
+          depegAdjustment,
+          isVirtual,
+          token22: isToken222,
+          oracle,
+          pricing,
+          permissions,
+          fees,
+          borrowRate,
+          ratios,
+          rewardThreshold,
+          minReserveUsd,
+          limitPriceBufferBps
+        })
+        .accounts({
+          admin: this.admin,
+          multisig: this.multisig.publicKey,
+          transferAuthority: this.authority.publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          pool: this.getPoolKey(poolName),
+          custody: this.getCustodyKey(poolName, tokenMint),
+          custodyTokenAccount: this.getCustodyTokenAccountKey(
+            poolName,
+            tokenMint
+          ),
+          custodyTokenMint: tokenMint,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY,
+        })
+        // .signers([this.admin])
+        .rpc()
+        .catch((err) => {
+          console.error(err);
+          throw err;
+        });
+
+      console.log("trx_id:", `https://explorer.solana.com/tx/${trx_id}?cluster=devnet`)
+    } catch (error) {
+      console.error("cli error :", error);
+      throw error;
+    }
+
+
+  };
+
+  //admin instruction
+  editCustody = async (
+    poolName: string,
+    tokenMint: PublicKey,
+    isStable: boolean,
+    oracle: OracleParams,
+    pricing: PricingParams,
+    permissions: Permissions,
+    fees: Fees,
+    borrowRate: BorrowRateParams,
+    ratios: TokenRatios[]
+  ) => {
+
+    const trx_id = await this.program.methods
+      //@ts-ignore
+      .testingEditCustody({
+        isStable,
+        oracle,
+        pricing,
+        permissions,
+        fees,
+        borrowRate,
+        ratios,
+      })
+      .accounts({
+        admin: this.admin,
+        multisig: this.multisig.publicKey,
+        transferAuthority: this.authority.publicKey,
+        perpetuals: this.perpetuals.publicKey,
+        pool: this.getPoolKey(poolName),
+        custody: this.getCustodyKey(poolName, tokenMint),
+        custodyTokenAccount: this.getCustodyTokenAccountKey(
+          poolName,
+          tokenMint
+        ),
+        custodyTokenMint: tokenMint,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: SYSVAR_RENT_PUBKEY,
+      })
+      // .signers([this.admin])
+      .rpc()
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+    console.log("trx_id:", `https://explorer.solana.com/tx/${trx_id}?cluster=devnet`)
+  };
+
+  //admin instruction
+  removeCustody = async (poolName: string, tokenMint: PublicKey, ratios: TokenRatios[], poolConfig: PoolConfig) => {
+    
+    const custodyConfig = poolConfig.custodies.find(f => f.mintKey.equals(tokenMint))
+
+    const userReceivingTokenAccount = getAssociatedTokenAddressSync(
+      tokenMint,
+      this.admin,
+      true
+    );
+
+    await this.program.methods
+      .removeCustody({ ratios })
+      .accounts({
+        admin: this.admin,
+        receivingAccount: userReceivingTokenAccount,
+        multisig: this.multisig.publicKey,
+        transferAuthority: this.authority.publicKey,
+        perpetuals: this.perpetuals.publicKey,
+        pool: this.getPoolKey(poolName),
+        custody: this.getCustodyKey(poolName, tokenMint),
+        custodyTokenAccount: this.getCustodyTokenAccountKey(
+          poolName,
+          tokenMint
+        ),
+        custodyOracleAccount: this.useExtOracleAccount ? custodyConfig.extOracleAccount : custodyConfig.intOracleAccount,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        receivingTokenMint: tokenMint,
+      })
+      // .signers([this.admin])
+      .rpc()
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+  };
+
+  /*
+  updateTokenRatios = async (poolName: string, ratios: TokenRatios[]) => {
+    await this.program.methods
+    .updateTokenRatios ({ ratios })
+    .accounts({
+      admin: this.provider.wallet.publicKey,
+      multisig: this.multisig.publicKey,
+      perpetuals: this.perpetuals.publicKey,
+      pool: this.getPoolKey(poolName),
+    })
+    // .signers([this.admin])
+    .rpc()
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+  }
+    */
+
+  
+  //admin instruction
+  protocolWithdrawFees = async (
+    rewardSymbol: string,
+    poolConfig: PoolConfig
+  ) => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    const custodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
+    
+    const receivingTokenAccount = await getAssociatedTokenAddress(
+      poolConfig.getTokenFromSymbol(rewardSymbol).mintKey,
+      publicKey,
+      true
+    );
+
+    let instructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+    
+    try {
+      
+      let withdrawFeesIx = await this.program.methods
+          .withdrawFees({})
+          .accounts({
+            admin: publicKey,
+            multisig: this.multisig.publicKey,
+            transferAuthority: this.authority.publicKey,
+            perpetuals: this.perpetuals.publicKey,
+            protocolVault: poolConfig.protocolVault,
+            protocolTokenAccount: poolConfig.protocolTokenAccount,
+            receivingTokenAccount: receivingTokenAccount,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            receivingMint: poolConfig.getTokenFromSymbol(rewardSymbol).mintKey,
+          })
+          .instruction();
+
+      instructions.push(withdrawFeesIx)
+
+
+    } catch (err) {
+      console.log("perpClient setPool error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  }
+
+  //admin instruction
+  moveProtocolFees = async (
+    rewardSymbol: string,
+    poolConfig: PoolConfig
+  ) => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
+  
+
+    let instructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+    
+    try {
+      
+      let moveProtocolFeesIx = await this.program.methods
+          .moveProtocolFees()
+          .accounts({
+            transferAuthority: this.authority.publicKey,
+            perpetuals: this.perpetuals.publicKey,
+            tokenVault: poolConfig.tokenVault,
+            pool: poolConfig.poolAddress,
+            rewardCustody: rewardCustodyConfig.custodyAccount,
+            rewardCustodyTokenAccount: rewardCustodyConfig.tokenAccount,
+            revenueTokenAccount: poolConfig.revenueTokenAccount,
+            protocolVault: poolConfig.protocolVault,
+            protocolTokenAccount: poolConfig.protocolTokenAccount,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            eventAuthority: this.eventAuthority.publicKey,
+            program: this.program.programId,
+            tokenMint: rewardCustodyConfig.mintKey,
+          })
+          .instruction();
+
+      instructions.push(moveProtocolFeesIx)
+
+
+    } catch (err) {
+      console.log("perpClient setPool error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  }
+
+  //admin instruction
+  setProtocolFeeShareBps = async (
+    feeShareBps: BN,
+    poolConfig: PoolConfig,
+  ): Promise<TransactionInstruction> => {
+
+    try {
+      let publicKey = this.provider.wallet.publicKey;
+
+      let setProtocolFeeShareBpsIx = await this.program.methods
+        .setProtocolFeeShare({
+          feeShareBps: feeShareBps
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          protocolVault: poolConfig.protocolVault,
+        })
+        .instruction();
+
+      return setProtocolFeeShareBpsIx;
+
+    } catch (err) {
+      console.log("perpClient setProtocolFeeShareBpsIx error:: ", err);
+      throw err;
+    }
+
+  }
+
+  //admin instruction
+  setPermissions = async (
+    permissions: Permissions,
+  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      
+    
+      let setPermissionsInstruction = await this.program.methods
+          .setPermissions({
+            permissions: permissions,
+          })
+          .accounts({
+            admin: publicKey,
+            multisig: this.multisig.publicKey,
+            perpetuals: this.perpetuals.publicKey
+
+          })
+          .instruction();
+        instructions.push(setPermissionsInstruction)
+
+    } catch (err) {
+      console.log("perpClient setPool error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  //admin instruction
+  reimburse = async (
+    tokenMint: PublicKey,
+    amountIn: BN,
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let custodyAccountMetas = [];
+    let custodyOracleAccountMetas = [];
+    // let custodyCustomOracles = []
+    let markets = []
+    for (const custody of poolConfig.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+
+      custodyOracleAccountMetas.push({
+        pubkey: this.useExtOracleAccount? custody.extOracleAccount : custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+    for (const market of poolConfig.markets) {
+      markets.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+    const custodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(tokenMint))!;
+    // console.log("custodyConfig: ", custodyConfig)
+
+    try {
+      let reimburse = await this.program.methods
+        .reimburse({ amountIn })
+        .accounts({
+          admin: this.provider.wallet.publicKey,
+          multisig: poolConfig.multisig,
+          fundingAccount: await getAssociatedTokenAddress(
+            tokenMint,
+            this.provider.wallet.publicKey,
+            true
+          ),
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          custody: custodyConfig.custodyAccount,
+          custodyOracleAccount: this.useExtOracleAccount ? custodyConfig.extOracleAccount : custodyConfig.intOracleAccount,
+          custodyTokenAccount: custodyConfig.tokenAccount,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          program: poolConfig.programId,
+          ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+          fundingMint: tokenMint,
+        })
+        .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
+        .instruction()
+      instructions.push(reimburse)
+
+    } catch (err) {
+
+      console.log("perpClient setPool error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+
+  // Admin Instruction
+  setInternalOraclePrice = async (
+    tokenMint: PublicKey,
+    useCurrentTime: number, // 0 : use input publish time, 1: use current time
+    price: BN,
+    expo: number,
+    conf: BN,
+    ema: BN,
+    publishTime: BN,
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+    const custodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(tokenMint))!;
+
+    try {
+      let setInternalOraclePrice = await this.program.methods
+        .setInternalOraclePrice({
+          useCurrentTime: useCurrentTime,
+          price: price,
+          expo: expo,
+          conf: conf,
+          ema: ema,
+          publishTime: publishTime,
+        })
+        .accounts({
+          authority: poolConfig.backupOracle,
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          custody: custodyConfig.custodyAccount,
+          intOracleAccount: custodyConfig.intOracleAccount,
+          extOracleAccount: custodyConfig.extOracleAccount,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction()
+      instructions.push(setInternalOraclePrice)
+
+    } catch (err) {
+      console.log("perpClient setInternalOracleAccount error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+  //  batch version of setInternalOraclePrice
+  setInternalOraclePriceBatch = async (
+    useCurrentTime: number, // 0 : use input publish time, 1: use current time
+    tokenMintList: PublicKey[],
+    tokenInternalPrices: InternalPrice[], // make sure that tokenMintList and tokenInternalPrices are in the same order
+    POOL_CONFIGS: PoolConfig[],
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+
+    if(tokenMintList.length !== tokenInternalPrices.length){
+      throw new Error("tokenMintList and tokenInternalPrices length mismatch");
+    }
+
+    // const ALL_POOL_CONFIGS = poolConfigs;
+     const ALL_CUSTODY_CONFIGS = POOL_CONFIGS.map((f) => f.custodies).flat()
+
+    let accountMetas = [];
+
+    for (const tokenMint of tokenMintList) {
+      const custody = ALL_CUSTODY_CONFIGS.find(i => i.mintKey.equals(tokenMint))!;
+      // accountMetas.push({
+      //   pubkey: custody.custodyAccount,
+      //   isSigner: false,
+      //   isWritable: false,
+      // });
+
+      accountMetas.push({
+        pubkey:  custody.intOracleAccount,
+        isSigner: false,
+        isWritable: true,
+      });
+
+       accountMetas.push({
+        pubkey:  custody.extOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+
+    try {
+      let setInternalOraclePrice = await this.program.methods
+        .setInternalCurrentPrice(
+          {
+            useCurrentTime: useCurrentTime,
+            prices : tokenInternalPrices
+          }
+        )
+        .accounts({
+          authority: POOL_CONFIGS[0].backupOracle,
+        })
+        .remainingAccounts([...accountMetas])
+        .instruction()
+      instructions.push(setInternalOraclePrice)
+
+    } catch (err) {
+      console.log("perpClient setInternalOracleAccount error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+
+  //  batch version of setInternalOraclePrice
+  setInternalOracleEmaPriceBatch = async (
+    tokenMintList: PublicKey[],
+    tokenInternalEmaPrices: InternalEmaPrice[], // make sure that tokenMintList and tokenInternalPrices are in the same order
+    POOL_CONFIGS: PoolConfig[]
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+
+    if(tokenMintList.length !== tokenInternalEmaPrices.length){
+      throw new Error("tokenMintList and tokenInternalPrices length mismatch");
+    }
+
+    // const ALL_POOL_CONFIGS = poolConfigs;
+     const ALL_CUSTODY_CONFIGS = POOL_CONFIGS.map((f) => f.custodies).flat()
+
+    let accountMetas = [];
+
+    for (const tokenMint of tokenMintList) {
+      const custody = ALL_CUSTODY_CONFIGS.find(i => i.mintKey.equals(tokenMint))!;
+      // accountMetas.push({
+      //   pubkey: custody.custodyAccount,
+      //   isSigner: false,
+      //   isWritable: false,
+      // });
+
+      accountMetas.push({
+        pubkey:  custody.intOracleAccount,
+        isSigner: false,
+        isWritable: true,
+      });
+
+      //  accountMetas.push({
+      //   pubkey:  custody.extOracleAccount,
+      //   isSigner: false,
+      //   isWritable: false,
+      // });
+    }
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+
+    try {
+      let setInternalOraclePrice = await this.program.methods
+        .setInternalEmaPrice(
+          {
+            prices : tokenInternalEmaPrices
+          }
+        )
+        .accounts({
+          authority: POOL_CONFIGS[0].backupOracle,
+        })
+        .remainingAccounts([...accountMetas])
+        .instruction()
+      instructions.push(setInternalOraclePrice)
+
+    } catch (err) {
+      console.log("perpClient setInternalOracleAccount error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+
+  /*
+  setInternalOraclePriceV2 = async (
+    poolConfig: PoolConfig,
+    tokenData: { tokenMint: PublicKey, price: BN, expo: number, conf: BN, ema: BN, publishTime: BN }[] 
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+    // const custodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(tokenMint))!;
+
+    let custodyAccountMetas = [];
+    let custodyIntOracleAccountMetas = [];
+    let custodyExtOracleAccountMetas = []
+    let markets = []
+
+    for (const custody of poolConfig.custodies) {
+      custodyAccountMetas.push({
+        pubkey: custody.custodyAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+
+      custodyIntOracleAccountMetas.push({
+        pubkey: custody.intOracleAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+      custodyExtOracleAccountMetas.push({
+        pubkey: poolConfig.backupOracle,
+        isSigner: false,
+        isWritable: false,
+      })
+    }
+
+    for (const market of poolConfig.markets) {
+      markets.push({
+        pubkey: market.marketAccount,
+        isSigner: false,
+        isWritable: false,
+      });
+    }
+
+
+    try {
+      const paramData = tokenData.map((i) => {
+        return {
+          // tokenMint: i.tokenMint,
+          price: i.price,
+          expo: i.expo,
+          conf: i.conf,
+          ema: i.ema,
+          publishTime: i.publishTime  
+        }
+      })
+
+      // this.program.idl.types['SetInternalOraclePriceV2Args'].fields[0].type = this.program.idl.types['InternalOraclePriceV2'].type;
+      let setInternalOraclePrice = await this.program.methods
+        .setInternalOraclePriceV2(
+        {
+          prices : paramData
+        })
+        .accounts({
+          authority: poolConfig.backupOracle,
+          // perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          // custody: custodyConfig.custodyAccount,
+          // intOracleAccount: custodyConfig.intOracleAccount,
+          // extOracleAccount: custodyConfig.extOracleAccount,
+          // systemProgram: SystemProgram.programId,
+        })
+        .remainingAccounts([...custodyAccountMetas, ...custodyIntOracleAccountMetas, ...custodyExtOracleAccountMetas])
+        .instruction()
+
+      instructions.push(setInternalOraclePrice)
+
+    } catch (err) {
+      console.log("perpClient setInternalOracleAccount error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+  */
+
+
+  // Authority Instruction - Set price impact on position profits
+  // Can only be called by the penalty authority (Perpetuals::PENALTY_AUTHORITY)
+  // Can only be called once per position (checks price_impact_set flag)
+  setPositionPriceImpact = async (
+    positionPubkey: PublicKey,
+    priceImpactUsd: BN, // in USD (6 decimals)
+    penaltyAuthority: PublicKey,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+
+    try {
+      let setPositionPriceImpactIx = await this.program.methods
+        .setPositionPriceImpact({
+          priceImpactUsd: priceImpactUsd,
+        })
+        .accounts({
+          authority: penaltyAuthority,
+          position: positionPubkey,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.program.programId,
+        })
+        .instruction()
+      instructions.push(setPositionPriceImpactIx)
+
+    } catch (err) {
+      console.log("perpClient setPositionPriceImpact error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  };
+
+
+  // Admin Instruction
+  renameFlp = async (
+    flag: BN,
+    lpTokenName: string,
+    lpTokenSymbol: string,
+    lpTokenUri: string,
+    poolConfig: PoolConfig,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let instructions: TransactionInstruction[] = [];
+    let additionalSigners: Signer[] = [];
+
+    const lpTokenMint = poolConfig.stakedLpTokenMint;
+
+    const lpMetadataAccount = PublicKey.findProgramAddressSync(
+      [Buffer.from("metadata"), METAPLEX_PROGRAM_ID.toBuffer(), lpTokenMint.toBuffer()],
+      METAPLEX_PROGRAM_ID
+    )[0];
+    
+
+    try {
+      let renameFlp = await this.program.methods
+        .renameFlp({
+          flag: flag,
+          lpTokenName: lpTokenName,
+          lpTokenSymbol: lpTokenSymbol,
+          lpTokenUri: lpTokenUri,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          perpetuals: poolConfig.perpetuals,
+          pool: poolConfig.poolAddress,
+          lpTokenMint: lpTokenMint,
+          lpMetadataAccount: lpMetadataAccount,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          metadataProgram: METAPLEX_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY
+        })
+        .instruction()
+      instructions.push(renameFlp)
+
+    } catch (err) {
+      console.log("perpClient renameFlp error:: ", err);
+    }
+
+    return {
+      instructions: [...instructions],
+      additionalSigners
+    };
+  }
+
+  // admin Instruction
+  initStake = async (
+    stakingFeeShareBps: BN,
+    rewardSymbol: string,
+    poolConfig: PoolConfig
+  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      
+      const lpTokenMint = poolConfig.stakedLpTokenMint;
+      const stakedLpTokenAccount = PublicKey.findProgramAddressSync(
+        [Buffer.from("staked_lp_token_account"), poolConfig.poolAddress.toBuffer(), lpTokenMint.toBuffer()],
+        this.programId
+      )[0];
+
+      const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
+
+      let initStakeInstruction = await this.program.methods
+          .initStaking({
+            stakingFeeShareBps: stakingFeeShareBps
+          })
+          .accounts({
+            admin: publicKey,
+            multisig: this.multisig.publicKey,
+            transferAuthority: poolConfig.transferAuthority,
+            perpetuals: this.perpetuals.publicKey,
+            pool: poolConfig.poolAddress,
+            custody: rewardCustodyConfig.custodyAccount,
+            lpTokenMint: lpTokenMint,
+            stakedLpTokenAccount: stakedLpTokenAccount,
+
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            rent: SYSVAR_RENT_PUBKEY
+
+          })
+          .instruction();
+        instructions.push(initStakeInstruction)
+
+    } catch (err) {
+      console.log("perpClient InitStaking error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  initCompounding = async (
+    feeShareBps: BN,
+    metadataTitle: string,
+    metadataSymbol: string,
+    metadataUri: string,
+    rewardSymbol: string,
+    poolConfig: PoolConfig
+  ): Promise< { instructions : TransactionInstruction[] , additionalSigners: Signer[]}> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+
+      const rewardCustodyConfig = poolConfig.custodies.find(i => i.mintKey.equals(poolConfig.getTokenFromSymbol(rewardSymbol).mintKey))!;
+
+      const compoundingTokenMint = this.getPoolCompoundingTokenKey(poolConfig.poolName)
+      const compoundingVault = PublicKey.findProgramAddressSync(
+        [Buffer.from("compounding_token_account"), poolConfig.poolAddress.toBuffer(), poolConfig.stakedLpTokenMint.toBuffer()],
+        this.programId
+      )[0]
+
+
+      const metadataAccount = PublicKey.findProgramAddressSync(
+        [Buffer.from("metadata"), METAPLEX_PROGRAM_ID.toBuffer(), compoundingTokenMint.toBuffer()],
+        METAPLEX_PROGRAM_ID
+      )[0]
+
+      let initCompoundingInstruction = await this.program.methods
+          .initCompounding({
+            feeShareBps: feeShareBps,
+            metadataTitle: metadataTitle,
+            metadataSymbol: metadataSymbol,
+            metadataUri: metadataUri
+          })
+          .accounts({
+            admin: publicKey,
+            multisig: this.multisig.publicKey,
+            transferAuthority: poolConfig.transferAuthority,
+            perpetuals: this.perpetuals.publicKey,
+            pool: poolConfig.poolAddress,
+            // custody: rewardCustodyConfig.custodyAccount,
+            lpTokenMint: poolConfig.stakedLpTokenMint,
+            compoundingVault: compoundingVault,
+            compoundingTokenMint: compoundingTokenMint,
+            metadataAccount: metadataAccount,
+
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_PROGRAM_ID,
+
+            metadataProgram: METAPLEX_PROGRAM_ID,
+            rent: SYSVAR_RENT_PUBKEY
+
+          })
+          .instruction();
+        instructions.push(initCompoundingInstruction)
+
+    } catch (err) {
+      console.log("perpClient initCompounding error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions : [...preInstructions, ...instructions ,...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  initTokenVault = async (
+    token_permissions: TokenPermissions,
+    tokens_to_distribute: BN,
+    withdrawTimeLimit: BN,
+    withdrawInstantFee: BN,
+    stakeLevel: BN[],
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const tokenMint = poolConfig.tokenMint; 
+      let fundingTokenAccount = getAssociatedTokenAddressSync(
+        tokenMint,
+        publicKey,
+        true
+      );
+
+      let initTokenVaultInstruction = await this.program.methods
+        .initTokenVault({
+          tokenPermissions: token_permissions,
+          amount: tokens_to_distribute,
+          withdrawTimeLimit: withdrawTimeLimit,
+          withdrawInstantFee: withdrawInstantFee,
+          stakeLevel: stakeLevel,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          fundingTokenAccount: fundingTokenAccount,
+          tokenMint: tokenMint,
+
+          tokenVault: poolConfig.tokenVault,
+          tokenVaultTokenAccount: poolConfig.tokenVaultTokenAccount,
+
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY
+
+        })
+        .instruction();
+      instructions.push(initTokenVaultInstruction)
+
+    } catch (err) {
+      console.log("perpClient InitTokenVaultInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  setTokenVaultConfig = async (
+    token_permissions: TokenPermissions,
+    withdrawTimeLimit: BN,
+    withdrawInstantFee: BN,
+    stakeLevel: BN[],
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+
+      let setTokenVaultConfigInstruction = await this.program.methods
+        .setTokenVaultConfig({
+          tokenPermissions: token_permissions,
+          withdrawTimeLimit: withdrawTimeLimit,
+          withdrawInstantFee: withdrawInstantFee,
+          stakeLevel: stakeLevel,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          tokenVault: poolConfig.tokenVault,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+      instructions.push(setTokenVaultConfigInstruction)
+
+    } catch (err) {
+      console.log("perpClient setTokenVaultConfigInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  withdrawInstantFee = async (
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+
+      let receivingTokenAccount = await getAssociatedTokenAddress(
+        poolConfig.tokenMint,
+        publicKey,
+        true
+      );
+
+      if (!(await checkIfAccountExists(receivingTokenAccount, this.provider.connection))) {
+        // throw `userTokenAccount doesn't exist : ${receivingTokenAccount.toBase58()}`
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            receivingTokenAccount,
+            publicKey,
+            poolConfig.tokenMint,
+          )
+        );
+      }
+
+      let withdrawInstantFeeInstruction = await this.program.methods
+        .withdrawInstantFees({})
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          tokenVault: poolConfig.tokenVault,
+          tokenVaultTokenAccount: poolConfig.tokenVaultTokenAccount,
+          receivingTokenAccount: receivingTokenAccount,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          receivingTokenMint: poolConfig.tokenMint,
+        })
+        .instruction();
+      instructions.push(withdrawInstantFeeInstruction)
+
+    } catch (err) {
+      console.log("perpClient withdrawInstantFeeInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+
+  // admin Instruction
+  withdrawUnclaimedTokens = async (
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+
+      let receivingTokenAccount = await getAssociatedTokenAddress(
+        poolConfig.tokenMint,
+        publicKey,
+        true
+      );
+
+      if (!(await checkIfAccountExists(receivingTokenAccount, this.provider.connection))) {
+        // throw `userTokenAccount doesn't exist : ${receivingTokenAccount.toBase58()}`
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            receivingTokenAccount,
+            publicKey,
+            poolConfig.tokenMint,
+          )
+        );
+      }
+
+      let withdrawUnclaimedTokensInstruction = await this.program.methods
+        .withdrawUnclaimedTokens({})
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          tokenVault: poolConfig.tokenVault,
+          tokenVaultTokenAccount: poolConfig.tokenVaultTokenAccount,
+          receivingTokenAccount: receivingTokenAccount,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          receivingTokenMint: poolConfig.tokenMint,
+        })
+        .instruction();
+      instructions.push(withdrawUnclaimedTokensInstruction)
+
+    } catch (err) {
+      console.log("perpClient withdrawUnclaimedTokensInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  initRevenueTokenAccount = async (
+    feeShareBps: BN,
+    rewardSymbol: string,
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
+
+      let initRevenueTokenAccountInstruction = await this.program.methods
+        .initRevenueTokenAccount({
+          feeShareBps: feeShareBps
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          
+          tokenVault: poolConfig.tokenVault,
+          rewardMint: rewardCustodyMint,
+          revenueTokenAccount: poolConfig.revenueTokenAccount,
+
+          protocolVault: poolConfig.protocolVault,
+          protocolTokenAccount: poolConfig.protocolTokenAccount,
+
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY
+
+        })
+        .instruction();
+      instructions.push(initRevenueTokenAccountInstruction)
+
+    } catch (err) {
+      console.log("perpClient initRevenueTokenAccountInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  initRebateVault = async (
+    allowRebatePayout: boolean,
+    rebateSymbol: string,
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const rebateCustodyMint = poolConfig.getTokenFromSymbol(rebateSymbol).mintKey
+
+      let initRebateVaultInstruction = await this.program.methods
+        .initRebateVault({
+          allowRebatePayout: allowRebatePayout
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          perpetuals: this.perpetuals.publicKey,
+          
+          rebateMint: rebateCustodyMint,
+          rebateTokenAccount: poolConfig.rebateTokenAccount,
+
+          rebateVault: poolConfig.rebateVault,
+
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY
+
+        })
+        .instruction();
+      instructions.push(initRebateVaultInstruction)
+
+    } catch (err) {
+      console.log("perpClient initRebateVaultInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // Token Reward Instructions 
+
+  // admin Instruction
+  distributeTokenReward = async (
+    amount: BN,
+    epochCount: number,
+    rewardSymbol: string,
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const rewardCustodyMint = poolConfig.getTokenFromSymbol(rewardSymbol).mintKey
+
+      let fundingTokenAccount = getAssociatedTokenAddressSync(
+        poolConfig.tokenMint,
+        publicKey,
+        true
+      );
+
+      let revenueFundingTokenAccount = getAssociatedTokenAddressSync(
+        rewardCustodyMint,
+        publicKey,
+        true
+      );
+
+
+      let distributeTokenRewardInstruction = await this.program.methods
+        .distributeTokenReward({
+          amount: amount,
+          epochCount: epochCount,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          perpetuals: this.perpetuals.publicKey,
+          transferAuthority: poolConfig.transferAuthority,
+          fundingTokenAccount: fundingTokenAccount,
+          tokenVault: poolConfig.tokenVault,
+          tokenVaultTokenAccount: poolConfig.tokenVaultTokenAccount,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.programId,
+          tokenMint: poolConfig.tokenMint,
+        })
+        .instruction();
+      instructions.push(distributeTokenRewardInstruction)
+
+    } catch (err) {
+      console.log("perpClient distributeTokenRewardInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  setTokenStakeLevel = async (
+    owner: PublicKey,
+    stakeLevel: number,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const tokenStakeAccount = PublicKey.findProgramAddressSync(
+        [Buffer.from("token_stake"), owner.toBuffer()],
+        this.programId
+      )[0];
+      let setTokenStakeLevelInstruction = await this.program.methods
+        .setTokenStakeLevel({
+          level: stakeLevel,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          tokenStakeAccount: tokenStakeAccount,
+        })
+        .instruction();
+      instructions.push(setTokenStakeLevelInstruction)
+    } catch (err) {
+      console.log("perpClient setTokenStakeLevelInstruction error:: ", err);
+      throw err;
+    }
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+  }
+
+  // admin Instruction
+  setTokenReward = async (
+    owner: PublicKey,
+    amount: BN,
+    epochCount: number,
+    poolConfig: PoolConfig
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+
+      const tokenStakeAccount = PublicKey.findProgramAddressSync(
+        [Buffer.from("token_stake"), owner.toBuffer()],
+        this.programId
+      )[0];
+
+      let setTokenRewardInstruction = await this.program.methods
+        .setTokenReward({
+          amount: amount,
+          epochCount: epochCount,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          tokenVault: poolConfig.tokenVault,
+          tokenStakeAccount: tokenStakeAccount,
+
+          eventAuthority: this.eventAuthority.publicKey,
+          program: this.programId
+        })
+        .instruction();
+      instructions.push(setTokenRewardInstruction)
+
+    } catch (err) {
+      console.log("perpClient setTokenRewardInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  resizeInternalOracle = async (
+    extOracle: PublicKey,
+    tokenMint: PublicKey,
+    intOracleAccount: PublicKey,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      let resizeInternalOracleInstruction = await this.program.methods
+        .resizeInternalOracle({
+          extOracle: extOracle
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          custodyTokenMint: tokenMint,
+          intOracleAccount: intOracleAccount,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+      instructions.push(resizeInternalOracleInstruction)
+
+    } catch (err) {
+      console.log("perpClient resizeInternalOracleInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  createWhitelist = async (
+    isSwapFeeExempt: boolean,
+    isDepositFeeExempt: boolean,
+    isWithdrawalFeeExempt: boolean,
+    poolAddress: PublicKey,
+    owner: PublicKey,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const whitelist = PublicKey.findProgramAddressSync(
+        [Buffer.from("whitelist"), owner.toBuffer()],
+        this.programId
+      )[0];
+
+      let createWhitelistInstruction = await this.program.methods
+        .createWhitelist({
+          isSwapFeeExempt,
+          isDepositFeeExempt,
+          isWithdrawalFeeExempt,
+          poolAddress,
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          owner: owner,
+          whitelist: whitelist,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+      instructions.push(createWhitelistInstruction)
+
+    } catch (err) {
+      console.log("perpClient createWhitelistInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  // admin Instruction
+  setWhitelistConfig = async (
+    isSwapFeeExempt: boolean,
+    isDepositFeeExempt: boolean,
+    isWithdrawalFeeExempt: boolean,
+    poolAddress: PublicKey,
+    owner: PublicKey,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let publicKey = this.provider.wallet.publicKey;
+
+    let preInstructions: TransactionInstruction[] = [];
+    let instructions: TransactionInstruction[] = [];
+    let postInstructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const whitelist = PublicKey.findProgramAddressSync(
+        [Buffer.from("whitelist"), owner.toBuffer()],
+        this.programId
+      )[0];
+
+      let setWhitelistConfigInstruction = await this.program.methods
+        .setWhitelistConfig({
+          isSwapFeeExempt,
+          isDepositFeeExempt,
+          isWithdrawalFeeExempt,
+          poolAddress
+        })
+        .accounts({
+          admin: publicKey,
+          multisig: this.multisig.publicKey,
+          owner: owner,
+          whitelist: whitelist,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+      instructions.push(setWhitelistConfigInstruction)
+
+    } catch (err) {
+      console.log("perpClient setWhitelistConfigInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
   }
 
 }
