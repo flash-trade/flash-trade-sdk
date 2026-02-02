@@ -5,7 +5,9 @@ import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { TransactionInstruction, Signer, PublicKey, ComputeBudgetProgram, AddressLookupTableAccount } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync } from '@solana/spl-token';
 
-export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
+// export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
+export const POOL_CONFIG = PoolConfig.fromIdsByName('devnet.1', 'devnet');
+
 // NOTE: choose the correct POOL_CONFIG based on the pool you want to interact 
 // flp.1
 // const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1','mainnet-beta')
@@ -24,7 +26,7 @@ export const POOL_CONFIG = PoolConfig.fromIdsByName('Crypto.1', 'mainnet-beta');
 // flp.r
 // const POOL_CONFIG = PoolConfig.fromIdsByName('Remora.1','mainnet-beta')
 
-export const RPC_URL = process.env.RPC_URL;
+export const RPC_URL = 'https://flashtr-flash-885f.devnet.rpcpool.com/e0f3d11e-6673-4e02-b3f8-361d596ee7fe' // process.env.RPC_URL;
 console.log("RPC_URL:>> ", RPC_URL);
 if (!RPC_URL) {
     throw new Error('RPC_URL is not set');
@@ -133,6 +135,11 @@ const addCompoundingLiquidity = async () => {
             'USDC',
             usdcCustody.mintKey,
             POOL_CONFIG,
+            false,
+            null,
+            undefined,
+            false,
+            false,
             false
         )
 
@@ -292,9 +299,45 @@ const getLpTokenPrices = async () => {
     console.log('compoundingLPTokenPrice :>> ', compoundingLPTokenPrice);
 }
 
+
+
+
+const collectStakeFees = async () => {
+
+    await flashClient.loadAddressLookupTable(POOL_CONFIG)
+
+    let instructions: TransactionInstruction[] = []
+    let additionalSigners: Signer[] = []
+    const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 120_000 }) // setLpTokenPrice
+
+    
+
+    const flpStakeAccountPK = PublicKey.findProgramAddressSync(
+        [Buffer.from('stake'), flashClient.provider.publicKey.toBuffer(), POOL_CONFIG.poolAddress.toBuffer()],
+        POOL_CONFIG.programId
+    )[0]
+
+    // const refreshStakeInstruction = await flashClient.refreshStakeWithTokenStake('USDC', POOL_CONFIG, flpStakeAccountPK)
+    // flash-sdk version >= "3.1.10"
+    const collectStakeFeesInx = await flashClient.collectStakeFees('USDC' ,POOL_CONFIG ,flpStakeAccountPK);
+
+    instructions.push(...collectStakeFeesInx.instructions)
+    additionalSigners.push(...collectStakeFeesInx.additionalSigners)
+
+    const trxId = await flashClient.sendTransaction([setCULimitIx, ...instructions], {
+        additionalSigners: additionalSigners
+    })
+
+    console.log('collectStakeFees trx :>> ', trxId);
+}
+
 (async () => {
 
     console.log("testing...");
+
+     await setLpTokenPrice()
+     console.log("setLpTokenPrice done");
+
 
     //  await addLiquidityAndStake()
     //  console.log("addLiquidityAndStake done");
@@ -302,12 +345,16 @@ const getLpTokenPrices = async () => {
     // await removeSflpLiquidity()
     // console.log("removeSflpLiquidity done");
 
-    // await addCompoundingLiquidity()
-    // console.log("addCompoundingLiquidity done");
+    await addCompoundingLiquidity()
+    console.log("addCompoundingLiquidity done");
 
     // await removeFlpLiquidity()
     //  console.log("removeFlpLiquidity done");
 
      await getLpTokenPrices()
     console.log("getLpTokenPrices done");
+
+    // await collectStakeFees()
+    // console.log("collectStakeFees done");
+
 })()
