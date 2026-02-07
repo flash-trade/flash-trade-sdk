@@ -3,6 +3,7 @@ import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
 import { IDL } from "./idl/perpetuals";
 import { IdlCoder } from "./utils/IdlCoder";
 import { PerpetualsClient } from "./PerpetualsClient";
+import { AddressLookupTableAccount } from "@solana/web3.js";
 
 export class ViewHelper {
     private perpetualsClient: PerpetualsClient;
@@ -47,6 +48,7 @@ export class ViewHelper {
 
     async simulateTransaction(
         transaction: Transaction,
+        addressLookupTableAccounts: AddressLookupTableAccount[],
         userPublicKey: PublicKey | undefined = undefined
     ): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
         transaction.feePayer = userPublicKey ?? this.perpetualsClient.provider.publicKey;
@@ -56,7 +58,7 @@ export class ViewHelper {
             payerKey: this.perpetualsClient.provider.publicKey,
             recentBlockhash: latestBlockhash.blockhash,
             instructions: transaction.instructions,
-        }).compileToV0Message(this.perpetualsClient.addressLookupTables);
+        }).compileToV0Message(addressLookupTableAccounts);
 
         const transaction2 = new VersionedTransaction(messageV0);
         return this.perpetualsClient.provider.connection.simulateTransaction(transaction2, { sigVerify: false, replaceRecentBlockhash: true });
