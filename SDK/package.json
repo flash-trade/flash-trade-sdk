@@ -1,6 +1,6 @@
 {
   "name": "flash-sdk",
-  "version": "11.8.1",
+  "version": "12.0.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -17,11 +17,12 @@
   "scripts": {
     "prebuild": "rimraf dist ",
     "build": "tsc",
+    "generate-types": "ts-node scripts/generate-types.ts",
     "pub": "git add . && git commit -m \"Updates\" && npm version patch && npm run build && npm publish",
     "doc": "yarn typedoc  --out docs src"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "=0.27.0",
+    "@coral-xyz/anchor": "^0.32.1",
     "@pythnetwork/price-service-client": "^1.8.2",
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "=1.98.2",

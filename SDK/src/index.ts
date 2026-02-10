@@ -16,7 +16,8 @@ export * from './PoolConfig';
 export * from './PoolDataClient';
 export * from './ViewHelper';
 
-export {IDL}  from './idl/perpetuals';
+export { default as IDL } from './idl/perpetuals.json';
+export type { Perpetuals } from './idl/perpetuals';
 export * from './utils/rpc';
 export * from './utils/IdlCoder';
 export * from './utils/anchorCpiEvents';

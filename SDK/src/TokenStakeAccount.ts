@@ -18,7 +18,7 @@ export class TokenStakeAccount implements TokenStake {
     rewardTokens: BN
     unclaimedRevenueAmount: BN
     revenueSnapshot: BN
-    claimableRebateUsd: BN // padding
+    claimableRebateUsd: BN
 
     // Constructor for initializing the object from provided data
     constructor(data: {
@@ -73,7 +73,7 @@ export class TokenStakeAccount implements TokenStake {
             lastRewardEpochCount: decodedData.lastRewardEpochCount,
             unclaimedRevenueAmount: decodedData.unclaimedRevenueAmount,
             revenueSnapshot: decodedData.revenueSnapshot,
-            claimableRebateUsd: decodedData.claimableRebateUsd, // Convert padding to BN
+            claimableRebateUsd: decodedData.claimableRebateUsd,
         })
     }
 

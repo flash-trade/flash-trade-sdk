@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { DEFAULT_POSITION, Market, MarketPermissions, Position, PositionStats, Side } from "./types";
+import { DEFAULT_POSITION, Market, MarketPermissions, Position, PositionStats } from "./types";
 import BN from "bn.js";
 import { PositionAccount } from "./PositionAccount";
 import { BN_ZERO } from "./constants";
@@ -11,7 +11,7 @@ export class MarketAccount implements Market {
     pool: PublicKey;
     targetCustody: PublicKey;
     collateralCustody: PublicKey;
-    side: Side;
+    side: Market["side"];
     correlation: boolean;
     maxPayoffBps: BN;
     permissions: MarketPermissions;
@@ -45,19 +45,19 @@ export class MarketAccount implements Market {
             const obj: Position = {
                 entryPrice: this.collectivePosition.averageEntryPrice,
 
-                sizeAmount : this.collectivePosition.sizeAmount,
+                sizeAmount: this.collectivePosition.sizeAmount,
                 sizeUsd: this.collectivePosition.sizeUsd,
 
-                collateralAmount : this.collectivePosition.collateralAmount,
+                collateralAmount: this.collectivePosition.collateralAmount,
                 collateralUsd: this.collectivePosition.collateralLiabilityUsd,
 
-                lockedAmount : this.collectivePosition.lockedAmount,
-                lockedUsd : this.collectivePosition.lockedUsd,
+                lockedAmount: this.collectivePosition.lockedAmount,
+                lockedUsd: this.collectivePosition.lockedUsd,
 
                 unsettledFeesUsd: this.collectivePosition.unsettledFeeUsd,
                 cumulativeLockFeeSnapshot: this.collectivePosition.cumulativeLockFeeSnapshot,
 
-                ...DEFAULT_POSITION // dangersous here
+                ...DEFAULT_POSITION 
             } as Position;
             return new PositionAccount(
                 PublicKey.default,

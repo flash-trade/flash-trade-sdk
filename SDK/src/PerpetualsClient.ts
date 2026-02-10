@@ -4,6 +4,7 @@ import {
   AnchorProvider,
   utils,
   BN,
+  Idl,
 } from "@coral-xyz/anchor";
 import {
   PublicKey,
@@ -35,12 +36,12 @@ import { sha256 } from "js-sha256";
 import { encode } from "bs58";
 import { PoolAccount } from "./PoolAccount";
 import { PositionAccount } from "./PositionAccount";
-import { AddLiquidityAmountAndFee, InternalPrice, BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice, Whitelist } from "./types";
+import { AddLiquidityAmountAndFee, InternalPrice, BorrowRateParams, Custody, DEFAULT_POSITION, ExitPriceAndFee, Fees, OracleParams, Permissions, Position, PricingParams, RemoveCollateralData, RemoveLiquidityAmountAndFee, Side, SwapAmountAndFees, TokenRatios, isVariant, MinAndMaxPrice, FeesAction, FeesMode, RatioFee, PermissionlessPythCache, OpenPositionParams, ContractOraclePrice, Privilege, FlpStake, PerpetualsAccount, Trading, Order, EntryPriceAndFeeV2, EntryPriceAndFee, TokenPermissions, TokenStake, InternalEmaPrice, Whitelist, VoltageMultiplier, MarketPermissions } from "./types";
 import { OraclePrice } from "./OraclePrice";
 import { CustodyAccount } from "./CustodyAccount";
-import { Perpetuals } from "./idl/perpetuals";
 
-import { IDL } from './idl/perpetuals';
+import IDL from './idl/perpetuals.json';
+import type { Perpetuals } from './idl/perpetuals';
 
 import { SendTransactionOpts, sendTransaction, sendTransactionV3 } from "./utils/rpc";
 import { MarketConfig, PoolConfig, Token } from "./PoolConfig";
@@ -110,7 +111,8 @@ export class PerpetualsClient {
     this.provider = provider;
     setProvider(provider);
 
-    this.program = new Program(IDL, programId);
+    const idlWithAddress = { ...IDL, address: programId.toBase58() };
+    this.program = new Program(idlWithAddress as Perpetuals, provider);
     this.programId = programId;
     this.admin = this.provider.wallet.publicKey;
     this.multisig = this.findProgramAddress("multisig");
@@ -246,6 +248,7 @@ export class PerpetualsClient {
   };
 
   getPerpetuals = async () => {
+    // @ts-ignore
     return this.program.account.perpetuals.fetch(this.perpetuals.publicKey);
   };
 
@@ -285,10 +288,6 @@ export class PerpetualsClient {
       this.getPoolKey(poolName),
       tokenMint,
     ]).publicKey;
-  };
-
-  getTradingAccount = async (tradingAccount: PublicKey) => {
-    return this.program.account.trading.fetch(tradingAccount);
   };
 
   getMarketPk(
@@ -352,7 +351,7 @@ export class PerpetualsClient {
       
       let getPositionData = await this.program.methods
           .getPositionData({})
-          .accounts({
+          .accountsPartial({
             perpetuals: this.perpetuals.publicKey,
             pool: poolConfig.poolAddress,
             position: position.publicKey,
@@ -448,7 +447,7 @@ export class PerpetualsClient {
   getAllActivePositions = async () => {
     const allPositions = await this.program.account.position.all();
 
-    const activePositions  = allPositions.filter(f => !f.account.sizeAmount.isZero());
+    const activePositions  = allPositions.filter(f => !(f.account as any).sizeAmount?.isZero());
 
     return activePositions;
   };
@@ -456,7 +455,7 @@ export class PerpetualsClient {
   getAllPositionsByMarket = async (marketKey: PublicKey ) => {
     // return this.program.account.position.all();
     const data = encode(
-        Buffer.concat([marketKey.toBuffer()])
+        new Uint8Array(marketKey.toBuffer())
     );
     const allPositions = await this.program.account.position.all([
         {
@@ -470,7 +469,7 @@ export class PerpetualsClient {
   getAllActivePositionsByMarket = async (marketKey: PublicKey ) => {
     // return this.program.account.position.all();
     const data = encode(
-        Buffer.concat([marketKey.toBuffer()])
+        new Uint8Array(marketKey.toBuffer())
     );
     const allPositions = await this.program.account.position.all([
         {
@@ -479,7 +478,7 @@ export class PerpetualsClient {
     ]);
 
     //  console.log("allPositions from market :",marketKey.toBase58() ,allPositions.length)
-     const activePositions  = allPositions.filter(f => !f.account.sizeAmount.isZero());
+     const activePositions  = allPositions.filter(f => !(f.account as any).sizeAmount?.isZero());
     //  console.log("allActivePositions from market :",marketKey.toBase58() ,activePositions.length)
      return activePositions
   };
@@ -517,7 +516,7 @@ export class PerpetualsClient {
    
     return await this.program.methods
       .liquidate({})
-      .accounts({
+      .accountsPartial({
         signer: this.provider.wallet.publicKey,
         perpetuals: this.perpetuals.publicKey,
         pool: poolConfig.poolAddress,
@@ -527,7 +526,6 @@ export class PerpetualsClient {
         targetOracleAccount: this.useExtOracleAccount ? targetCustodyConfig.extOracleAccount : targetCustodyConfig.intOracleAccount,
         collateralCustody: collateralCustodyConfig.custodyAccount,
         collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
-        eventAuthority: this.eventAuthority.publicKey,
         program: this.program.programId,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
       })
@@ -1081,7 +1079,7 @@ export class PerpetualsClient {
 
     if(enableDebuglogs){
       console.log("SDK logs : finalCollateralUsd:", finalCollateralUsd.toString(), "finalCollateralAmount:", finalCollateralAmount.toString() ,
-       "sizeAmount:", sizeAmount.toString(), "sizeAmountUsd:", sizeAmountUsd.toString(),
+       "size_amount:", sizeAmount.toString(), "sizeAmountUsd:", sizeAmountUsd.toString(),
         "sizeDeltaAmount:", sizeDeltaAmount.toString(), "sizeUsd:", sizeUsd.toString(),
         "currentCollateralUsdIncludingPnl:", currentCollateralUsdIncludingPnl.toString(),
         "finalCollateralUsd :", finalCollateralUsd.toString(),
@@ -3399,21 +3397,24 @@ export class PerpetualsClient {
       });
     }
 
+       
+
     return await this.program.methods
       .getLpTokenPrice({})
-      .accounts({
+      .accountsPartial({
         perpetuals: this.perpetuals.publicKey,
         pool: poolConfig.poolAddress,
         lpTokenMint: poolConfig.stakedLpTokenMint,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
       })
-      .remainingAccounts(includeRemainingAccounts ? [...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets] : [])
+      .remainingAccounts([...custodyAccountMetas, ...custodyOracleAccountMetas, ...markets])
       .view()
       .catch((err) => {
         console.error(err);
         throw err;
       });
   };
+    
 
   getStakedLpTokenPrice = async (poolKey: PublicKey, POOL_CONFIG: PoolConfig , includeRemainingAccounts = true): Promise<string> => {
     const backUpOracleInstructionPromise = createBackupOracleInstruction(POOL_CONFIG.poolAddress.toBase58(), true)
@@ -3447,7 +3448,7 @@ export class PerpetualsClient {
 
     let transaction = await this.program.methods
       .getLpTokenPrice({})
-      .accounts({
+      .accountsPartial({
         perpetuals: POOL_CONFIG.perpetuals,
         pool: poolKey,
         lpTokenMint: POOL_CONFIG.stakedLpTokenMint,
@@ -3468,8 +3469,8 @@ export class PerpetualsClient {
 
     const result = await this.viewHelper.simulateTransaction(transaction, addressLookupTables)
     // console.log('result :>> ', result)
-    const index = IDL.instructions.findIndex((f) => f.name === 'getLpTokenPrice')
-    const res: any = this.viewHelper.decodeLogs(result, index, 'getLpTokenPrice')
+    const index = IDL.instructions.findIndex((f) => f.name === 'get_lp_token_price')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'get_lp_token_price')
     // console.log("res:",res)
     return res.toString()
   }
@@ -3527,8 +3528,8 @@ export class PerpetualsClient {
     const result = await this.viewHelper.simulateTransaction(transaction, addressLookupTables)
 
     // console.log('result :>> ', result)
-    const index = IDL.instructions.findIndex((f) => f.name === 'getCompoundingTokenPrice')
-    const res: any = this.viewHelper.decodeLogs(result, index, 'getCompoundingTokenPrice')
+    const index = IDL.instructions.findIndex((f) => f.name === 'get_compounding_token_price')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'get_compounding_token_price')
 
     return res.toString()
   }
@@ -3565,7 +3566,7 @@ export class PerpetualsClient {
 
     return await this.program.methods
       .getAssetsUnderManagement({})
-      .accounts({
+      .accountsPartial({
         perpetuals: POOL_CONFIG.perpetuals,
         pool: poolKey,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
@@ -3634,7 +3635,7 @@ export class PerpetualsClient {
       .getAddLiquidityAmountAndFee({
         amountIn: amount,
       })
-      .accounts({
+      .accountsPartial({
         perpetuals: POOL_CONFIG.perpetuals,
         pool: poolKey,
         custody: depositCustodyKey,
@@ -3664,8 +3665,8 @@ export class PerpetualsClient {
               error: 'Simulation failed: ' + JSON.stringify(result.value.err),
           }
       }
-    const index = IDL.instructions.findIndex((f) => f.name === 'getAddLiquidityAmountAndFee')
-    const res: any = this.viewHelper.decodeLogs(result, index, 'getAddLiquidityAmountAndFee')
+    const index = IDL.instructions.findIndex((f) => f.name === 'get_add_liquidity_amount_and_fee')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'get_add_liquidity_amount_and_fee')
 
     return {
       amount: res.amount,
@@ -3726,7 +3727,7 @@ export class PerpetualsClient {
       .getRemoveLiquidityAmountAndFee({
         lpAmountIn: amount,
       })
-      .accounts({
+      .accountsPartial({
         perpetuals: POOL_CONFIG.perpetuals,
         pool: poolKey,
         custody: removeTokenCustodyKey,
@@ -3748,7 +3749,7 @@ export class PerpetualsClient {
     const addressLookupTables = (await this.getOrLoadAddressLookupTable(POOL_CONFIG)).addressLookupTables
 
     const result = await this.viewHelper.simulateTransaction(transaction, addressLookupTables, userPublicKey)
-    const index = IDL.instructions.findIndex((f) => f.name === 'getRemoveLiquidityAmountAndFee')
+    const index = IDL.instructions.findIndex((f) => f.name === 'get_remove_liquidity_amount_and_fee')
    
      if (result.value.err) {
         console.error('error Simulation failed:', result)
@@ -3758,7 +3759,7 @@ export class PerpetualsClient {
               error: 'Simulation failed: ' + JSON.stringify(result.value.err),
           }
       }
-    const res: any = this.viewHelper.decodeLogs(result, index, 'getRemoveLiquidityAmountAndFee')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'get_remove_liquidity_amount_and_fee')
 
     return {
       amount: res.amount,
@@ -3819,7 +3820,7 @@ export class PerpetualsClient {
       .getAddCompoundingLiquidityAmountAndFee({
         amountIn: amount,
       })
-      .accounts({
+      .accountsPartial({
         perpetuals: POOL_CONFIG.perpetuals,
         pool: poolKey,
         inCustody: depositCustodyKey,
@@ -3844,8 +3845,8 @@ export class PerpetualsClient {
     }
 
     const result = await this.viewHelper.simulateTransaction(transaction, addressLookupTables, userPublicKey)
-    const index = IDL.instructions.findIndex((f) => f.name === 'getAddCompoundingLiquidityAmountAndFee')
-    const res: any = this.viewHelper.decodeLogs(result, index, 'getAddCompoundingLiquidityAmountAndFee')
+    const index = IDL.instructions.findIndex((f) => f.name === 'get_add_compounding_liquidity_amount_and_fee')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'get_add_compounding_liquidity_amount_and_fee')
 
     return {
       amount: res.amount,
@@ -3906,7 +3907,7 @@ export class PerpetualsClient {
       .getRemoveCompoundingLiquidityAmountAndFee({
         compoundingAmountIn: amount,
       })
-      .accounts({
+      .accountsPartial({
         perpetuals: POOL_CONFIG.perpetuals,
         pool: poolKey,
         outCustody: removeTokenCustodyKey,
@@ -3931,14 +3932,14 @@ export class PerpetualsClient {
     const { addressLookupTables } = await this.getOrLoadAddressLookupTable(POOL_CONFIG)
 
     const result = await this.viewHelper.simulateTransaction(transaction, addressLookupTables, userPublicKey)
-    const index = IDL.instructions.findIndex((f) => f.name === 'getRemoveCompoundingLiquidityAmountAndFee')
+    const index = IDL.instructions.findIndex((f) => f.name === 'get_remove_compounding_liquidity_amount_and_fee')
     if (result.value.err) {
       return {
         amount: new BN(0),
         fee: new BN(0),
       }
     }
-    const res: any = this.viewHelper.decodeLogs(result, index, 'getRemoveCompoundingLiquidityAmountAndFee')
+    const res: any = this.viewHelper.decodeLogs(result, index, 'get_remove_compounding_liquidity_amount_and_fee')
 
     return {
       amount: res.amount,
@@ -3965,7 +3966,7 @@ export class PerpetualsClient {
 
       return await this.program.methods
         .getLiquidationPrice({})
-        .accounts({
+        .accountsPartial({
           perpetuals: this.perpetuals.publicKey,
           pool: poolConfig.poolAddress,
           position: positionAccountKey,
@@ -4001,7 +4002,7 @@ export class PerpetualsClient {
    
     return await this.program.methods
       .getLiquidationState({})
-      .accounts({
+      .accountsPartial({
         perpetuals: this.perpetuals.publicKey,
         pool: poolConfig.poolAddress,
         position: positionAccount,
@@ -4046,7 +4047,7 @@ export class PerpetualsClient {
 
     return await this.program.methods
       .getCompoundingTokenData({})
-      .accounts({
+      .accountsPartial({
         perpetuals: this.perpetuals.publicKey,
         pool: poolConfig.poolAddress,
         lpTokenMint: poolConfig.stakedLpTokenMint,
@@ -4059,7 +4060,6 @@ export class PerpetualsClient {
         throw err;
       });
   };
-
 
 
 
@@ -4164,11 +4164,11 @@ export class PerpetualsClient {
     // replace with getPositionKey()
     let positionAccount = poolConfig.getPositionFromMarketPk(publicKey, marketAccount)
 
-    const params: OpenPositionParams = {
-      priceWithSlippage: priceWithSlippage,
+    const params = {
+      priceWithSlippage,
       collateralAmount: collateralWithfee,
-      sizeAmount : size,
-      privilege : privilege
+      sizeAmount: size,
+      privilege: privilege as any
     };
 
     // ephemeralSignerPubkey = undefined // for Squads wallet
@@ -4177,7 +4177,7 @@ export class PerpetualsClient {
     
     let instruction = await this.program.methods
       .openPosition(params)
-      .accounts({
+      .accountsPartial({
         owner: publicKey,
         feePayer: publicKey,
         fundingAccount: collateralSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userCollateralTokenAccount,
@@ -4192,8 +4192,6 @@ export class PerpetualsClient {
         collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
         systemProgram: SystemProgram.programId,
         fundingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-        eventAuthority: this.eventAuthority.publicKey,
-        program: this.programId,
         transferAuthority: this.authority.publicKey,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
         fundingMint: collateralCustodyConfig.mintKey
@@ -4302,9 +4300,9 @@ export class PerpetualsClient {
       let instruction = await this.program.methods
         .closePosition({
           priceWithSlippage: priceWithSlippage,
-          privilege: privilege
+          privilege: privilege as any
         })
-        .accounts({
+        .accountsPartial({
           feePayer: publicKey,
           owner: publicKey,
           receivingAccount: collateralSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey)  : userReceivingTokenAccount,
@@ -4320,7 +4318,6 @@ export class PerpetualsClient {
           collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount, 
           eventAuthority : this.eventAuthority.publicKey,
 
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           collateralMint: collateralCustodyConfig.mintKey,
           collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
@@ -4533,9 +4530,9 @@ export class PerpetualsClient {
             amountIn,
             priceWithSlippage,
             sizeAmount,
-            privilege
+            privilege: privilege as any
           })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           feePayer: publicKey,
           fundingAccount: userInputTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey)  : userInputTokenAccount,
@@ -4560,7 +4557,6 @@ export class PerpetualsClient {
 
           systemProgram: SystemProgram.programId,
           eventAuthority : this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           fundingMint: userInputCustodyConfig.mintKey,
           fundingTokenProgram: poolConfig.getTokenFromSymbol(userInputTokenSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
@@ -4719,9 +4715,9 @@ export class PerpetualsClient {
       let inx = await this.program.methods
         .closeAndSwap({
           priceWithSlippage,
-          privilege
+          privilege: privilege as any
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           feePayer: publicKey,
           receivingAccount : userOutputTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userReceivingTokenAccount,
@@ -4745,8 +4741,6 @@ export class PerpetualsClient {
 
           // tokenProgram: TOKEN_PROGRAM_ID,
           
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
 
           receivingMint: userOutputCustodyConfig.mintKey,
@@ -4869,7 +4863,7 @@ export class PerpetualsClient {
 
     let instruction = await this.program.methods.addCollateral({
       collateralDelta: collateralWithFee
-    }).accounts({
+    }).accountsPartial({
       owner: publicKey,
       position: positionPubKey,
       market: marketAccount,
@@ -4881,9 +4875,7 @@ export class PerpetualsClient {
       collateralCustody: collateralCustodyConfig.custodyAccount,
       collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
       collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount, 
-      eventAuthority: this.eventAuthority.publicKey,
       fundingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-      program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       fundingMint: collateralCustodyConfig.mintKey
     })
@@ -5016,7 +5008,7 @@ export class PerpetualsClient {
 
     let instruction = await this.program.methods.swapAndAddCollateral({
       amountIn: amountIn,
-    }).accounts({
+    }).accountsPartial({
       owner: publicKey,
       feePayer: publicKey,
       fundingAccount: inputSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userInputTokenAccount, // user token account for custody token account
@@ -5038,9 +5030,7 @@ export class PerpetualsClient {
       collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
       collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
 
-      eventAuthority: this.eventAuthority.publicKey,
       fundingTokenProgram: poolConfig.getTokenFromSymbol(inputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-      program: this.programId,
 
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       fundingMint: poolConfig.getTokenFromSymbol(inputSymbol).mintKey,
@@ -5151,7 +5141,7 @@ export class PerpetualsClient {
     .removeCollateral({
         collateralDeltaUsd: collateralDeltaUsd,
     })
-    .accounts({
+    .accountsPartial({
         owner: publicKey,
         receivingAccount: collateralSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userReceivingTokenAccount, // user token account for custody token account
         transferAuthority: poolConfig.transferAuthority,
@@ -5167,7 +5157,6 @@ export class PerpetualsClient {
         collateralCustodyTokenAccount:  collateralCustodyConfig.tokenAccount,
         eventAuthority : this.eventAuthority.publicKey,
         receivingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-        program: this.programId,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
         receivingMint: collateralCustodyConfig.mintKey
     })
@@ -5308,7 +5297,7 @@ export class PerpetualsClient {
       .removeCollateralAndSwap({
         collateralDeltaUsd: collateralDeltaUsd,
       })
-      .accounts({
+      .accountsPartial({
         owner: publicKey,
         feePayer: publicKey,
         // swapOutput
@@ -5332,9 +5321,7 @@ export class PerpetualsClient {
         dispensingOracleAccount: this.useExtOracleAccount ? outputCustodyConfig.extOracleAccount : outputCustodyConfig.intOracleAccount,
         dispensingCustodyTokenAccount: outputCustodyConfig.tokenAccount,
 
-        eventAuthority: this.eventAuthority.publicKey,
 
-        program: this.programId,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
         receivingMint: outputCustodyConfig.mintKey,
         receivingTokenProgram: poolConfig.getTokenFromSymbol(outputSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
@@ -5387,11 +5374,11 @@ export class PerpetualsClient {
 
     let instruction = await this.program.methods
     .increaseSize( {
-      priceWithSlippage: priceWithSlippage,
-      sizeDelta: sizeDelta,
-      privilege : privilege
+      priceWithSlippage,
+      sizeDelta,
+      privilege: privilege as any
      } )
-    .accounts({
+    .accountsPartial({
       owner: publicKey,
       transferAuthority: poolConfig.transferAuthority,
       perpetuals: poolConfig.perpetuals,
@@ -5405,7 +5392,6 @@ export class PerpetualsClient {
       collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
       collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       eventAuthority : this.eventAuthority.publicKey,
-      program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       collateralMint: collateralCustodyConfig.mintKey
     })
@@ -5457,11 +5443,11 @@ export class PerpetualsClient {
     
     let instruction = await this.program.methods
     .decreaseSize( {
-      priceWithSlippage: priceWithSlippage,
-      sizeDelta: sizeDelta,
-      privilege : privilege
+      priceWithSlippage,
+      sizeDelta,
+      privilege: privilege as any
     } )
-    .accounts({
+    .accountsPartial({
       owner: publicKey,
       transferAuthority: poolConfig.transferAuthority,
       perpetuals: poolConfig.perpetuals,
@@ -5476,7 +5462,6 @@ export class PerpetualsClient {
       collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
       collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
       eventAuthority : this.eventAuthority.publicKey,
-      program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       collateralMint: collateralCustodyConfig.mintKey
     })
@@ -5648,7 +5633,7 @@ export class PerpetualsClient {
           amountIn: tokenAmountIn,
           minLpAmountOut
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           fundingAccount: payTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userPayingTokenAccount, // user token account for custody token account
           lpTokenAccount,
@@ -5661,7 +5646,6 @@ export class PerpetualsClient {
           lpTokenMint: poolConfig.stakedLpTokenMint,
           eventAuthority : this.eventAuthority.publicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           fundingMint: payTokenCustodyConfig.mintKey,
           fundingTokenProgram: payToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
@@ -5840,7 +5824,7 @@ export class PerpetualsClient {
     let instruction = await this.program.methods.addLiquidityAndStake({
       amountIn: amountIn,
       minLpAmountOut: minLpAmountOut,
-    }).accounts({
+    }).accountsPartial({
       owner: publicKey,
       feePayer: publicKey,
       fundingAccount: inputSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userInputTokenAccount, // user token account for custody token account
@@ -5859,8 +5843,6 @@ export class PerpetualsClient {
 
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
-      eventAuthority: this.eventAuthority.publicKey,
-      program: this.programId,
       ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
       fundingMint: inputCustodyConfig.mintKey,
       fundingTokenProgram: inputToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
@@ -6015,7 +5997,7 @@ export class PerpetualsClient {
           lpAmountIn: liquidityAmountIn,
           minAmountOut: minTokenAmountOut
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           receivingAccount: recieveTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userReceivingTokenAccount, // user token account for custody token account
           lpTokenAccount: stakedLpTokenAccount,
@@ -6028,7 +6010,6 @@ export class PerpetualsClient {
           lpTokenMint: poolConfig.stakedLpTokenMint,
           eventAuthority : this.eventAuthority.publicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: recieveTokenCustodyConfig.mintKey,
           receivingTokenProgram: recieveToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID ,
@@ -6076,7 +6057,7 @@ export class PerpetualsClient {
     try {
       let addReferralInstruction = await this.program.methods
           .createReferral({})
-          .accounts({
+          .accountsPartial({
             owner: publicKey,
             feePayer: publicKey,
             referralAccount: nftReferralAccount,
@@ -6136,7 +6117,7 @@ export class PerpetualsClient {
           .depositStake({
             depositAmount: depositAmount
           })
-          .accounts({
+          .accountsPartial({
             owner,
             feePayer,
             fundingLpTokenAccount: userLpTokenAccount,
@@ -6148,8 +6129,6 @@ export class PerpetualsClient {
 
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
-            program: this.programId,
             lpTokenMint: poolConfig.stakedLpTokenMint,
           })
           .instruction();
@@ -6211,12 +6190,11 @@ export class PerpetualsClient {
       
       let refreshStakeInstruction = await this.program.methods
           .refreshStake({})
-          .accounts({
+          .accountsPartial({
             perpetuals: this.perpetuals.publicKey,
             pool: pool,
             rewardCustody: rewardCustodyConfig.custodyAccount,
             feeDistributionTokenAccount: feeDistributionTokenAccount,
-            eventAuthority: this.eventAuthority.publicKey,
             program: this.program.programId,
           })
           .remainingAccounts([...custodyAccountMetas, ...flpStakeAccountMetas])
@@ -6284,12 +6262,11 @@ export class PerpetualsClient {
       
       let refreshStakeInstruction = await this.program.methods
           .refreshStake({})
-          .accounts({
+          .accountsPartial({
             perpetuals: this.perpetuals.publicKey,
             pool: pool,
             rewardCustody: rewardCustodyConfig.custodyAccount,
             feeDistributionTokenAccount: feeDistributionTokenAccount,
-            eventAuthority: this.eventAuthority.publicKey,
             program: this.program.programId,
           })
           .remainingAccounts([...custodyAccountMetas, ...stakeAccountMetas ])
@@ -6354,13 +6331,12 @@ export class PerpetualsClient {
           .unstakeInstant({
             unstakeAmount: unstakeAmount
           })
-          .accounts({
+          .accountsPartial({
             owner: publicKey,
             perpetuals: this.perpetuals.publicKey,
             pool: pool,
             flpStakeAccount: flpStakeAccount,
             rewardCustody: rewardCustodyConfig.custodyAccount,
-            eventAuthority: this.eventAuthority.publicKey,
             program: this.program.programId,
           })
           .remainingAccounts([...tokenStakeAccounts])
@@ -6417,7 +6393,7 @@ export class PerpetualsClient {
         .setFeeShare({
           feeShareBps: new BN(7000)
         })
-        .accounts({
+        .accountsPartial({
           admin: publicKey,
           multisig: this.multisig.publicKey,
           pool: pool,
@@ -6458,7 +6434,7 @@ export class PerpetualsClient {
           .unstakeRequest({
             unstakeAmount: unstakeAmount
           })
-          .accounts({
+          .accountsPartial({
             owner: publicKey,
             perpetuals: this.perpetuals.publicKey,
             pool: pool,
@@ -6466,7 +6442,6 @@ export class PerpetualsClient {
 
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
             program: this.programId
           })
           .instruction();
@@ -6534,7 +6509,7 @@ export class PerpetualsClient {
             pendingActivation: pendingActivation,
             deactivated: deactivated
           })
-          .accounts({
+          .accountsPartial({
             owner: publicKey,
             receivingLpTokenAccount: userLpTokenAccount,
             transferAuthority: poolConfig.transferAuthority,
@@ -6544,7 +6519,6 @@ export class PerpetualsClient {
             poolStakedLpVault: poolStakedLpVault,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
             program: this.program.programId,
             lpMint: poolConfig.stakedLpTokenMint,
           })
@@ -6623,7 +6597,7 @@ export class PerpetualsClient {
 
       let withdrawStakeInstruction = await this.program.methods
           .collectStakeFees({})
-          .accounts({
+          .accountsPartial({
             owner: publicKey,
             receivingTokenAccount: receivingTokenAccount,
             transferAuthority: poolConfig.transferAuthority,
@@ -6636,7 +6610,6 @@ export class PerpetualsClient {
             program: this.program.programId,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
-            eventAuthority: this.eventAuthority.publicKey,
             ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
             receivingMint: rewardCustodyMint,
           })
@@ -6833,7 +6806,7 @@ export class PerpetualsClient {
           amountIn: amountIn,
           minCompoundingAmountOut: minCompoundingAmountOut
         })
-        .accounts({
+        .accountsPartial({
         owner: publicKey,
         fundingAccount: inTokenSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : fundingAccount,
         compoundingTokenAccount: compoundingTokenAccount,
@@ -6851,7 +6824,6 @@ export class PerpetualsClient {
         compoundingTokenMint: compoundingTokenMint,
         
         tokenProgram: TOKEN_PROGRAM_ID,
-        eventAuthority: this.eventAuthority.publicKey,
         program: this.program.programId,
         ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
         fundingMint: inCustodyConfig.mintKey,
@@ -7020,7 +6992,7 @@ export class PerpetualsClient {
           compoundingAmountIn: compoundingAmountIn,
           minAmountOut: minAmountOut
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           receivingAccount: outCustodyConfig.symbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey) : userReceivingTokenAccount,
           compoundingTokenAccount: compoundingTokenAccount,
@@ -7038,7 +7010,6 @@ export class PerpetualsClient {
           compoundingTokenMint: compoundingTokenMint,
           
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: outCustodyConfig.mintKey,
@@ -7160,7 +7131,7 @@ export class PerpetualsClient {
         .migrateStake({
           amount: amount
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           compoundingTokenAccount: compoudingTokenAccount,
           transferAuthority: poolConfig.transferAuthority,
@@ -7174,7 +7145,6 @@ export class PerpetualsClient {
           lpTokenMint: lpTokenMint,
           compoundingTokenMint: compoundingTokenMint,
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
         })
@@ -7257,7 +7227,7 @@ export class PerpetualsClient {
         .migrateFlp({
           compoundingTokenAmount: amount
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           compoundingTokenAccount: compoudingTokenAccount,
           transferAuthority: poolConfig.transferAuthority,
@@ -7272,7 +7242,6 @@ export class PerpetualsClient {
           compoundingTokenMint: compoundingTokenMint,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
         })
@@ -7331,7 +7300,7 @@ export class PerpetualsClient {
     try {
       let compoundingFee = await this.program.methods
         .compoundFees({})
-        .accounts({
+        .accountsPartial({
           poolCompoundingLpVault: poolConfig.compoundingLpVault,
           transferAuthority: poolConfig.transferAuthority,
           perpetuals: poolConfig.perpetuals,
@@ -7341,7 +7310,6 @@ export class PerpetualsClient {
           lpTokenMint: lpTokenMint,
 
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
           program: this.program.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
         })
@@ -7399,7 +7367,7 @@ export class PerpetualsClient {
         .depositTokenStake({
           depositAmount: depositAmount
         })
-        .accounts({
+        .accountsPartial({
           owner: owner,
           feePayer: feePayer,
           fundingTokenAccount: userTokenAccount,
@@ -7411,8 +7379,6 @@ export class PerpetualsClient {
 
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           tokenMint: poolConfig.tokenMint,
         })
         .instruction();
@@ -7451,11 +7417,10 @@ export class PerpetualsClient {
         .unstakeTokenRequest({
           unstakeAmount: unstakeAmount
         })
-        .accounts({
+        .accountsPartial({
           owner: owner,
           tokenVault: poolConfig.tokenVault,
           tokenStakeAccount: tokenStakeAccount,
-          eventAuthority: this.eventAuthority.publicKey,
           program: this.programId
         })
         .instruction();
@@ -7511,7 +7476,7 @@ export class PerpetualsClient {
         .unstakeTokenInstant({
           unstakeAmount: unstakeAmount
         })
-        .accounts({
+        .accountsPartial({
           owner: owner,
           receivingTokenAccount: userTokenAccount,
           perpetuals: poolConfig.perpetuals,
@@ -7521,8 +7486,6 @@ export class PerpetualsClient {
 
           tokenStakeAccount: tokenStakeAccount,
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           tokenMint: poolConfig.tokenMint,
         })
         .instruction();
@@ -7579,7 +7542,7 @@ export class PerpetualsClient {
         .withdrawToken({
           withdrawRequestId: withdrawRequestId
         })
-        .accounts({
+        .accountsPartial({
           owner: owner,
           receivingTokenAccount: userTokenAccount,
           perpetuals: this.perpetuals.publicKey,
@@ -7590,8 +7553,6 @@ export class PerpetualsClient {
           tokenStakeAccount: tokenStakeAccount,
 
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           tokenMint: poolConfig.tokenMint,
         })
         .instruction();
@@ -7630,12 +7591,11 @@ export class PerpetualsClient {
         .cancelUnstakeTokenRequest({
           withdrawRequestId: withdrawRequestId
         })
-        .accounts({
+        .accountsPartial({
           owner: owner,
           tokenVault: poolConfig.tokenVault,
           tokenStakeAccount: tokenStakeAccount,
 
-          eventAuthority: this.eventAuthority.publicKey,
           program: this.programId
         })
         .instruction();
@@ -7693,7 +7653,7 @@ export class PerpetualsClient {
 
       let collectTokenRewardInstruction = await this.program.methods
         .collectTokenReward({})
-        .accounts({
+        .accountsPartial({
           owner: owner,
           receivingTokenAccount: userTokenAccount,
           perpetuals: this.perpetuals.publicKey,
@@ -7703,8 +7663,6 @@ export class PerpetualsClient {
           tokenStakeAccount: tokenStakeAccount,
 
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           tokenMint: poolConfig.tokenMint,
         })
         .instruction();
@@ -7762,7 +7720,7 @@ export class PerpetualsClient {
 
       let collectRevenueInstruction = await this.program.methods
         .collectRevenue({})
-        .accounts({
+        .accountsPartial({
           owner: owner,
           receivingRevenueAccount: userTokenAccount,
           perpetuals: this.perpetuals.publicKey,
@@ -7772,8 +7730,6 @@ export class PerpetualsClient {
           tokenStakeAccount: tokenStakeAccount,
 
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           receivingTokenMint: rewardCustodyMint,
         })
         .instruction();
@@ -7831,7 +7787,7 @@ export class PerpetualsClient {
 
       let collectRebateInstruction = await this.program.methods
         .collectRebate()
-        .accounts({
+        .accountsPartial({
           owner: owner,
           receivingTokenAccount: userTokenAccount,
           perpetuals: this.perpetuals.publicKey,
@@ -7841,8 +7797,6 @@ export class PerpetualsClient {
           tokenStakeAccount: tokenStakeAccount,
 
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           receivingTokenMint: rebateMint,
         })
         .instruction();
@@ -7879,7 +7833,7 @@ export class PerpetualsClient {
 
       let settleRebatesInstruction = await this.program.methods
         .settleRebates()
-        .accounts({
+        .accountsPartial({
           transferAuthority: poolConfig.transferAuthority,
           perpetuals: this.perpetuals.publicKey,
           pool: poolConfig.poolAddress,
@@ -7891,8 +7845,6 @@ export class PerpetualsClient {
           tokenMint: rebateMint,
 
           tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
         })
         .instruction();
@@ -8020,7 +7972,7 @@ export class PerpetualsClient {
           stopLossPrice: stopLossPrice,
           takeProfitPrice: takeProfitPrice
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           feePayer: publicKey,
           fundingAccount: reserveSymbol == 'SOL' ? wrappedSolAccount.publicKey : userReserveTokenAccount,
@@ -8038,8 +7990,6 @@ export class PerpetualsClient {
 
           systemProgram: SystemProgram.programId,
           fundingTokenProgram: poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           fundingMint: reserveCustodyConfig.mintKey,
         })
@@ -8156,7 +8106,7 @@ export class PerpetualsClient {
           stopLossPrice: stopLossPrice,
           takeProfitPrice: takeProfitPrice
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           feePayer: publicKey,
           receivingAccount: reserveSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey)  : userReceivingTokenAccount,
@@ -8173,8 +8123,6 @@ export class PerpetualsClient {
           reserveCustodyTokenAccount: reserveCustodyConfig.tokenAccount,
           receiveCustody: receiveCustodyConfig.custodyAccount,
           receivingTokenProgram: poolConfig.getTokenFromSymbol(reserveSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: poolConfig.getTokenFromSymbol(reserveSymbol).mintKey
 
@@ -8227,9 +8175,9 @@ export class PerpetualsClient {
       let executeLimitOrder = await this.program.methods
         .executeLimitOrder({
           orderId: orderId,
-          privilege: privilege
+          privilege: privilege as any
         })
-        .accounts({
+        .accountsPartial({
           positionOwner: userPubkey,
           feePayer: publicKey,
           transferAuthority: poolConfig.transferAuthority,
@@ -8246,8 +8194,6 @@ export class PerpetualsClient {
 
           systemProgram: SystemProgram.programId,
           collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           collateralMint: collateralCustodyConfig.mintKey,
         })
@@ -8302,9 +8248,9 @@ export class PerpetualsClient {
       let executeLimitWithSwap = await this.program.methods
         .executeLimitWithSwap({
           orderId: orderId,
-          privilege: privilege
+          privilege: privilege as any
         })
-        .accounts({
+        .accountsPartial({
           positionOwner: userPubkey,
           feePayer: publicKey,
           transferAuthority: poolConfig.transferAuthority,
@@ -8323,8 +8269,6 @@ export class PerpetualsClient {
 
           systemProgram: SystemProgram.programId,
           collateralTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           collateralMint: collateralCustodyConfig.mintKey,
         })
@@ -8380,7 +8324,7 @@ export class PerpetualsClient {
           deltaSizeAmount: deltaSizeAmount,
           isStopLoss: isStopLoss
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           feePayer: publicKey,
           perpetuals: poolConfig.perpetuals,
@@ -8395,8 +8339,6 @@ export class PerpetualsClient {
           receiveCustody: receivingCustodyConfig.custodyAccount,
 
           systemProgram: SystemProgram.programId,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
         })
         .instruction();
@@ -8452,7 +8394,7 @@ export class PerpetualsClient {
           deltaSizeAmount: deltaSizeAmount,
           isStopLoss: isStopLoss
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           perpetuals: poolConfig.perpetuals,
           pool: poolConfig.poolAddress,
@@ -8465,8 +8407,6 @@ export class PerpetualsClient {
           collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
           receiveCustody: receivingCustodyConfig.custodyAccount,
 
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY
         })
         .instruction();
@@ -8515,12 +8455,10 @@ export class PerpetualsClient {
           orderId: orderId,
           isStopLoss: isStopLoss
         })
-        .accounts({
+        .accountsPartial({
           owner: publicKey,
           order: orderAccount,
 
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
         })
         .instruction();
 
@@ -8561,11 +8499,9 @@ export class PerpetualsClient {
 
       let cancelAllTriggerOrders = await this.program.methods
         .cancelAllTriggerOrders()
-        .accounts({
+        .accountsPartial({
           position: positionAccount,
           order: orderAccount,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
         })
         .instruction();
 
@@ -8712,9 +8648,9 @@ export class PerpetualsClient {
         .executeTriggerWithSwap({
           isStopLoss: isStopLoss,
           orderId: orderId,
-          privilege: privilege
+          privilege: privilege as any
         })
-        .accounts({
+        .accountsPartial({
           positionOwner: owner,
           feePayer: payerPubkey,
           receivingAccount: userReceivingTokenAccount, // collateralSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey)  : userReceivingTokenAccount,
@@ -8734,8 +8670,6 @@ export class PerpetualsClient {
           dispensingOracleAccount: this.useExtOracleAccount ? receivingCustodyConfig.extOracleAccount : receivingCustodyConfig.intOracleAccount,
           dispensingCustodyTokenAccount: receivingCustodyConfig.tokenAccount,
           // tokenProgram: TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: receivingCustodyConfig.mintKey,
           receivingTokenProgram: receivingToken.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID, //TODO: tokenType
@@ -8852,9 +8786,9 @@ export class PerpetualsClient {
         .executeTriggerOrder({
           isStopLoss: isStopLoss,
           orderId: orderId,
-          privilege: privilege
+          privilege: privilege as any
         })
-        .accounts({
+        .accountsPartial({
           feePayer: payerPubkey,
           positionOwner : owner,
           receivingAccount: userReceivingTokenAccount, // collateralSymbol == 'SOL' ? (ephemeralSignerPubkey ? ephemeralSignerPubkey : wrappedSolAccount.publicKey)  : userReceivingTokenAccount,
@@ -8870,8 +8804,6 @@ export class PerpetualsClient {
           collateralOracleAccount: this.useExtOracleAccount ? collateralCustodyConfig.extOracleAccount : collateralCustodyConfig.intOracleAccount,
           collateralCustodyTokenAccount: collateralCustodyConfig.tokenAccount,
           receivingTokenProgram: poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID,
-          eventAuthority: this.eventAuthority.publicKey,
-          program: this.programId,
           ixSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
           receivingMint: collateralCustodyConfig.mintKey
         })
@@ -8928,4 +8860,4 @@ export class PerpetualsClient {
   }
 
 
-}
+ }

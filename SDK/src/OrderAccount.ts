@@ -7,7 +7,7 @@ export class OrderAccount implements Order{
 
     public publicKey: PublicKey;
 
-    //  all Position Type data IMP:: SHOULD MATCH NAMES 
+    //  all Position Type data IMP:: SHOULD MATCH NAMES (camelCase for Anchor v0.32)
     public owner: PublicKey;
     public market: PublicKey;
 
@@ -24,7 +24,7 @@ export class OrderAccount implements Order{
     public inactiveTp: number;
     public activeOrders: number;
 
-    // extra 
+    // extra
     public bump: number;
     public referenceTimestamp: BN;
     public executionCount: BN;

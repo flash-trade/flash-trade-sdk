@@ -8,7 +8,7 @@ export const REMORA_TOKENS_WITH_PRICE_IDS = [
         "tokenPrecision": 4,
         "isStable": false,
         "isVirtual": false,
-        "lazerId": 7,
+        "lazerId": 1435,
         "pythTicker": "Equity.US.TSLA/USD",
         "pythPriceId": "0x16dad506d7db8da01c87581c87ca897a012a153557d4d578c3b9c9e1bc0632f1",
         "isToken2022": true
@@ -60,7 +60,7 @@ export const REMORA_TOKENS_WITH_PRICE_IDS = [
         "tokenPrecision": 4,
         "isStable": false,
         "isVirtual": false,
-        "lazerId": 182,
+        "lazerId": 1314,
         "pythTicker": "Equity.US.NVDA/USD",
         "pythPriceId": "0xb1073854ed24cbc755dc527418f52b7d271f6cc967bbf8d8129112b18860a593",
         "isToken2022": true
@@ -112,7 +112,7 @@ export const REMORA_TOKENS_WITH_PRICE_IDS = [
         "tokenPrecision": 4,
         "isStable": false,
         "isVirtual": false,
-        "lazerId": 182,
+        "lazerId": 1683,
         "pythTicker": "Equity.US.CRCL/USD",
         "pythPriceId": "0x92b8527aabe59ea2b12230f7b532769b133ffb118dfbd48ff676f14b273f1365",
         "isToken2022": true
@@ -164,7 +164,7 @@ export const REMORA_TOKENS_WITH_PRICE_IDS = [
         "tokenPrecision": 4,
         "isStable": false,
         "isVirtual": false,
-        "lazerId": 182,
+        "lazerId": 1294,
         "pythTicker": "Equity.US.MSTR/USD",
         "pythPriceId": "0xe1e80251e5f5184f2195008382538e847fafc36f751896889dd3d1b1f6111f09",
         "isToken2022": true
@@ -216,7 +216,7 @@ export const REMORA_TOKENS_WITH_PRICE_IDS = [
         "tokenPrecision": 4,
         "isStable": false,
         "isVirtual": false,
-        "lazerId": 182,
+        "lazerId": 1398,
         "pythTicker": "Equity.US.SPY/USD",
         "pythPriceId": "0x19e09bb805456ada3979a7d1cbb4b6d63babc3a0f8e8a9509f68afa5c4c11cd5",
         "isToken2022": true

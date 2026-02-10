@@ -10,7 +10,7 @@ export class CustodyAccount implements Custody {
 
       publicKey: PublicKey;
 
-      //  all Custody Type data IMP:: SHOULD MATCH NAMES 
+      //  all Custody Type data IMP:: SHOULD MATCH NAMES (camelCase for Anchor v0.32)
       pool: PublicKey;
       mint: PublicKey;
       tokenAccount: PublicKey;
@@ -18,7 +18,7 @@ export class CustodyAccount implements Custody {
       isStable: boolean;
       depegAdjustment: boolean;
       isVirtual: boolean;
-      distributeRewards: boolean; 
+      inversePrice: boolean; 
       oracle: OracleParams;
       pricing: PricingParams;
       permissions: Permissions;
@@ -29,9 +29,6 @@ export class CustodyAccount implements Custody {
       assets: Assets;
       feesStats: FeesStats;
       borrowRateState: BorrowRateState;
-
-      // longPositions: PositionStats;
-      // shortPositions: PositionStats;
 
       bump: number;
       tokenAccountBump: number;
@@ -53,43 +50,9 @@ export class CustodyAccount implements Custody {
           parseData
         );
       }
-  
+
       updateCustodyData(custody: Custody) {
             Object.assign(this,{...custody})
       }
-
-      // getCollectivePosition(side: Side):PositionAccount {
-      //   let stats : PositionStats; 
-      //   if ( isVariant(side,'long')) {
-      //     stats = this.longPositions;
-      //   } else {
-      //     stats = this.shortPositions;
-      //   };
-      //   if (stats.openPositions.gt(BN_ZERO)) {
-            
-      //       const obj: Position =  {
-      //         side,
-      //         price: stats.averagePrice.div(stats.totalQuantity),
-      //         sizeUsd: stats.sizeUsd,
-      //         collateralUsd: stats.collateralUsd,
-      //         unrealizedLossUsd: stats.cumulativeInterestUsd,
-      //         cumulativeInterestSnapshot: stats.cumulativeInterestSnapshot,
-      //         lockedAmount: stats.lockedAmount,
-      //         ...DEFAULT_POSITION
-      //       } as Position;
-      //       return new PositionAccount(
-      //         PublicKey.default,
-      //         obj
-      //       )
-      //   } else {
-      //     return new PositionAccount(
-      //       PublicKey.default,
-      //       DEFAULT_POSITION
-      //     )
-      //   }
-      // }
-
-      
-      
 
   }

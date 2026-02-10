@@ -1,6 +1,6 @@
 import { PublicKey, RpcResponseAndContext, SimulatedTransactionResponse, Transaction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
 import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
-import { IDL } from "./idl/perpetuals";
+import IDL from "./idl/perpetuals.json";
 import { IdlCoder } from "./utils/IdlCoder";
 import { PerpetualsClient } from "./PerpetualsClient";
 import { AddressLookupTableAccount } from "@solana/web3.js";
@@ -32,8 +32,8 @@ export class ViewHelper {
                     throw new Error('View expected return type');
                 }
                 const coder = IdlCoder.fieldLayout(
-                    { type: returnType },
-                    Array.from([...(IDL.accounts ?? []), ...(IDL.types ?? [])])
+                    { type: returnType as any },
+                    Array.from([...(IDL.accounts ?? []), ...(IDL.types ?? [])]) as any
                 );
                 return coder.decode(returnData);
             } else {
