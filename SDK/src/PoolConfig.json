@@ -3756,9 +3756,9 @@
           "tokenPrecision": 4,
           "isStable": false,
           "isVirtual": false,
-          "lazerId": 102,
-          "pythTicker": "Crypto.W/USD",
-          "pythPriceId": "0xeff7446475e218517566ea99e72a4abec2e1bd8498b43b7d8331e29dcb059389",
+          "lazerId": 2382,
+          "pythTicker": "Crypto.MET/USD",
+          "pythPriceId": "0x0292e0f405bcd4a496d34e48307f6787349ad2bcd8505c3d3a9f77d81a67a682",
           "isToken2022": false
         }
       ],
@@ -3895,9 +3895,9 @@
           "isVirtual": false,
           "intOracleAddress": "792tp3W9dzvfofq65LgtoJdfCdb9cRoXm1pAT3nxNEbG",
           "extOracleAddress": "BEMsCSQEGi2kwPA4mKnGjxnreijhMki7L4eeb96ypzF9",
-          "lazerId": 102,
-          "pythTicker": "Crypto.W/USD",
-          "pythPriceId": "0xeff7446475e218517566ea99e72a4abec2e1bd8498b43b7d8331e29dcb059389"
+          "lazerId": 2382,
+          "pythTicker": "Crypto.MET/USD",
+          "pythPriceId": "0x0292e0f405bcd4a496d34e48307f6787349ad2bcd8505c3d3a9f77d81a67a682"
         }
       ],
       "markets": [

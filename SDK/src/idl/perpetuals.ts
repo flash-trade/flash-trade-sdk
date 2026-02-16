@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/perpetuals.json`.
  */
 export type Perpetuals = {
-  "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+  "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4",
   "metadata": {
     "name": "perpetuals",
     "version": "1.1.0",
@@ -255,7 +255,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -494,7 +494,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -1181,7 +1181,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -1458,7 +1458,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -1880,7 +1880,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": []
@@ -1963,7 +1963,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -2077,7 +2077,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -2448,7 +2448,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -2752,7 +2752,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -2971,7 +2971,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "receivingTokenMint"
@@ -3176,7 +3176,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "receivingTokenMint"
@@ -3427,7 +3427,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -3650,7 +3650,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "tokenMint"
@@ -3828,7 +3828,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -4291,7 +4291,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -4524,7 +4524,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "lpTokenMint"
@@ -4721,7 +4721,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "tokenMint"
@@ -4929,7 +4929,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "tokenMint"
@@ -5276,7 +5276,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -5539,7 +5539,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -5858,7 +5858,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -6211,7 +6211,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -6532,7 +6532,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -6929,7 +6929,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -9381,7 +9381,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -9497,7 +9497,7 @@ export type Perpetuals = {
         },
         {
           "name": "perpetualsProgram",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "perpetualsProgramData"
@@ -10807,7 +10807,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -11036,7 +11036,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -11260,7 +11260,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -11590,7 +11590,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "tokenMint"
@@ -11879,7 +11879,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -12203,7 +12203,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -12474,7 +12474,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -12651,7 +12651,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -12660,6 +12660,110 @@ export type Perpetuals = {
           "type": {
             "defined": {
               "name": "refreshStakeParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "refreshTokenStake",
+      "discriminator": [
+        55,
+        39,
+        150,
+        54,
+        174,
+        139,
+        76,
+        69
+      ],
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "eventAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "refreshTokenStakeParams"
             }
           }
         }
@@ -12791,7 +12895,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -13084,7 +13188,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -13463,7 +13567,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -13708,7 +13812,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -14130,7 +14234,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -15201,63 +15305,33 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "setInternalOraclePrice",
+      "name": "setInternalLazerPrice",
       "discriminator": [
-        174,
-        160,
-        15,
-        168,
-        232,
-        159,
-        122,
-        204
+        56,
+        112,
+        153,
+        62,
+        193,
+        123,
+        193,
+        115
       ],
       "accounts": [
         {
-          "name": "authority",
+          "name": "payer",
           "writable": true,
           "signer": true
         },
         {
-          "name": "perpetuals"
+          "name": "pythStorage"
         },
         {
-          "name": "pool"
-        },
-        {
-          "name": "custody",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  117,
-                  115,
-                  116,
-                  111,
-                  100,
-                  121
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool"
-              },
-              {
-                "kind": "account",
-                "path": "custody.mint",
-                "account": "custody"
-              }
-            ]
-          }
-        },
-        {
-          "name": "intOracleAccount",
+          "name": "pythTreasury",
           "writable": true
         },
         {
-          "name": "extOracleAccount"
+          "name": "pythLazerProgram",
+          "address": "pytd2yyk641x7ak7mkaasSJVXh6YYZnC7wTmtgAyxPt"
         },
         {
           "name": "systemProgram",
@@ -15269,7 +15343,7 @@ export type Perpetuals = {
           "name": "params",
           "type": {
             "defined": {
-              "name": "setInternalOraclePriceParams"
+              "name": "setInternalLazerPriceParams"
             }
           }
         }
@@ -15719,7 +15793,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -16008,7 +16082,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -16433,7 +16507,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -16725,7 +16799,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -17030,7 +17104,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -17329,7 +17403,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -17522,7 +17596,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "ixSysvar",
@@ -17799,7 +17873,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -17938,7 +18012,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -17947,223 +18021,6 @@ export type Perpetuals = {
           "type": {
             "defined": {
               "name": "unstakeRequestParams"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "unstakeTokenInstant",
-      "discriminator": [
-        25,
-        0,
-        89,
-        156,
-        98,
-        220,
-        199,
-        140
-      ],
-      "accounts": [
-        {
-          "name": "owner",
-          "signer": true,
-          "relations": [
-            "receivingTokenAccount"
-          ]
-        },
-        {
-          "name": "receivingTokenAccount",
-          "writable": true
-        },
-        {
-          "name": "perpetuals",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  101,
-                  114,
-                  112,
-                  101,
-                  116,
-                  117,
-                  97,
-                  108,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "transferAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  114,
-                  97,
-                  110,
-                  115,
-                  102,
-                  101,
-                  114,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenVault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  111,
-                  107,
-                  101,
-                  110,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenVaultTokenAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  111,
-                  107,
-                  101,
-                  110,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  116,
-                  111,
-                  107,
-                  101,
-                  110,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenStakeAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  116,
-                  111,
-                  107,
-                  101,
-                  110,
-                  95,
-                  115,
-                  116,
-                  97,
-                  107,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "owner"
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenProgram"
-        },
-        {
-          "name": "eventAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  95,
-                  95,
-                  101,
-                  118,
-                  101,
-                  110,
-                  116,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
-        },
-        {
-          "name": "tokenMint"
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "unstakeTokenInstantParams"
             }
           }
         }
@@ -18269,7 +18126,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         }
       ],
       "args": [
@@ -18907,7 +18764,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "lpMint"
@@ -19125,7 +18982,7 @@ export type Perpetuals = {
         },
         {
           "name": "program",
-          "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn"
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
         },
         {
           "name": "tokenMint"
@@ -20388,6 +20245,32 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "refreshTokenStakeLog",
+      "discriminator": [
+        72,
+        155,
+        111,
+        101,
+        228,
+        125,
+        255,
+        95
+      ]
+    },
+    {
+      "name": "refreshTokenStakeUserLog",
+      "discriminator": [
+        100,
+        14,
+        17,
+        101,
+        26,
+        231,
+        147,
+        98
+      ]
+    },
+    {
       "name": "removeCollateralAndSwapLog",
       "discriminator": [
         19,
@@ -20697,19 +20580,6 @@ export type Perpetuals = {
         24,
         11,
         238
-      ]
-    },
-    {
-      "name": "unstakeTokenInstantLog",
-      "discriminator": [
-        17,
-        112,
-        136,
-        162,
-        64,
-        44,
-        205,
-        221
       ]
     },
     {
@@ -21080,6 +20950,36 @@ export type Perpetuals = {
       "code": 6062,
       "name": "oraclePenaltyAlreadySet",
       "msg": "Oracle penalty already set on this position"
+    },
+    {
+      "code": 6063,
+      "name": "invalidLazerMessage",
+      "msg": "Invalid Lazer message"
+    },
+    {
+      "code": 6064,
+      "name": "invalidLazerPayload",
+      "msg": "Invalid Lazer payload"
+    },
+    {
+      "code": 6065,
+      "name": "invalidLazerChannel",
+      "msg": "Invalid Lazer channel"
+    },
+    {
+      "code": 6066,
+      "name": "invalidLazerTimestamp",
+      "msg": "Invalid Lazer timestamp"
+    },
+    {
+      "code": 6067,
+      "name": "invalidWithdrawal",
+      "msg": "Invalid amount for withdrawal"
+    },
+    {
+      "code": 6068,
+      "name": "invalidWithdrawRequestId",
+      "msg": "Invalid withdraw request ID"
     }
   ],
   "types": [
@@ -21456,8 +21356,8 @@ export type Perpetuals = {
             "type": "i32"
           },
           {
-            "name": "extOracle",
-            "type": "pubkey"
+            "name": "lazerFeedId",
+            "type": "u32"
           }
         ]
       }
@@ -23064,8 +22964,21 @@ export type Perpetuals = {
             "type": "i64"
           },
           {
-            "name": "extOracleAccount",
-            "type": "pubkey"
+            "name": "lazerFeedId",
+            "type": "u32"
+          },
+          {
+            "name": "lazerPrice",
+            "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
           }
         ]
       }
@@ -28086,6 +27999,45 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "refreshTokenStakeLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "revenuePerFafStaked",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "refreshTokenStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "refreshTokenStakeUserLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "revenueAmount",
+            "type": "u64"
+          },
+          {
+            "name": "newlyUnlockedAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "reimburseParams",
       "type": {
         "kind": "struct",
@@ -28673,8 +28625,8 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "extOracle",
-            "type": "pubkey"
+            "name": "lazerFeedId",
+            "type": "u32"
           }
         ]
       }
@@ -28854,33 +28806,13 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "setInternalOraclePriceParams",
+      "name": "setInternalLazerPriceParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "useCurrentTime",
-            "type": "u8"
-          },
-          {
-            "name": "price",
-            "type": "u64"
-          },
-          {
-            "name": "expo",
-            "type": "i32"
-          },
-          {
-            "name": "conf",
-            "type": "u64"
-          },
-          {
-            "name": "ema",
-            "type": "u64"
-          },
-          {
-            "name": "publishTime",
-            "type": "i64"
+            "name": "messageData",
+            "type": "bytes"
           }
         ]
       }
@@ -29194,6 +29126,10 @@ export type Perpetuals = {
                 6
               ]
             }
+          },
+          {
+            "name": "unlockPeriod",
+            "type": "i64"
           }
         ]
       }
@@ -30241,7 +30177,16 @@ export type Perpetuals = {
                     "name": "withdrawRequest"
                   }
                 },
-                5
+                3
+              ]
+            }
+          },
+          {
+            "name": "buffer",
+            "type": {
+              "array": [
+                "u8",
+                8
               ]
             }
           },
@@ -30279,6 +30224,30 @@ export type Perpetuals = {
           },
           {
             "name": "claimableRebateUsd",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "tokenStakeStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "activeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawableAmount",
+            "type": "u64"
+          },
+          {
+            "name": "buffer",
             "type": "u64"
           }
         ]
@@ -30342,7 +30311,7 @@ export type Perpetuals = {
             "name": "tokensStaked",
             "type": {
               "defined": {
-                "name": "stakeStats"
+                "name": "tokenStakeStats"
               }
             }
           },
@@ -30400,11 +30369,15 @@ export type Perpetuals = {
             "type": "u128"
           },
           {
+            "name": "unlockPeriod",
+            "type": "i64"
+          },
+          {
             "name": "padding2",
             "type": {
               "array": [
                 "u64",
-                4
+                3
               ]
             }
           }
@@ -30493,54 +30466,6 @@ export type Perpetuals = {
     },
     {
       "name": "unstakeRequestParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "unstakeAmount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "unstakeTokenInstantLog",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "tokenStake",
-            "type": "pubkey"
-          },
-          {
-            "name": "withdrawAmount",
-            "type": "u64"
-          },
-          {
-            "name": "currentTimestamp",
-            "type": "i64"
-          },
-          {
-            "name": "lastUpdatedTimestamp",
-            "type": "i64"
-          },
-          {
-            "name": "level",
-            "type": "u8"
-          },
-          {
-            "name": "activeStakeAmount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "unstakeTokenInstantParams",
       "type": {
         "kind": "struct",
         "fields": [
@@ -30717,11 +30642,15 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
-            "name": "pendingDeactivation",
+            "name": "withdrawableAmount",
             "type": "u64"
           },
           {
-            "name": "withdrawRequestTimestamp",
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "timeRemaining",
             "type": "i64"
           }
         ]

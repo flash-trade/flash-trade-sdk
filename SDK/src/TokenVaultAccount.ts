@@ -35,6 +35,7 @@ export class TokenVaultAccount implements TokenVault {
     public revenueAccrued: BN;
     public revenueDistributed: BN;
     public revenuePaid: BN;
+    public unlockPeriod: BN;
     public padding2: BN[];
 
     constructor( publicKey : PublicKey, parseData : TokenVault) {

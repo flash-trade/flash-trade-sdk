@@ -46,7 +46,7 @@ import type { Perpetuals } from './idl/perpetuals';
 import { SendTransactionOpts, sendTransaction, sendTransactionV3 } from "./utils/rpc";
 import { MarketConfig, PoolConfig, Token } from "./PoolConfig";
 import { checkIfAccountExists, checkedDecimalCeilMul, checkedDecimalMul, getUnixTs, nativeToUiDecimals, scaleToExponent, uiDecimalsToNative } from "./utils";
-import { BPS_DECIMALS, BPS_POWER, LP_DECIMALS, RATE_DECIMALS, USD_DECIMALS, BN_ZERO, RATE_POWER, METAPLEX_PROGRAM_ID, BN_ONE, ORACLE_EXPONENT, DAY_SECONDS, FAF_DECIMALS } from "./constants";
+import { BPS_DECIMALS, BPS_POWER, LP_DECIMALS, RATE_DECIMALS, USD_DECIMALS, BN_ZERO, RATE_POWER, METAPLEX_PROGRAM_ID, BN_ONE, ORACLE_EXPONENT, DAY_SECONDS, FAF_DECIMALS, PYTH_LAZER_PROGRAM_ID } from "./constants";
 import BigNumber from "bignumber.js";
 import { createBackupOracleInstruction } from "./backupOracle";
 import { MarketAccount } from "./MarketAccount";
@@ -248,7 +248,7 @@ export class PerpetualsClient {
   };
 
   getPerpetuals = async () => {
-    // @ts-ignore
+    // @ts-ignore - Anchor IDL type recursion too deep for TS
     return this.program.account.perpetuals.fetch(this.perpetuals.publicKey);
   };
 
@@ -3341,10 +3341,10 @@ export class PerpetualsClient {
       )
       const tokenStakeFafAccount = TokenStakeAccount.from(fafStakeData)
 
-      const activeStakeAmount = tokenStakeFafAccount?.activeStakeAmount ?? BN_ZERO
+      const eligibleAmount = tokenStakeFafAccount?.getRevenueEligibleAmount() ?? BN_ZERO
       const revenuePerFafStaked = fafTokenVaultAccount?.revenuePerFafStaked ?? BN_ZERO
 
-      const revenueWatermark = activeStakeAmount
+      const revenueWatermark = eligibleAmount
         .mul(revenuePerFafStaked)
         .div(new BN(10).pow(new BN(FAF_DECIMALS)))
 
@@ -3362,6 +3362,49 @@ export class PerpetualsClient {
       return BN_ZERO
     }
 
+  }
+
+  getTokenStakeAccount = async (
+    poolConfig: PoolConfig,
+    userPublicKey: PublicKey,
+  ): Promise<TokenStakeAccount | null> => {
+    const tokenStakePk = PublicKey.findProgramAddressSync(
+      [Buffer.from('token_stake'), userPublicKey.toBuffer()],
+      poolConfig.programId
+    )[0];
+
+    const accountInfo = await this.provider.connection.getAccountInfo(tokenStakePk);
+    if (!accountInfo) {
+      return null;
+    }
+    const decoded = this.program.coder.accounts.decode<TokenStake>(
+      'tokenStake',
+      accountInfo.data
+    );
+    return TokenStakeAccount.from(decoded);
+  }
+
+  getUserUnstakingStatus = async (
+    poolConfig: PoolConfig,
+    userPublicKey: PublicKey,
+  ): Promise<{
+    activeStakeAmount: BN;
+    totalLocked: BN;
+    totalWithdrawable: BN;
+    revenueEligibleAmount: BN;
+    requests: { requestId: number; lockedAmount: BN; withdrawableAmount: BN; timeRemaining: BN; totalAmount: BN }[];
+  } | null> => {
+    const tokenStakeAccount = await this.getTokenStakeAccount(poolConfig, userPublicKey);
+    if (!tokenStakeAccount) {
+      return null;
+    }
+    return {
+      activeStakeAmount: tokenStakeAccount.activeStakeAmount,
+      totalLocked: tokenStakeAccount.getLockedAmount(),
+      totalWithdrawable: tokenStakeAccount.getWithdrawableAmount(),
+      revenueEligibleAmount: tokenStakeAccount.getRevenueEligibleAmount(),
+      requests: tokenStakeAccount.getLockStatus(),
+    };
   }
 
 
@@ -7438,75 +7481,10 @@ export class PerpetualsClient {
 
   }
 
-  unstakeTokenInstant = async (
-    owner: PublicKey,
-    unstakeAmount: BN,
-    poolConfig: PoolConfig
-  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
-    let preInstructions: TransactionInstruction[] = [];
-    let instructions: TransactionInstruction[] = [];
-    let postInstructions: TransactionInstruction[] = [];
-    const additionalSigners: Signer[] = [];
-
-    try {
-      const tokenStakeAccount = PublicKey.findProgramAddressSync(
-        [Buffer.from("token_stake"), owner.toBuffer()],
-        this.programId
-      )[0];
-
-      let userTokenAccount =  getAssociatedTokenAddressSync(
-        poolConfig.tokenMint,
-        owner,
-        true
-      );
-
-      if (!(await checkIfAccountExists(userTokenAccount, this.provider.connection))) {
-        // throw `userTokenAccount doesn't exist : ${userTokenAccount.toBase58()}`
-        preInstructions.push(
-          createAssociatedTokenAccountInstruction(
-            this.provider.wallet.publicKey,
-            userTokenAccount,
-            owner,
-            poolConfig.tokenMint,
-          )
-        );
-      }
-
-      let unstakeTokenInstantInstruction = await this.program.methods
-        .unstakeTokenInstant({
-          unstakeAmount: unstakeAmount
-        })
-        .accountsPartial({
-          owner: owner,
-          receivingTokenAccount: userTokenAccount,
-          perpetuals: poolConfig.perpetuals,
-          transferAuthority: poolConfig.transferAuthority,
-          tokenVault: poolConfig.tokenVault,
-          tokenVaultTokenAccount: poolConfig.tokenVaultTokenAccount,
-
-          tokenStakeAccount: tokenStakeAccount,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          tokenMint: poolConfig.tokenMint,
-        })
-        .instruction();
-      instructions.push(unstakeTokenInstantInstruction)
-
-    } catch (err) {
-      console.log("perpClient unstakeTokenInstantInstruction error:: ", err);
-      throw err;
-    }
-
-    return {
-      instructions: [...preInstructions, ...instructions, ...postInstructions],
-      additionalSigners
-    };
-
-  }
-
   withdrawToken = async (
     owner: PublicKey,
     withdrawRequestId: number,
-    poolConfig: PoolConfig
+    poolConfig: PoolConfig,
   ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
     let preInstructions: TransactionInstruction[] = [];
     let instructions: TransactionInstruction[] = [];
@@ -7540,7 +7518,7 @@ export class PerpetualsClient {
 
       let withdrawTokenInstruction = await this.program.methods
         .withdrawToken({
-          withdrawRequestId: withdrawRequestId
+          withdrawRequestId: withdrawRequestId,
         })
         .accountsPartial({
           owner: owner,
@@ -7570,7 +7548,7 @@ export class PerpetualsClient {
 
   }
 
-  cancelUnstakeRequest = async (
+  cancelUnstakeTokenRequest = async (
     owner: PublicKey,
     withdrawRequestId: number,
     poolConfig: PoolConfig
@@ -7587,7 +7565,7 @@ export class PerpetualsClient {
         this.programId
       )[0];
 
-      let cancelUnstakeRequestInstruction = await this.program.methods
+      let cancelUnstakeTokenRequestInstruction = await this.program.methods
         .cancelUnstakeTokenRequest({
           withdrawRequestId: withdrawRequestId
         })
@@ -7599,10 +7577,10 @@ export class PerpetualsClient {
           program: this.programId
         })
         .instruction();
-      instructions.push(cancelUnstakeRequestInstruction)
+      instructions.push(cancelUnstakeTokenRequestInstruction)
 
     } catch (err) {
-      console.log("perpClient cancelUnstakeRequestInstruction error:: ", err);
+      console.log("perpClient cancelUnstakeTokenRequestInstruction error:: ", err);
       throw err;
     }
 
@@ -7742,6 +7720,43 @@ export class PerpetualsClient {
 
     return {
       instructions: [...preInstructions, ...instructions, ...postInstructions],
+      additionalSigners
+    };
+
+  }
+
+  refreshTokenStake = async (
+    tokenStakeAccounts: PublicKey[],
+    poolConfig: PoolConfig,
+  ): Promise<{ instructions: TransactionInstruction[], additionalSigners: Signer[] }> => {
+    let instructions: TransactionInstruction[] = [];
+    const additionalSigners: Signer[] = [];
+
+    try {
+      const remainingAccounts = tokenStakeAccounts.map((pubkey) => ({
+        pubkey,
+        isSigner: false,
+        isWritable: true,
+      }));
+
+      let refreshTokenStakeInstruction = await this.program.methods
+        .refreshTokenStake({})
+        .accountsPartial({
+          perpetuals: this.perpetuals.publicKey,
+          tokenVault: poolConfig.tokenVault,
+          program: this.programId,
+        })
+        .remainingAccounts(remainingAccounts)
+        .instruction();
+      instructions.push(refreshTokenStakeInstruction);
+
+    } catch (err) {
+      console.log("perpClient refreshTokenStakeInstruction error:: ", err);
+      throw err;
+    }
+
+    return {
+      instructions,
       additionalSigners
     };
 
@@ -8859,5 +8874,4 @@ export class PerpetualsClient {
     );
   }
 
-
- }
+};

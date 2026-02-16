@@ -1,7 +1,16 @@
-import { TokenStake, WithdrawStakeLog } from "./types"
+import { TokenStake, WithdrawRequest } from "./types"
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 
+const BN_ZERO = new BN(0);
+
+export interface LockRequestStatus {
+    requestId: number;
+    lockedAmount: BN;
+    withdrawableAmount: BN;
+    timeRemaining: BN;
+    totalAmount: BN;
+}
 
 export class TokenStakeAccount implements TokenStake {
     owner: PublicKey
@@ -9,7 +18,8 @@ export class TokenStakeAccount implements TokenStake {
     bump: number
     level: number
     withdrawRequestCount: number
-    withdrawRequest: WithdrawStakeLog[] | any
+    withdrawRequest: WithdrawRequest[]
+    buffer: number[]
     activeStakeAmount: BN
     updateTimestamp: BN
     tradeTimestamp: BN
@@ -20,14 +30,14 @@ export class TokenStakeAccount implements TokenStake {
     revenueSnapshot: BN
     claimableRebateUsd: BN
 
-    // Constructor for initializing the object from provided data
     constructor(data: {
         owner: PublicKey
         isInitialized: boolean
         bump: number
         level: number
         withdrawRequestCount: number
-        withdrawRequest: WithdrawStakeLog[]
+        withdrawRequest: WithdrawRequest[]
+        buffer: number[]
         activeStakeAmount: BN
         updateTimestamp: BN
         tradeTimestamp: BN
@@ -44,6 +54,7 @@ export class TokenStakeAccount implements TokenStake {
         this.level = data.level
         this.withdrawRequestCount = data.withdrawRequestCount
         this.withdrawRequest = data.withdrawRequest
+        this.buffer = data.buffer
         this.activeStakeAmount = data.activeStakeAmount
         this.updateTimestamp = data.updateTimestamp
         this.tradeTimestamp = data.tradeTimestamp
@@ -55,9 +66,7 @@ export class TokenStakeAccount implements TokenStake {
         this.claimableRebateUsd = data.claimableRebateUsd
     }
 
-    // Static method to create a TokenStakeAccount from decoded data
     static from(decodedData: any): TokenStakeAccount {
-        // Assume decodedData is an object that matches the structure of TokenStake
         return new TokenStakeAccount({
             owner: decodedData.owner,
             isInitialized: decodedData.isInitialized,
@@ -65,6 +74,7 @@ export class TokenStakeAccount implements TokenStake {
             level: decodedData.level,
             withdrawRequestCount: decodedData.withdrawRequestCount,
             withdrawRequest: decodedData.withdrawRequest,
+            buffer: decodedData.buffer,
             activeStakeAmount: new BN(decodedData.activeStakeAmount),
             updateTimestamp: new BN(decodedData.updateTimestamp),
             tradeTimestamp: new BN(decodedData.tradeTimestamp),
@@ -77,7 +87,47 @@ export class TokenStakeAccount implements TokenStake {
         })
     }
 
-    // You can add methods to manipulate or display data as needed
+    /** Total locked amount across all active withdraw requests. */
+    getLockedAmount(): BN {
+        let total = BN_ZERO;
+        for (let i = 0; i < this.withdrawRequestCount; i++) {
+            total = total.add(new BN(this.withdrawRequest[i].lockedAmount));
+        }
+        return total;
+    }
+
+    /** Total withdrawable (vested) amount across all active withdraw requests. */
+    getWithdrawableAmount(): BN {
+        let total = BN_ZERO;
+        for (let i = 0; i < this.withdrawRequestCount; i++) {
+            total = total.add(new BN(this.withdrawRequest[i].withdrawableAmount));
+        }
+        return total;
+    }
+
+    /** Revenue-eligible amount: active stake + locked tokens. */
+    getRevenueEligibleAmount(): BN {
+        return this.activeStakeAmount.add(this.getLockedAmount());
+    }
+
+    /** Per-request lock status with amounts and time remaining. */
+    getLockStatus(): LockRequestStatus[] {
+        const statuses: LockRequestStatus[] = [];
+        for (let i = 0; i < this.withdrawRequestCount; i++) {
+            const req = this.withdrawRequest[i];
+            const locked = new BN(req.lockedAmount);
+            const withdrawable = new BN(req.withdrawableAmount);
+            statuses.push({
+                requestId: i,
+                lockedAmount: locked,
+                withdrawableAmount: withdrawable,
+                timeRemaining: new BN(req.timeRemaining),
+                totalAmount: locked.add(withdrawable),
+            });
+        }
+        return statuses;
+    }
+
     updateData(newData: Partial<TokenStakeAccount>) {
         Object.assign(this, newData)
     }

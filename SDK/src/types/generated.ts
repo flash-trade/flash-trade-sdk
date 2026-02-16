@@ -109,7 +109,7 @@ export interface AddCustodyToken22AccountParams {
 
 export interface AddInternalOracleParams {
   expo: number;
-  extOracle: PublicKey;
+  lazerFeedId: number;
 }
 
 export interface AddLiquidityAndStakeLog {
@@ -530,7 +530,9 @@ export interface CustomOracle {
   conf: BN;
   ema: BN;
   publishTime: BN;
-  extOracleAccount: PublicKey;
+  lazerFeedId: number;
+  lazerPrice: BN;
+  Reserved: number[];
 }
 
 export interface DecreaseSizeLog {
@@ -1791,6 +1793,19 @@ export interface RefreshStakeUserLog {
   reward_share: BN;
 }
 
+export interface RefreshTokenStakeLog {
+  revenue_per_faf_staked: BN;
+}
+
+export interface RefreshTokenStakeParams {
+}
+
+export interface RefreshTokenStakeUserLog {
+  owner: PublicKey;
+  revenue_amount: BN;
+  newly_unlocked_amount: BN;
+}
+
 export interface ReimburseParams {
   amountIn: BN;
 }
@@ -1952,7 +1967,7 @@ export interface RenameFlpParams {
 }
 
 export interface ResizeInternalOracleParams {
-  extOracle: PublicKey;
+  lazerFeedId: number;
 }
 
 export interface SetAdminSignersParams {
@@ -1995,13 +2010,8 @@ export interface SetInternalEmaPriceParams {
   prices: InternalEmaPrice[];
 }
 
-export interface SetInternalOraclePriceParams {
-  useCurrentTime: number;
-  price: BN;
-  expo: number;
-  conf: BN;
-  ema: BN;
-  publishTime: BN;
+export interface SetInternalLazerPriceParams {
+  messageData: number[];
 }
 
 export interface SetLpTokenPriceParams {
@@ -2081,6 +2091,7 @@ export interface SetTokenVaultConfigParams {
   withdrawTimeLimit: BN;
   withdrawInstantFee: BN;
   stakeLevel: BN[];
+  unlockPeriod: BN;
 }
 
 export interface SetWhitelistConfigParams {
@@ -2352,6 +2363,7 @@ export interface TokenStake {
   level: number;
   withdrawRequestCount: number;
   withdrawRequest: WithdrawRequest[];
+  buffer: number[];
   activeStakeAmount: BN;
   updateTimestamp: BN;
   tradeTimestamp: BN;
@@ -2361,6 +2373,13 @@ export interface TokenStake {
   unclaimedRevenueAmount: BN;
   revenueSnapshot: BN;
   claimableRebateUsd: BN;
+}
+
+export interface TokenStakeStats {
+  lockedAmount: BN;
+  activeAmount: BN;
+  withdrawableAmount: BN;
+  buffer: BN;
 }
 
 export interface TokenVault {
@@ -2374,7 +2393,7 @@ export interface TokenVault {
   withdrawInstantFee: BN;
   withdrawInstantFeeEarned: BN;
   stakeLevel: BN[];
-  tokensStaked: StakeStats;
+  tokensStaked: TokenStakeStats;
   rewardTokensToDistribute: BN;
   rewardTokensPaid: BN;
   tokensToDistribute: BN;
@@ -2387,6 +2406,7 @@ export interface TokenVault {
   revenueAccrued: BN;
   revenueDistributed: BN;
   revenuePaid: BN;
+  unlockPeriod: BN;
   padding2: BN[];
 }
 
@@ -2414,20 +2434,6 @@ export interface UnstakeRequestLog {
 }
 
 export interface UnstakeRequestParams {
-  unstakeAmount: BN;
-}
-
-export interface UnstakeTokenInstantLog {
-  owner: PublicKey;
-  token_stake: PublicKey;
-  withdraw_amount: BN;
-  current_timestamp: BN;
-  last_updated_timestamp: BN;
-  level: number;
-  active_stake_amount: BN;
-}
-
-export interface UnstakeTokenInstantParams {
   unstakeAmount: BN;
 }
 
@@ -2477,8 +2483,9 @@ export interface WithdrawInstantFeesParams {
 }
 
 export interface WithdrawRequest {
-  pendingDeactivation: BN;
-  withdrawRequestTimestamp: BN;
+  withdrawableAmount: BN;
+  lockedAmount: BN;
+  timeRemaining: BN;
 }
 
 export interface WithdrawSolFeesParams {
