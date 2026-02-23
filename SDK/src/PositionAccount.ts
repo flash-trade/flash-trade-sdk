@@ -34,6 +34,7 @@ export class PositionAccount implements Position {
     public degenSizeUsd: BN;
     public referencePrice: ContractOraclePrice;
 
+    public isActive: boolean;
     public buffer: number[];
     public priceImpactSet: number;
 

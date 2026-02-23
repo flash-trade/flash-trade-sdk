@@ -123,7 +123,8 @@ export const DEFAULT_POSITION: Position = {
     degenSizeUsd: BN_ZERO,
     referencePrice: { price: BN_ZERO, exponent: 0 },
 
-    buffer: [0, 0, 0],
+    isActive: false,
+    buffer: [0, 0],
     priceImpactSet: 0,
 
     sizeDecimals: 0,

@@ -8,7 +8,7 @@ export type Perpetuals = {
   "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4",
   "metadata": {
     "name": "perpetuals",
-    "version": "1.1.0",
+    "version": "14.1.0",
     "spec": "0.1.0",
     "description": "Flash Trade Perpetuals Exchange",
     "repository": "https://github.com/flash-trade/"
@@ -1884,6 +1884,310 @@ export type Perpetuals = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "cancelLimitOrder",
+      "discriminator": [
+        132,
+        156,
+        132,
+        31,
+        67,
+        40,
+        232,
+        97
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "receivingAccount",
+            "order"
+          ]
+        },
+        {
+          "name": "receivingAccount",
+          "writable": true
+        },
+        {
+          "name": "transferAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  110,
+                  115,
+                  102,
+                  101,
+                  114,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "order.market",
+                "account": "order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserveCustody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserveCustodyTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserveTokenProgram"
+        },
+        {
+          "name": "eventAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "reserveMint"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "cancelLimitOrderParams"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "cancelTriggerOrder",
@@ -6960,6 +7264,619 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "forceSettleOrder",
+      "discriminator": [
+        101,
+        22,
+        147,
+        162,
+        252,
+        227,
+        60,
+        187
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "receivingAccount",
+          "writable": true
+        },
+        {
+          "name": "transferAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  110,
+                  115,
+                  102,
+                  101,
+                  114,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order.owner",
+                "account": "order"
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market"
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserveCustody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserveCustodyTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserveTokenProgram"
+        },
+        {
+          "name": "eventAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "reserveMint"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "forceSettleOrderParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "forceSettlePosition",
+      "discriminator": [
+        186,
+        54,
+        180,
+        26,
+        133,
+        30,
+        216,
+        167
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "receivingAccount",
+          "writable": true
+        },
+        {
+          "name": "transferAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  110,
+                  115,
+                  102,
+                  101,
+                  114,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "position.owner",
+                "account": "position"
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "targetOracleAccount"
+        },
+        {
+          "name": "collateralCustody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralOracleAccount"
+        },
+        {
+          "name": "collateralCustodyTokenAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralTokenProgram"
+        },
+        {
+          "name": "eventAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "collateralMint"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "forceSettlePositionParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "getAddCompoundingLiquidityAmountAndFee",
       "discriminator": [
         29,
@@ -11055,6 +11972,356 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "migrateMarketOrder",
+      "discriminator": [
+        201,
+        167,
+        49,
+        9,
+        184,
+        67,
+        47,
+        132
+      ],
+      "accounts": [
+        {
+          "name": "feePayer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "oldOrder",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_order.owner",
+                "account": "order"
+              },
+              {
+                "kind": "account",
+                "path": "oldMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oldMarket"
+        },
+        {
+          "name": "newOrder",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_order.owner",
+                "account": "order"
+              },
+              {
+                "kind": "account",
+                "path": "newMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "newMarket"
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "migrateMarketOrderParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "migrateMarketPosition",
+      "discriminator": [
+        8,
+        127,
+        1,
+        112,
+        142,
+        206,
+        43,
+        189
+      ],
+      "accounts": [
+        {
+          "name": "feePayer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oldPosition",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_position.owner",
+                "account": "position"
+              },
+              {
+                "kind": "account",
+                "path": "oldMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oldMarket",
+          "writable": true
+        },
+        {
+          "name": "oldCollateralCustody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "old_collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oldCollateralOracleAccount"
+        },
+        {
+          "name": "newPosition",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_position.owner",
+                "account": "position"
+              },
+              {
+                "kind": "account",
+                "path": "newMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "newMarket",
+          "writable": true
+        },
+        {
+          "name": "newCollateralCustody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "new_collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "newCollateralOracleAccount"
+        },
+        {
+          "name": "eventAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "migrateMarketPositionParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "migrateStake",
       "discriminator": [
         178,
@@ -12491,6 +13758,108 @@ export type Perpetuals = {
           }
         }
       ]
+    },
+    {
+      "name": "refreshOrdersStatus",
+      "discriminator": [
+        40,
+        88,
+        107,
+        182,
+        177,
+        57,
+        247,
+        55
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "refreshOrdersStatusParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "refreshPositionsStatus",
+      "discriminator": [
+        128,
+        146,
+        70,
+        109,
+        88,
+        250,
+        26,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "refreshPositionsStatusParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
     },
     {
       "name": "refreshStake",
@@ -14961,6 +16330,28 @@ export type Perpetuals = {
           }
         },
         {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "custody",
           "writable": true,
           "pda": {
@@ -14988,6 +16379,13 @@ export type Perpetuals = {
               }
             ]
           }
+        },
+        {
+          "name": "custodyOracleAccount"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
           "name": "systemProgram",
@@ -19946,6 +21344,45 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "forceSettleOrderLog",
+      "discriminator": [
+        19,
+        17,
+        159,
+        29,
+        151,
+        198,
+        220,
+        5
+      ]
+    },
+    {
+      "name": "forceSettlePositionLog",
+      "discriminator": [
+        192,
+        168,
+        53,
+        197,
+        70,
+        45,
+        146,
+        136
+      ]
+    },
+    {
+      "name": "forceSettleTriggerOrderLog",
+      "discriminator": [
+        239,
+        255,
+        3,
+        232,
+        119,
+        209,
+        127,
+        125
+      ]
+    },
+    {
       "name": "increaseSizeLog",
       "discriminator": [
         186,
@@ -20072,6 +21509,19 @@ export type Perpetuals = {
         112,
         83,
         178,
+        243
+      ]
+    },
+    {
+      "name": "migrateMarketPositionLog",
+      "discriminator": [
+        63,
+        228,
+        42,
+        201,
+        178,
+        237,
+        203,
         243
       ]
     },
@@ -21835,6 +23285,18 @@ export type Perpetuals = {
           {
             "name": "oracleAccountPriceExponent",
             "type": "i32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cancelLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "orderId",
+            "type": "u8"
           }
         ]
       }
@@ -24966,6 +26428,207 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "forceSettleOrderLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "orderId",
+            "type": "u8"
+          },
+          {
+            "name": "limitPrice",
+            "type": "u64"
+          },
+          {
+            "name": "limitPriceExponent",
+            "type": "i32"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "reserveAmount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "forceSettleOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "forceSettlePositionLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "tradeId",
+            "type": "i64"
+          },
+          {
+            "name": "entryPrice",
+            "type": "u64"
+          },
+          {
+            "name": "entryPriceExponent",
+            "type": "i32"
+          },
+          {
+            "name": "duration",
+            "type": "i64"
+          },
+          {
+            "name": "exitPrice",
+            "type": "u64"
+          },
+          {
+            "name": "exitPriceExponent",
+            "type": "i32"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "collateralPrice",
+            "type": "u64"
+          },
+          {
+            "name": "collateralPriceExponent",
+            "type": "i32"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "profitUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lossUsd",
+            "type": "u64"
+          },
+          {
+            "name": "feeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "oracleAccountTime",
+            "type": "i64"
+          },
+          {
+            "name": "oracleAccountType",
+            "type": "u8"
+          },
+          {
+            "name": "oracleAccountPrice",
+            "type": "u64"
+          },
+          {
+            "name": "oracleAccountPriceExponent",
+            "type": "i32"
+          },
+          {
+            "name": "priceImpactUsd",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "forceSettlePositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "forceSettleTriggerOrderLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "triggerOrdersCancelled",
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "GetAddCompoundingLiquidityAmountAndFeeParams",
       "type": {
         "kind": "struct",
@@ -26144,6 +27807,72 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "migrateMarketOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "migrateMarketPositionLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "position",
+            "type": "pubkey"
+          },
+          {
+            "name": "entryPrice",
+            "type": "u64"
+          },
+          {
+            "name": "entryPriceExponent",
+            "type": "i32"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "collateralAmount",
+            "type": "u64"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "collateralPrice",
+            "type": "u64"
+          },
+          {
+            "name": "collateralPriceExponent",
+            "type": "i32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "migrateMarketPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "migratePositionLog",
       "type": {
         "kind": "struct",
@@ -26847,8 +28576,8 @@ export type Perpetuals = {
             "type": "bool"
           },
           {
-            "name": "openOrders",
-            "type": "u8"
+            "name": "isActive",
+            "type": "bool"
           },
           {
             "name": "openSl",
@@ -27490,11 +29219,15 @@ export type Perpetuals = {
             }
           },
           {
+            "name": "isActive",
+            "type": "bool"
+          },
+          {
             "name": "buffer",
             "type": {
               "array": [
                 "u8",
-                3
+                2
               ]
             }
           },
@@ -27536,20 +29269,52 @@ export type Perpetuals = {
         "kind": "struct",
         "fields": [
           {
+            "name": "entryOraclePrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "collateralAmount",
+            "type": "u64"
+          },
+          {
             "name": "collateralUsd",
             "type": "u64"
           },
           {
-            "name": "profitUsd",
-            "type": "u64"
+            "name": "pnl",
+            "type": {
+              "defined": {
+                "name": "positionPnl"
+              }
+            }
           },
           {
-            "name": "lossUsd",
-            "type": "u64"
+            "name": "pnlWithFeeUsd",
+            "type": "i64"
           },
           {
-            "name": "feeUsd",
-            "type": "u64"
+            "name": "pnlPercentageWithFee",
+            "type": "i64"
+          },
+          {
+            "name": "pnlWithoutFeeUsd",
+            "type": "i64"
+          },
+          {
+            "name": "pnlPercentageWithoutFee",
+            "type": "i64"
           },
           {
             "name": "leverage",
@@ -27562,6 +29327,46 @@ export type Perpetuals = {
                 "name": "oraclePrice"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "positionPnl",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "profitUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lossUsd",
+            "type": "u64"
+          },
+          {
+            "name": "exitFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "borrowFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "exitFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "borrowFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "priceImpactUsd",
+            "type": "u64"
+          },
+          {
+            "name": "priceImpactSet",
+            "type": "bool"
           }
         ]
       }
@@ -27945,6 +29750,20 @@ export type Perpetuals = {
             }
           }
         ]
+      }
+    },
+    {
+      "name": "refreshOrdersStatusParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "refreshPositionsStatusParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -28648,6 +30467,10 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "isVirtual",
+            "type": "bool"
+          },
           {
             "name": "depegAdjustment",
             "type": "bool"

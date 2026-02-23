@@ -16,7 +16,7 @@ export class OrderAccount implements Order{
     public stopLossOrders: TriggerOrder[];
 
     public isInitialised: boolean;
-    public openOrders: number;
+    public isActive: boolean;
 
     public openSl: number;
     public openTp: number;

@@ -241,6 +241,10 @@ export interface CancelLimitOrderLog {
   oracle_account_price_exponent: number;
 }
 
+export interface CancelLimitOrderParams {
+  orderId: number;
+}
+
 export interface CancelTriggerOrderLog {
   owner: PublicKey;
   market: PublicKey;
@@ -1033,6 +1037,58 @@ export interface FlpStake {
   bump: number;
 }
 
+export interface ForceSettleOrderLog {
+  admin: PublicKey;
+  owner: PublicKey;
+  market: PublicKey;
+  order_id: number;
+  limit_price: BN;
+  limit_price_exponent: number;
+  size_amount: BN;
+  reserve_amount: BN;
+  padding: BN[];
+}
+
+export interface ForceSettleOrderParams {
+}
+
+export interface ForceSettlePositionLog {
+  admin: PublicKey;
+  owner: PublicKey;
+  market: PublicKey;
+  trade_id: BN;
+  entry_price: BN;
+  entry_price_exponent: number;
+  duration: BN;
+  exit_price: BN;
+  exit_price_exponent: number;
+  size_amount: BN;
+  size_usd: BN;
+  collateral_price: BN;
+  collateral_price_exponent: number;
+  collateral_usd: BN;
+  profit_usd: BN;
+  loss_usd: BN;
+  fee_usd: BN;
+  oracle_account_time: BN;
+  oracle_account_type: number;
+  oracle_account_price: BN;
+  oracle_account_price_exponent: number;
+  price_impact_usd: BN;
+  padding: BN[];
+}
+
+export interface ForceSettlePositionParams {
+}
+
+export interface ForceSettleTriggerOrderLog {
+  admin: PublicKey;
+  owner: PublicKey;
+  market: PublicKey;
+  trigger_orders_cancelled: number;
+  padding: BN[];
+}
+
 export interface GetAddCompoundingLiquidityAmountAndFeeParams {
   amountIn: BN;
 }
@@ -1347,6 +1403,26 @@ export interface MigrateFlpParams {
   compoundingTokenAmount: BN;
 }
 
+export interface MigrateMarketOrderParams {
+}
+
+export interface MigrateMarketPositionLog {
+  owner: PublicKey;
+  market: PublicKey;
+  position: PublicKey;
+  entry_price: BN;
+  entry_price_exponent: number;
+  size_amount: BN;
+  size_usd: BN;
+  collateral_amount: BN;
+  collateral_usd: BN;
+  collateral_price: BN;
+  collateral_price_exponent: number;
+}
+
+export interface MigrateMarketPositionParams {
+}
+
 export interface MigratePositionLog {
   owner: PublicKey;
   market: PublicKey;
@@ -1516,7 +1592,7 @@ export interface Order {
   takeProfitOrders: TriggerOrder[];
   stopLossOrders: TriggerOrder[];
   isInitialised: boolean;
-  openOrders: number;
+  isActive: boolean;
   openSl: number;
   openTp: number;
   inactiveSl: number;
@@ -1664,6 +1740,7 @@ export interface Position {
   cumulativeLockFeeSnapshot: BN;
   degenSizeUsd: BN;
   referencePrice: ContractOraclePrice;
+  isActive: boolean;
   buffer: number[];
   priceImpactSet: number;
   sizeDecimals: number;
@@ -1674,12 +1751,29 @@ export interface Position {
 }
 
 export interface PositionData {
+  entryOraclePrice: ContractOraclePrice;
+  sizeAmount: BN;
+  sizeUsd: BN;
+  collateralAmount: BN;
   collateralUsd: BN;
-  profitUsd: BN;
-  lossUsd: BN;
-  feeUsd: BN;
+  pnl: PositionPnl;
+  pnlWithFeeUsd: BN;
+  pnlPercentageWithFee: BN;
+  pnlWithoutFeeUsd: BN;
+  pnlPercentageWithoutFee: BN;
   leverage: BN;
   liquidationPrice: ContractOraclePrice;
+}
+
+export interface PositionPnl {
+  profitUsd: BN;
+  lossUsd: BN;
+  exitFeeUsd: BN;
+  borrowFeeUsd: BN;
+  exitFeeAmount: BN;
+  borrowFeeAmount: BN;
+  priceImpactUsd: BN;
+  priceImpactSet: boolean;
 }
 
 export interface PositionStats {
@@ -1775,6 +1869,12 @@ export interface ReferralRebateLog {
   volume_usd: BN;
   voltage_points_type: number;
   padding: BN[];
+}
+
+export interface RefreshOrdersStatusParams {
+}
+
+export interface RefreshPositionsStatusParams {
 }
 
 export interface RefreshStakeLog {
@@ -1975,6 +2075,7 @@ export interface SetAdminSignersParams {
 }
 
 export interface SetCustodyConfigParams {
+  isVirtual: boolean;
   depegAdjustment: boolean;
   inversePrice: boolean;
   oracle: OracleParams;

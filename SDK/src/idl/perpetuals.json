@@ -2,7 +2,7 @@
   "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4",
   "metadata": {
     "name": "perpetuals",
-    "version": "1.1.0",
+    "version": "14.1.0",
     "spec": "0.1.0",
     "description": "Flash Trade Perpetuals Exchange",
     "repository": "https://github.com/flash-trade/"
@@ -1878,6 +1878,310 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "cancel_limit_order",
+      "discriminator": [
+        132,
+        156,
+        132,
+        31,
+        67,
+        40,
+        232,
+        97
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "receiving_account",
+            "order"
+          ]
+        },
+        {
+          "name": "receiving_account",
+          "writable": true
+        },
+        {
+          "name": "transfer_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  110,
+                  115,
+                  102,
+                  101,
+                  114,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "order.market",
+                "account": "Order"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_custody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateral_custody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserve_custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserve_custody_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserve_token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "reserve_mint"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "CancelLimitOrderParams"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "cancel_trigger_order",
@@ -6954,6 +7258,619 @@
       ]
     },
     {
+      "name": "force_settle_order",
+      "discriminator": [
+        101,
+        22,
+        147,
+        162,
+        252,
+        227,
+        60,
+        187
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiving_account",
+          "writable": true
+        },
+        {
+          "name": "transfer_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  110,
+                  115,
+                  102,
+                  101,
+                  114,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "order.owner",
+                "account": "Order"
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market"
+        },
+        {
+          "name": "target_custody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserve_custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserve_custody_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "reserve_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reserve_token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ix_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "reserve_mint"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "ForceSettleOrderParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "force_settle_position",
+      "discriminator": [
+        186,
+        54,
+        180,
+        26,
+        133,
+        30,
+        216,
+        167
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiving_account",
+          "writable": true
+        },
+        {
+          "name": "transfer_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  110,
+                  115,
+                  102,
+                  101,
+                  114,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "position.owner",
+                "account": "Position"
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "target_custody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_oracle_account"
+        },
+        {
+          "name": "collateral_custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateral_oracle_account"
+        },
+        {
+          "name": "collateral_custody_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateral_token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ix_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "collateral_mint"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "ForceSettlePositionParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "get_add_compounding_liquidity_amount_and_fee",
       "discriminator": [
         29,
@@ -11049,6 +11966,356 @@
       ]
     },
     {
+      "name": "migrate_market_order",
+      "discriminator": [
+        201,
+        167,
+        49,
+        9,
+        184,
+        67,
+        47,
+        132
+      ],
+      "accounts": [
+        {
+          "name": "fee_payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "old_order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_order.owner",
+                "account": "Order"
+              },
+              {
+                "kind": "account",
+                "path": "old_market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "old_market"
+        },
+        {
+          "name": "new_order",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  100,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_order.owner",
+                "account": "Order"
+              },
+              {
+                "kind": "account",
+                "path": "new_market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_market"
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ix_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "MigrateMarketOrderParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "migrate_market_position",
+      "discriminator": [
+        8,
+        127,
+        1,
+        112,
+        142,
+        206,
+        43,
+        189
+      ],
+      "accounts": [
+        {
+          "name": "fee_payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "old_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_position.owner",
+                "account": "Position"
+              },
+              {
+                "kind": "account",
+                "path": "old_market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "old_market",
+          "writable": true
+        },
+        {
+          "name": "old_collateral_custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "old_collateral_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "old_collateral_oracle_account"
+        },
+        {
+          "name": "new_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_position.owner",
+                "account": "Position"
+              },
+              {
+                "kind": "account",
+                "path": "new_market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_market",
+          "writable": true
+        },
+        {
+          "name": "new_collateral_custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "new_collateral_custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_collateral_oracle_account"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "FTPP4jEWW1n8s2FEccwVfS9KCPjpndaswg7Nkkuz4ER4"
+        },
+        {
+          "name": "ix_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "MigrateMarketPositionParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "migrate_stake",
       "discriminator": [
         178,
@@ -12485,6 +13752,108 @@
           }
         }
       ]
+    },
+    {
+      "name": "refresh_orders_status",
+      "discriminator": [
+        40,
+        88,
+        107,
+        182,
+        177,
+        57,
+        247,
+        55
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "RefreshOrdersStatusParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
+      "name": "refresh_positions_status",
+      "discriminator": [
+        128,
+        146,
+        70,
+        109,
+        88,
+        250,
+        26,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "RefreshPositionsStatusParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
     },
     {
       "name": "refresh_stake",
@@ -14955,6 +16324,28 @@
           }
         },
         {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "custody",
           "writable": true,
           "pda": {
@@ -14982,6 +16373,13 @@
               }
             ]
           }
+        },
+        {
+          "name": "custody_oracle_account"
+        },
+        {
+          "name": "ix_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
           "name": "system_program",
@@ -19940,6 +21338,45 @@
       ]
     },
     {
+      "name": "ForceSettleOrderLog",
+      "discriminator": [
+        19,
+        17,
+        159,
+        29,
+        151,
+        198,
+        220,
+        5
+      ]
+    },
+    {
+      "name": "ForceSettlePositionLog",
+      "discriminator": [
+        192,
+        168,
+        53,
+        197,
+        70,
+        45,
+        146,
+        136
+      ]
+    },
+    {
+      "name": "ForceSettleTriggerOrderLog",
+      "discriminator": [
+        239,
+        255,
+        3,
+        232,
+        119,
+        209,
+        127,
+        125
+      ]
+    },
+    {
       "name": "IncreaseSizeLog",
       "discriminator": [
         186,
@@ -20066,6 +21503,19 @@
         112,
         83,
         178,
+        243
+      ]
+    },
+    {
+      "name": "MigrateMarketPositionLog",
+      "discriminator": [
+        63,
+        228,
+        42,
+        201,
+        178,
+        237,
+        203,
         243
       ]
     },
@@ -21829,6 +23279,18 @@
           {
             "name": "oracle_account_price_exponent",
             "type": "i32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CancelLimitOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "order_id",
+            "type": "u8"
           }
         ]
       }
@@ -24960,6 +26422,207 @@
       }
     },
     {
+      "name": "ForceSettleOrderLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "order_id",
+            "type": "u8"
+          },
+          {
+            "name": "limit_price",
+            "type": "u64"
+          },
+          {
+            "name": "limit_price_exponent",
+            "type": "i32"
+          },
+          {
+            "name": "size_amount",
+            "type": "u64"
+          },
+          {
+            "name": "reserve_amount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ForceSettleOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "ForceSettlePositionLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "trade_id",
+            "type": "i64"
+          },
+          {
+            "name": "entry_price",
+            "type": "u64"
+          },
+          {
+            "name": "entry_price_exponent",
+            "type": "i32"
+          },
+          {
+            "name": "duration",
+            "type": "i64"
+          },
+          {
+            "name": "exit_price",
+            "type": "u64"
+          },
+          {
+            "name": "exit_price_exponent",
+            "type": "i32"
+          },
+          {
+            "name": "size_amount",
+            "type": "u64"
+          },
+          {
+            "name": "size_usd",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_price",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_price_exponent",
+            "type": "i32"
+          },
+          {
+            "name": "collateral_usd",
+            "type": "u64"
+          },
+          {
+            "name": "profit_usd",
+            "type": "u64"
+          },
+          {
+            "name": "loss_usd",
+            "type": "u64"
+          },
+          {
+            "name": "fee_usd",
+            "type": "u64"
+          },
+          {
+            "name": "oracle_account_time",
+            "type": "i64"
+          },
+          {
+            "name": "oracle_account_type",
+            "type": "u8"
+          },
+          {
+            "name": "oracle_account_price",
+            "type": "u64"
+          },
+          {
+            "name": "oracle_account_price_exponent",
+            "type": "i32"
+          },
+          {
+            "name": "price_impact_usd",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ForceSettlePositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "ForceSettleTriggerOrderLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "trigger_orders_cancelled",
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "GetAddCompoundingLiquidityAmountAndFeeParams",
       "type": {
         "kind": "struct",
@@ -26138,6 +27801,72 @@
       }
     },
     {
+      "name": "MigrateMarketOrderParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "MigrateMarketPositionLog",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "position",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_price",
+            "type": "u64"
+          },
+          {
+            "name": "entry_price_exponent",
+            "type": "i32"
+          },
+          {
+            "name": "size_amount",
+            "type": "u64"
+          },
+          {
+            "name": "size_usd",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_amount",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_usd",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_price",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_price_exponent",
+            "type": "i32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MigrateMarketPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "MigratePositionLog",
       "type": {
         "kind": "struct",
@@ -26841,8 +28570,8 @@
             "type": "bool"
           },
           {
-            "name": "open_orders",
-            "type": "u8"
+            "name": "is_active",
+            "type": "bool"
           },
           {
             "name": "open_sl",
@@ -27484,11 +29213,15 @@
             }
           },
           {
+            "name": "is_active",
+            "type": "bool"
+          },
+          {
             "name": "buffer",
             "type": {
               "array": [
                 "u8",
-                3
+                2
               ]
             }
           },
@@ -27530,20 +29263,52 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "entry_oracle_price",
+            "type": {
+              "defined": {
+                "name": "OraclePrice"
+              }
+            }
+          },
+          {
+            "name": "size_amount",
+            "type": "u64"
+          },
+          {
+            "name": "size_usd",
+            "type": "u64"
+          },
+          {
+            "name": "collateral_amount",
+            "type": "u64"
+          },
+          {
             "name": "collateral_usd",
             "type": "u64"
           },
           {
-            "name": "profit_usd",
-            "type": "u64"
+            "name": "pnl",
+            "type": {
+              "defined": {
+                "name": "PositionPnl"
+              }
+            }
           },
           {
-            "name": "loss_usd",
-            "type": "u64"
+            "name": "pnl_with_fee_usd",
+            "type": "i64"
           },
           {
-            "name": "fee_usd",
-            "type": "u64"
+            "name": "pnl_percentage_with_fee",
+            "type": "i64"
+          },
+          {
+            "name": "pnl_without_fee_usd",
+            "type": "i64"
+          },
+          {
+            "name": "pnl_percentage_without_fee",
+            "type": "i64"
           },
           {
             "name": "leverage",
@@ -27556,6 +29321,46 @@
                 "name": "OraclePrice"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PositionPnl",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "profit_usd",
+            "type": "u64"
+          },
+          {
+            "name": "loss_usd",
+            "type": "u64"
+          },
+          {
+            "name": "exit_fee_usd",
+            "type": "u64"
+          },
+          {
+            "name": "borrow_fee_usd",
+            "type": "u64"
+          },
+          {
+            "name": "exit_fee_amount",
+            "type": "u64"
+          },
+          {
+            "name": "borrow_fee_amount",
+            "type": "u64"
+          },
+          {
+            "name": "price_impact_usd",
+            "type": "u64"
+          },
+          {
+            "name": "price_impact_set",
+            "type": "bool"
           }
         ]
       }
@@ -27939,6 +29744,20 @@
             }
           }
         ]
+      }
+    },
+    {
+      "name": "RefreshOrdersStatusParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "RefreshPositionsStatusParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -28642,6 +30461,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "is_virtual",
+            "type": "bool"
+          },
           {
             "name": "depeg_adjustment",
             "type": "bool"
