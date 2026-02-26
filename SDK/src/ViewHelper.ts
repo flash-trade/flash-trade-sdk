@@ -1,8 +1,9 @@
 import { PublicKey, RpcResponseAndContext, SimulatedTransactionResponse, Transaction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
 import { decode } from '@coral-xyz/anchor/dist/cjs/utils/bytes/base64'
-import { IDL } from "./idl/perpetuals";
+import IDL from "./idl/perpetuals.json";
 import { IdlCoder } from "./utils/IdlCoder";
 import { PerpetualsClient } from "./PerpetualsClient";
+import { AddressLookupTableAccount } from "@solana/web3.js";
 
 export class ViewHelper {
     private perpetualsClient: PerpetualsClient;
@@ -31,8 +32,8 @@ export class ViewHelper {
                     throw new Error('View expected return type');
                 }
                 const coder = IdlCoder.fieldLayout(
-                    { type: returnType },
-                    Array.from([...(IDL.accounts ?? []), ...(IDL.types ?? [])])
+                    { type: returnType as any },
+                    Array.from([...(IDL.accounts ?? []), ...(IDL.types ?? [])]) as any
                 );
                 return coder.decode(returnData);
             } else {
@@ -47,6 +48,7 @@ export class ViewHelper {
 
     async simulateTransaction(
         transaction: Transaction,
+        addressLookupTableAccounts: AddressLookupTableAccount[],
         userPublicKey: PublicKey | undefined = undefined
     ): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
         transaction.feePayer = userPublicKey ?? this.perpetualsClient.provider.publicKey;
@@ -56,7 +58,7 @@ export class ViewHelper {
             payerKey: this.perpetualsClient.provider.publicKey,
             recentBlockhash: latestBlockhash.blockhash,
             instructions: transaction.instructions,
-        }).compileToV0Message(this.perpetualsClient.addressLookupTables);
+        }).compileToV0Message(addressLookupTableAccounts);
 
         const transaction2 = new VersionedTransaction(messageV0);
         return this.perpetualsClient.provider.connection.simulateTransaction(transaction2, { sigVerify: false, replaceRecentBlockhash: true });

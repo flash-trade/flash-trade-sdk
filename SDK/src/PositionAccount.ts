@@ -7,7 +7,7 @@ export class PositionAccount implements Position {
 
     public publicKey: PublicKey;
 
-    //  all Position Type data IMP:: SHOULD MATCH NAMES 
+    //  all Position Type data IMP:: SHOULD MATCH NAMES (camelCase for Anchor v0.32)
     public owner: PublicKey;
     public market: PublicKey;
     public delegate: PublicKey;
@@ -23,7 +23,7 @@ export class PositionAccount implements Position {
     public lockedAmount: BN;
     public lockedUsd: BN;
 
-    public collateralAmount: BN;
+    public priceImpactUsd: BN;
     public collateralUsd: BN;
 
     public unsettledValueUsd: BN;
@@ -33,13 +33,16 @@ export class PositionAccount implements Position {
 
     public degenSizeUsd: BN;
     public referencePrice: ContractOraclePrice;
-    public buffer: number;
-    
+
+    public isActive: boolean;
+    public buffer: number[];
+    public priceImpactSet: number;
+
     public sizeDecimals: number;
     public lockedDecimals: number;
     public collateralDecimals: number;
 
-    // extra 
+    // extra
     public bump: number
     public padding: number[];
 

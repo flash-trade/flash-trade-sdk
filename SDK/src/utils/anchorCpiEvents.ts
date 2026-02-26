@@ -1,5 +1,5 @@
-import { BorshEventCoder, Event, EventCoder, web3 } from "@coral-xyz/anchor";
-import { IDL } from "../idl/perpetuals";
+import { BorshEventCoder, Event, EventCoder, web3, Idl } from "@coral-xyz/anchor";
+import IDL from "../idl/perpetuals.json";
 import { base64, bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 
@@ -8,22 +8,21 @@ export function getAndValidateEvent(
     currentProgram: web3.PublicKey,
     eventAuthority: web3.PublicKey,
     eventCoder: EventCoder,
-    ixData: Buffer
+    ixData: Uint8Array
   ): Event {
     // CHECK 1: Event tag
-    let eventTag = Buffer.from(
-      [0x1d, 0x9a, 0xcb, 0x51, 0x2e, 0xa5, 0x45, 0xe4].reverse()
-    );
-    if (!ixData.slice(0, 8).equals(eventTag)) {
+    const eventTag = new Uint8Array([0x1d, 0x9a, 0xcb, 0x51, 0x2e, 0xa5, 0x45, 0xe4].reverse());
+    const ixTag = ixData.slice(0, 8);
+    if (ixTag.length !== eventTag.length || !ixTag.every((val, i) => val === eventTag[i])) {
       throw new Error("Invalid CPI Event: Event tag mismatch");
     }
     // console.log("ixData.slice(0, 8):",ixData.slice(0, 8))
-  
+
     // CHECK 2: Previous program's ID must match current program's ID
     // if (previousProgram.toString() !== currentProgram.toString()) {
     //   throw new Error("Invalid CPI Event: Program ID mismatch");
     // }
-  
+
     // CHECK 3: The first account meta must be the event authority,
     //          derived from the seed's `__event_authority` and the
     //          current program's ID
@@ -34,10 +33,10 @@ export function getAndValidateEvent(
     if (expectedAuthority.toString() !== eventAuthority.toString()) {
       throw new Error("Invalid CPI Event: Event authority does not match");
     }
-  
+
     // CHECK 4: The current program must have an Anchor IDL
     //          associated with it (implicit)
-    let event = eventCoder.decode(base64.encode(ixData.slice(8)));
+    let event = eventCoder.decode(base64.encode(Buffer.from(ixData.slice(8))));
     if (!event) {
       throw new Error("Invalid CPI Event: Failed to decode event");
     }
@@ -53,7 +52,7 @@ export const getCpiEventsFromTransaction = async (response: web3.VersionedTransa
         .concat(response.meta.loadedAddresses.writable ?? [])
         .concat(response.meta.loadedAddresses.readonly ?? []);
   
-    let eventCoder = new BorshEventCoder(IDL);
+    let eventCoder = new BorshEventCoder(IDL as Idl);
     const events : Event[] = []
   
     for (const packet of innerInstructions) {
@@ -61,8 +60,8 @@ export const getCpiEventsFromTransaction = async (response: web3.VersionedTransa
       packet.instructions.forEach((instruction, indexofInnerIns) => {
         // console.log("instruction:",instruction)
         // console.log(">> indexofInnerIns:",indexofInnerIns)
-        let bytes = bs58.decode(instruction.data);
-  
+        let bytes = new Uint8Array(bs58.decode(instruction.data));
+
         let currentProgram = accounts[instruction.programIdIndex];
         let eventAuthority = accounts[instruction.accounts[0]];
         try {

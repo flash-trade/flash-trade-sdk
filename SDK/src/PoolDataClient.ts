@@ -235,7 +235,7 @@ export class PoolDataClient {
   //   for (const custody of this.poolConfig.custodies) {
   //     const custodyData = this.custodies.find(t => t.mint.toBase58() === custody.mintKey.toBase58())
   //     if (custodyData) {
-  //       const collectedFees = custodyData.feesStats.accrued.sub(custodyData.feesStats.paid)
+  //       const collectedFees = custodyData.fees_stats.accrued.sub(custodyData.fees_stats.paid)
   //       totalFees = totalFees.add(collectedFees)
 
         

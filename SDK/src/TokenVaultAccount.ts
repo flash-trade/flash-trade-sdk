@@ -5,22 +5,22 @@ import { ContractOraclePrice, LimitOrder, Order, Position, TokenVault, TriggerOr
 
 
 export class TokenVaultAccount implements TokenVault {
-   
+
 
     public publicKey: PublicKey;
-    public isInitialized: boolean; // Add this property to satisfy the interface
+    public isInitialized: boolean;
     public bump: number;
     public tokenAccountBump: number;
 
     public tokenMint: PublicKey;
     public tokenVaultTokenAccount: PublicKey;
 
-    public tokenPermissions: any; // Replace 'any' with the correct type if known
+    public tokenPermissions: any;
     public withdrawTimeLimit: BN;
     public withdrawInstantFee: BN;
     public withdrawInstantFeeEarned: BN;
     public stakeLevel: BN[];
-    public tokensStaked: any; // Replace 'any' with the correct type if known
+    public tokensStaked: any;
     public rewardTokensToDistribute: BN;
     public rewardTokensPaid: BN;
 
@@ -35,6 +35,7 @@ export class TokenVaultAccount implements TokenVault {
     public revenueAccrued: BN;
     public revenueDistributed: BN;
     public revenuePaid: BN;
+    public unlockPeriod: BN;
     public padding2: BN[];
 
     constructor( publicKey : PublicKey, parseData : TokenVault) {

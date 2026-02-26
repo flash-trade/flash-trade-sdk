@@ -12,15 +12,15 @@ export class PoolAccount implements Pool {
     inceptionTime: BN;
     lpMint: PublicKey;
     oracleAuthority: PublicKey;
-    stakedLpVault: PublicKey; // set in init_staking
-    rewardCustody: PublicKey; // set in init_staking
-    custodies:  PublicKey[];
+    stakedLpVault: PublicKey;
+    rewardCustody: PublicKey;
+    custodies: PublicKey[];
     ratios: TokenRatios[];
-    markets:  PublicKey[];
+    markets: PublicKey[];
     maxAumUsd: BN;
     buffer: BN;
-    rawAumUsd: BN; 
-    equityUsd: BN; 
+    rawAumUsd: BN;
+    equityUsd: BN;
     totalStaked: StakeStats;
     stakingFeeShareBps: BN;
     bump: number;

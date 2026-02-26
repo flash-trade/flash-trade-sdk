@@ -5,9 +5,10 @@ import * as borsh from '@coral-xyz/borsh'
 import { IdlField, IdlTypeDef, IdlEnumVariant, IdlType } from '@coral-xyz/anchor/dist/cjs/idl'
 import { BN, IdlError } from '@coral-xyz/anchor'
 export class IdlCoder {
-    public static fieldLayout(field: { name?: string } & Pick<IdlField, 'type'>, types?: IdlTypeDef[]): Layout {
+    // Using 'any' for field type to support both old and new IDL formats
+    public static fieldLayout(field: { name?: string; type: any }, types?: IdlTypeDef[]): Layout {
         const fieldName = field.name !== undefined ? camelCase(field.name) : undefined
-        switch (field.type) {
+        switch (field.type as string) {
             case 'bool': {
                 return borsh.bool(fieldName)
             }
@@ -59,34 +60,37 @@ export class IdlCoder {
             case 'string': {
                 return borsh.str(fieldName)
             }
-            case 'publicKey': {
+            case 'publicKey':
+            case 'pubkey': {
                 return borsh.publicKey(fieldName)
             }
             default: {
-                if ('vec' in field.type) {
+                if ('vec' in (field.type as object)) {
                     return borsh.vec(
                         IdlCoder.fieldLayout(
                             {
                                 name: undefined,
-                                type: field.type.vec,
+                                type: (field.type as any).vec,
                             },
                             types
                         ),
                         fieldName
                     )
-                } else if ('option' in field.type) {
+                } else if ('option' in (field.type as object)) {
                     return borsh.option(
                         IdlCoder.fieldLayout(
                             {
                                 name: undefined,
-                                type: field.type.option,
+                                type: (field.type as any).option,
                             },
                             types
                         ),
                         fieldName
                     )
-                } else if ('defined' in field.type) {
-                    const defined = field.type.defined
+                } else if ('defined' in (field.type as object)) {
+                    const definedType = (field.type as any).defined
+                    // In Anchor v0.32, defined can be an object { name: string } or a string
+                    const defined = typeof definedType === 'string' ? definedType : definedType.name
                     // User defined type.
                     if (types === undefined) {
                         throw new IdlError('User defined types not provided')
@@ -96,9 +100,9 @@ export class IdlCoder {
                         throw new IdlError(`Type not found: ${JSON.stringify(field)}`)
                     }
                     return IdlCoder.typeDefLayout(filtered[0]!, types, fieldName)
-                } else if ('array' in field.type) {
-                    let arrayTy = field.type.array[0]
-                    let arrayLen = field.type.array[1]
+                } else if ('array' in (field.type as object)) {
+                    let arrayTy = (field.type as any).array[0]
+                    let arrayLen = (field.type as any).array[1] as number
                     let innerLayout = IdlCoder.fieldLayout(
                         {
                             name: undefined,

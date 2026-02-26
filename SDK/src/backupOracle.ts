@@ -8,6 +8,23 @@ import { BackupOracle, PermissionlessPythCache } from "./types";
 import { Program } from "@coral-xyz/anchor";
 import { Perpetuals } from "./idl/perpetuals";
 
+const BACKUP_ORACLE_SIZE = 36; // i64 + i32 + i64 + i64 + i64
+
+function encodePermissionlessPythCache(cache: PermissionlessPythCache): Uint8Array {
+    const { backupCache } = cache;
+    const buf = Buffer.alloc(4 + backupCache.length * BACKUP_ORACLE_SIZE);
+    buf.writeUInt32LE(backupCache.length, 0);
+    let offset = 4;
+    for (const oracle of backupCache) {
+        buf.writeBigInt64LE(BigInt(oracle.price.toString()), offset); offset += 8;
+        buf.writeInt32LE(oracle.expo, offset); offset += 4;
+        buf.writeBigInt64LE(BigInt(oracle.conf.toString()), offset); offset += 8;
+        buf.writeBigInt64LE(BigInt(oracle.emaPrice.toString()), offset); offset += 8;
+        buf.writeBigInt64LE(BigInt(oracle.publishTime.toString()), offset); offset += 8;
+    }
+    return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+}
+
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT ?? 'https://api.prod.flash.trade'
 
 export const pythPriceServiceConnection = new PriceServiceConnection('https://hermes.pyth.network', {
@@ -54,8 +71,7 @@ export const getPythnetOraclePrices = async (
             backupCache: caches
         };
 
-        // @ts-ignore
-        let message = program._coder.types.encode('PermissionlessPythCache', permissionlessPythCache);
+        let message = encodePermissionlessPythCache(permissionlessPythCache);
 
         const signature = nacl.sign.detached(message, backupOracleAccount.secretKey);
 
@@ -90,8 +106,7 @@ export const getBackupOracleInstruction =  (
             backupCache: backupCaches
         };
 
-        // @ts-ignore
-        let message = program._coder.types.encode('PermissionlessPythCache', permissionlessPythCache);
+        let message = encodePermissionlessPythCache(permissionlessPythCache);
 
         const signature = nacl.sign.detached(message, backupOracleAccount.secretKey);
 
