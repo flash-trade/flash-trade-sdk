@@ -193,7 +193,7 @@ const closePosition = async (targetTokenSymbol: string, side: Side) => {
 
     const priceAfterSlippage = flashClient.getPriceAfterSlippage(false, new BN(slippageBps), targetTokenPrice, side)
 
-    const openPositionData = await flashClient.closePosition(
+    const closePositionData = await flashClient.closePosition(
         targetToken.symbol,
         userRecievingToken.symbol, // for WSOL
         priceAfterSlippage,
@@ -205,8 +205,8 @@ const closePosition = async (targetTokenSymbol: string, side: Side) => {
         // new PublicKey('...'), // nftRebateTokenAccount
     )
 
-    instructions.push(...openPositionData.instructions)
-    additionalSigners.push(...openPositionData.additionalSigners)
+    instructions.push(...closePositionData.instructions)
+    additionalSigners.push(...closePositionData.additionalSigners)
 
     const setCULimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 }) // addLiquidity
 
