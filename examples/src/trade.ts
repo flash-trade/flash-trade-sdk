@@ -34,6 +34,8 @@ if (!RPC_URL) {
     throw new Error('RPC_URL is not set');
 }
 
+const connection = new Connection(RPC_URL);
+
 export const PYTHNET_URL = process.env.PYTHNET_URL!;
 console.log("PYTHNET_URL:>> ", PYTHNET_URL);
 if (!PYTHNET_URL) {
@@ -258,7 +260,7 @@ const openPositionWithSwap = async (inputTokenSymbol: string, outputTokenSymbol:
 
     const allCustodies = await flashClient.program.account.custody.all()
 
-    const lpMintData = await getMint(flashClient.provider.connection, POOL_CONFIG.stakedLpTokenMint);
+    const lpMintData = await getMint(connection, POOL_CONFIG.stakedLpTokenMint);
 
     const poolDataClient = new PoolDataClient(
         POOL_CONFIG,

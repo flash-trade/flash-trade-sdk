@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/trade.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,11 +16,12 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
     "@pythnetwork/client": "^2.22.0",
     "@solana/spl-token": "^0.4.8",
     "@solana/web3.js": "^1.95.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
-    "flash-sdk": "^11.8.1"
+    "flash-sdk": "^15.1.6"
   }
 }
