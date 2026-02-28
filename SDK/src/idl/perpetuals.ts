@@ -8,7 +8,7 @@ export type Perpetuals = {
   "address": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
   "metadata": {
     "name": "perpetuals",
-    "version": "15.1.0",
+    "version": "15.2.0",
     "spec": "0.1.0",
     "description": "Flash Trade Perpetuals Exchange",
     "repository": "https://github.com/flash-trade/"
@@ -7877,6 +7877,182 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "getAddCollateralQuote",
+      "discriminator": [
+        103,
+        106,
+        18,
+        57,
+        44,
+        127,
+        202,
+        159
+      ],
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "position"
+        },
+        {
+          "name": "market"
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "targetOracleAccount"
+        },
+        {
+          "name": "collateralCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralOracleAccount"
+        },
+        {
+          "name": "receivingCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "receiving_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receivingOracleAccount"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "getAddCollateralQuoteParams"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "addCollateralQuoteData"
+        }
+      }
+    },
+    {
       "name": "getAddCompoundingLiquidityAmountAndFee",
       "discriminator": [
         29,
@@ -8203,6 +8379,182 @@ export type Perpetuals = {
           }
         }
       ]
+    },
+    {
+      "name": "getClosePositionQuote",
+      "discriminator": [
+        94,
+        207,
+        132,
+        38,
+        227,
+        145,
+        139,
+        133
+      ],
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market"
+        },
+        {
+          "name": "position"
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "targetOracleAccount"
+        },
+        {
+          "name": "collateralCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralOracleAccount"
+        },
+        {
+          "name": "dispensingCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "dispensing_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "dispensingOracleAccount"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "getClosePositionQuoteParams"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "closePositionQuoteData"
+        }
+      }
     },
     {
       "name": "getCompoundingTokenData",
@@ -9166,6 +9518,179 @@ export type Perpetuals = {
       "returns": "u64"
     },
     {
+      "name": "getOpenPositionQuote",
+      "discriminator": [
+        41,
+        125,
+        167,
+        65,
+        176,
+        136,
+        144,
+        58
+      ],
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "market"
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "targetOracleAccount"
+        },
+        {
+          "name": "collateralCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralOracleAccount"
+        },
+        {
+          "name": "receivingCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "receiving_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receivingCustodyOracleAccount"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "getOpenPositionQuoteParams"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "openPositionQuoteData"
+        }
+      }
+    },
+    {
       "name": "getOraclePrice",
       "discriminator": [
         200,
@@ -9607,6 +10132,182 @@ export type Perpetuals = {
       "returns": {
         "defined": {
           "name": "positionData"
+        }
+      }
+    },
+    {
+      "name": "getRemoveCollateralQuote",
+      "discriminator": [
+        194,
+        54,
+        218,
+        133,
+        18,
+        59,
+        109,
+        253
+      ],
+      "accounts": [
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "position"
+        },
+        {
+          "name": "market"
+        },
+        {
+          "name": "targetCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "target_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "targetOracleAccount"
+        },
+        {
+          "name": "collateralCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "collateral_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateralOracleAccount"
+        },
+        {
+          "name": "dispensingCustody",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "dispensing_custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "dispensingOracleAccount"
+        },
+        {
+          "name": "ixSysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "getRemoveCollateralQuoteParams"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "removeCollateralQuoteData"
         }
       }
     },
@@ -22430,6 +23131,21 @@ export type Perpetuals = {
       "code": 6068,
       "name": "invalidWithdrawRequestId",
       "msg": "Invalid withdraw request ID"
+    },
+    {
+      "code": 6069,
+      "name": "invalidWhitelistAccount",
+      "msg": "Invalid whitelist account"
+    },
+    {
+      "code": 6070,
+      "name": "backupPriceDeviation",
+      "msg": "Backup price out of bounds"
+    },
+    {
+      "code": 6071,
+      "name": "oracleConfidenceOutOfBounds",
+      "msg": "Oracle confidence out of bounds"
     }
   ],
   "types": [
@@ -22626,6 +23342,74 @@ export type Perpetuals = {
           {
             "name": "collateralDelta",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "addCollateralQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "collateralDeltaUsd",
+            "type": "u64"
+          },
+          {
+            "name": "existingCollateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "existingLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "existingLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "newCollateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "newLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "newLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "maxAddableUsd",
+            "type": "u64"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "swapPossible",
+            "type": "bool"
+          },
+          {
+            "name": "passesMinCollateral",
+            "type": "bool"
+          },
+          {
+            "name": "passesLeverageCheck",
+            "type": "bool"
           }
         ]
       }
@@ -23959,6 +24743,134 @@ export type Perpetuals = {
                 "name": "privilege"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "closePositionQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "receiveTokenAmount",
+            "type": "u64"
+          },
+          {
+            "name": "receiveTokenAmountUsd",
+            "type": "u64"
+          },
+          {
+            "name": "markPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "entryPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "existingLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "newLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "existingSize",
+            "type": "u64"
+          },
+          {
+            "name": "newSize",
+            "type": "u64"
+          },
+          {
+            "name": "existingCollateral",
+            "type": "u64"
+          },
+          {
+            "name": "newCollateral",
+            "type": "u64"
+          },
+          {
+            "name": "existingLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "newLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "settledPnlUsd",
+            "type": "u64"
+          },
+          {
+            "name": "isProfitable",
+            "type": "bool"
+          },
+          {
+            "name": "profitUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lossUsd",
+            "type": "u64"
+          },
+          {
+            "name": "fees",
+            "type": "u64"
+          },
+          {
+            "name": "feesBeforeDiscount",
+            "type": "u64"
+          },
+          {
+            "name": "exitFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "exitFeeBeforeDiscountUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lockAndUnsettledFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "priceImpactUsd",
+            "type": "u64"
+          },
+          {
+            "name": "isSolvent",
+            "type": "bool"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "swapPossible",
+            "type": "bool"
+          },
+          {
+            "name": "isPartialClose",
+            "type": "bool"
           }
         ]
       }
@@ -26629,6 +27541,18 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "getAddCollateralQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "GetAddCompoundingLiquidityAmountAndFeeParams",
       "type": {
         "kind": "struct",
@@ -26657,6 +27581,42 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "getClosePositionQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sizeDeltaUsd",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": {
+                "name": "privilege"
+              }
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "triggerPrice",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "oraclePrice"
+                }
+              }
+            }
+          }
+        ]
       }
     },
     {
@@ -26726,6 +27686,46 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "getOpenPositionQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "privilege",
+            "type": {
+              "defined": {
+                "name": "privilege"
+              }
+            }
+          },
+          {
+            "name": "discountIndex",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "limitPrice",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "oraclePrice"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "getOraclePriceParams",
       "type": {
         "kind": "struct",
@@ -26744,6 +27744,18 @@ export type Perpetuals = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "getRemoveCollateralQuoteParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "collateralDeltaUsd",
+            "type": "u64"
+          }
+        ]
       }
     },
     {
@@ -28440,6 +29452,130 @@ export type Perpetuals = {
             "type": {
               "defined": {
                 "name": "privilege"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "openPositionQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amountIn",
+            "type": "u64"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "collateralAmount",
+            "type": "u64"
+          },
+          {
+            "name": "collateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "sizeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "sizeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "entryPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "liquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "entryFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "entryFeeBeforeDiscountUsd",
+            "type": "u64"
+          },
+          {
+            "name": "volatilityFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "totalFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "feeRate",
+            "type": "u64"
+          },
+          {
+            "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "availableLiquidityUsd",
+            "type": "u64"
+          },
+          {
+            "name": "borrowFeeRate",
+            "type": "u64"
+          },
+          {
+            "name": "hasExistingPosition",
+            "type": "bool"
+          },
+          {
+            "name": "oldLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "oldEntryPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "oldLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "finalLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "finalEntryPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "finalLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
               }
             }
           }
@@ -30222,6 +31358,78 @@ export type Perpetuals = {
           {
             "name": "collateralDeltaUsd",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "removeCollateralQuoteData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "collateralDeltaUsd",
+            "type": "u64"
+          },
+          {
+            "name": "receiveTokenAmount",
+            "type": "u64"
+          },
+          {
+            "name": "receiveTokenAmountUsd",
+            "type": "u64"
+          },
+          {
+            "name": "existingCollateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "existingLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "existingLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "newCollateralUsd",
+            "type": "u64"
+          },
+          {
+            "name": "newLeverage",
+            "type": "u64"
+          },
+          {
+            "name": "newLiquidationPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "maxWithdrawableUsd",
+            "type": "u64"
+          },
+          {
+            "name": "swapRequired",
+            "type": "bool"
+          },
+          {
+            "name": "swapPossible",
+            "type": "bool"
+          },
+          {
+            "name": "passesMinCollateral",
+            "type": "bool"
+          },
+          {
+            "name": "passesLeverageCheck",
+            "type": "bool"
           }
         ]
       }

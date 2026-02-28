@@ -68,6 +68,22 @@ export interface AddCollateralParams {
   collateralDelta: BN;
 }
 
+export interface AddCollateralQuoteData {
+  amountIn: BN;
+  collateralDeltaUsd: BN;
+  existingCollateralUsd: BN;
+  existingLeverage: BN;
+  existingLiquidationPrice: ContractOraclePrice;
+  newCollateralUsd: BN;
+  newLeverage: BN;
+  newLiquidationPrice: ContractOraclePrice;
+  maxAddableUsd: BN;
+  swapRequired: boolean;
+  swapPossible: boolean;
+  passesMinCollateral: boolean;
+  passesLeverageCheck: boolean;
+}
+
 export interface AddCompoundingLiquidityLog {
   pool_name: string;
   owner: PublicKey;
@@ -414,6 +430,35 @@ export interface ClosePositionLogV3 {
 export interface ClosePositionParams {
   priceWithSlippage: ContractOraclePrice;
   privilege: Privilege;
+}
+
+export interface ClosePositionQuoteData {
+  receiveTokenAmount: BN;
+  receiveTokenAmountUsd: BN;
+  markPrice: ContractOraclePrice;
+  entryPrice: ContractOraclePrice;
+  existingLiquidationPrice: ContractOraclePrice;
+  newLiquidationPrice: ContractOraclePrice;
+  existingSize: BN;
+  newSize: BN;
+  existingCollateral: BN;
+  newCollateral: BN;
+  existingLeverage: BN;
+  newLeverage: BN;
+  settledPnlUsd: BN;
+  isProfitable: boolean;
+  profitUsd: BN;
+  lossUsd: BN;
+  fees: BN;
+  feesBeforeDiscount: BN;
+  exitFeeUsd: BN;
+  exitFeeBeforeDiscountUsd: BN;
+  lockAndUnsettledFeeUsd: BN;
+  priceImpactUsd: BN;
+  isSolvent: boolean;
+  swapRequired: boolean;
+  swapPossible: boolean;
+  isPartialClose: boolean;
 }
 
 export interface CollectRebateLog {
@@ -1089,6 +1134,10 @@ export interface ForceSettleTriggerOrderLog {
   padding: BN[];
 }
 
+export interface GetAddCollateralQuoteParams {
+  amountIn: BN;
+}
+
 export interface GetAddCompoundingLiquidityAmountAndFeeParams {
   amountIn: BN;
 }
@@ -1098,6 +1147,13 @@ export interface GetAddLiquidityAmountAndFeeParams {
 }
 
 export interface GetAssetsUnderManagementParams {
+}
+
+export interface GetClosePositionQuoteParams {
+  sizeDeltaUsd: BN;
+  privilege: Privilege;
+  discountIndex: number | null;
+  triggerPrice: ContractOraclePrice | null;
 }
 
 export interface GetCompoundingTokenDataParams {
@@ -1124,6 +1180,14 @@ export interface GetLiquidationStateParams {
 export interface GetLpTokenPriceParams {
 }
 
+export interface GetOpenPositionQuoteParams {
+  amountIn: BN;
+  leverage: BN;
+  privilege: Privilege;
+  discountIndex: number | null;
+  limitPrice: ContractOraclePrice | null;
+}
+
 export interface GetOraclePriceParams {
 }
 
@@ -1131,6 +1195,10 @@ export interface GetPnlParams {
 }
 
 export interface GetPositionDataParams {
+}
+
+export interface GetRemoveCollateralQuoteParams {
+  collateralDeltaUsd: BN;
 }
 
 export interface GetRemoveCompoundingLiquidityAmountAndFeeParams {
@@ -1568,6 +1636,32 @@ export interface OpenPositionParams {
   privilege: Privilege;
 }
 
+export interface OpenPositionQuoteData {
+  amountIn: BN;
+  swapRequired: boolean;
+  collateralAmount: BN;
+  collateralUsd: BN;
+  sizeAmount: BN;
+  sizeUsd: BN;
+  entryPrice: ContractOraclePrice;
+  liquidationPrice: ContractOraclePrice;
+  entryFeeUsd: BN;
+  entryFeeBeforeDiscountUsd: BN;
+  volatilityFeeUsd: BN;
+  totalFeeUsd: BN;
+  feeRate: BN;
+  leverage: BN;
+  availableLiquidityUsd: BN;
+  borrowFeeRate: BN;
+  hasExistingPosition: boolean;
+  oldLeverage: BN;
+  oldEntryPrice: ContractOraclePrice;
+  oldLiquidationPrice: ContractOraclePrice;
+  finalLeverage: BN;
+  finalEntryPrice: ContractOraclePrice;
+  finalLiquidationPrice: ContractOraclePrice;
+}
+
 export interface OracleParams {
   intOracleAccount: PublicKey;
   extOracleAccount: PublicKey;
@@ -2003,6 +2097,23 @@ export interface RemoveCollateralLogV3 {
 
 export interface RemoveCollateralParams {
   collateralDeltaUsd: BN;
+}
+
+export interface RemoveCollateralQuoteData {
+  collateralDeltaUsd: BN;
+  receiveTokenAmount: BN;
+  receiveTokenAmountUsd: BN;
+  existingCollateralUsd: BN;
+  existingLeverage: BN;
+  existingLiquidationPrice: ContractOraclePrice;
+  newCollateralUsd: BN;
+  newLeverage: BN;
+  newLiquidationPrice: ContractOraclePrice;
+  maxWithdrawableUsd: BN;
+  swapRequired: boolean;
+  swapPossible: boolean;
+  passesMinCollateral: boolean;
+  passesLeverageCheck: boolean;
 }
 
 export interface RemoveCompoundingLiquidityLog {

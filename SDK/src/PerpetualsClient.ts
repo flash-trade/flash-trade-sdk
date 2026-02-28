@@ -1973,6 +1973,10 @@ export class PerpetualsClient {
     return { maxWithdrawableAmount, maxWithdrawableAmountUsd, diffUsd }
   }
 
+  // NOTE: Unlike getDecreaseSizeCollateralAndFeeSync, this function does NOT accept a discountBps
+  // parameter, so fees are always computed without any trading discount applied. This means the
+  // returned closeAmountUsd will be lower than what a discounted user actually receives.
+  // Prefer using the on-chain get_close_position_quote instruction which handles discounts correctly.
   getFinalCloseAmountUsdSync = (
     positionAccount: PositionAccount,
     marketCorrelation: boolean,

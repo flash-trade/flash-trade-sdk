@@ -60,6 +60,7 @@ export class PoolConfig {
     public fbNftRewardProgramId: PublicKey,
     public cluster: Cluster,
     public poolName: string,
+    public isDeprecated: boolean,
     public poolAddress: PublicKey,
     public stakedLpTokenMint: PublicKey,
     public compoundingTokenMint: PublicKey,
@@ -93,6 +94,8 @@ export class PoolConfig {
 
     public tokens: Token[],
 
+    public tokensDeprecated: Token[],
+
     public custodies: CustodyConfig[],
 
     public markets: MarketConfig[],
@@ -101,9 +104,13 @@ export class PoolConfig {
   ) { }
 
   public getAllTokenMints(): PublicKey[] {
-    return Array.from(
+    const tokenList =  Array.from(
       this.tokens.map((token) => new PublicKey(token.mintKey)),
     );
+    const deprecatedTokenList =  Array.from(
+      this.tokensDeprecated.map((token) => new PublicKey(token.mintKey)),
+    );
+    return tokenList.concat(deprecatedTokenList);
   }
 
   public getMarketConfigByPk(marketAccountPk: PublicKey): MarketConfig {
@@ -281,6 +288,25 @@ export class PoolConfig {
     } catch (error) {
       console.log("ERROR: buildPoolconfigFromJson  unable to load tokens ")
     }
+
+
+    let tokensDeprecated: Token[] ;
+    try {
+      if (!poolConfig['tokensDeprecated']) {
+        tokensDeprecated = []
+      } else {
+        tokensDeprecated = poolConfig['tokensDeprecated'].map(i => {
+          return {
+            ...i,
+            mintKey: new PublicKey(i.mintKey)
+          }
+        })
+      }
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load tokensDeprecated ")
+    }
+
+
     let custodies: CustodyConfig[];
     try {
       custodies = poolConfig['custodies'].map((i, index) => {
@@ -372,6 +398,7 @@ export class PoolConfig {
       new PublicKey(poolConfig.fbNftRewardProgramId),
       poolConfig.cluster as Cluster,
       poolConfig.poolName,
+      poolConfig.isDeprecated,
       new PublicKey(poolConfig.poolAddress),
       new PublicKey(poolConfig.stakedLpTokenMint),
       new PublicKey(poolConfig.compoundingTokenMint),
@@ -403,6 +430,7 @@ export class PoolConfig {
         transferAuthority: new PublicKey(poolConfig.rewardDistributionProgram.transferAuthority),
       },
       tokens,
+      tokensDeprecated,
       custodies,
       markets,
       marketsDeprecated
