@@ -2369,7 +2369,9 @@
           "pythTicker": "Crypto.USDC/USD",
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
           "isToken2022": false
-        },
+        }
+      ],
+      "tokensDeprecated" :  [
         {
           "symbol": "TSLAr",
           "mintKey": "FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe",
@@ -2437,7 +2439,7 @@
         }
       ],
       "custodies": [
-        {
+         {
           "custodyId": 0,
           "custodyAccount": "ChE66qGH61VCZCcj28gJnQtUSBQjJYHbrkDPEbKWsWum",
           "tokenAccount": "CuT1jYvGqL981wxKXGchXVsZjs5vytcLAE6LB1Twkzw9",
@@ -2453,7 +2455,9 @@
           "lazerId": 7,
           "pythTicker": "Crypto.USDC/USD",
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
-        },
+        }
+      ],
+      "custodiesDeprecated": [
         {
           "custodyId": 1,
           "custodyAccount": "FxgR3FNcBQksFhtFz4XqLNMmW7UJnh4XMXS7Z69dnzP",
@@ -2540,7 +2544,8 @@
           "pythPriceId": "0x19e09bb805456ada3979a7d1cbb4b6d63babc3a0f8e8a9509f68afa5c4c11cd5"
         }
       ],
-      "markets": [
+      "markets": [],
+      "marketsDeprecated": [
         {
           "marketId": 0,
           "marketAccount": "HChXe7VQno8NCibktPhxmeF46vqDx6MQJYRqjdFVAS1P",
@@ -4926,8 +4931,10 @@
           "pythTicker": "Crypto.USDC/USD",
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
           "isToken2022": false
-        },
-        {
+        }
+      ],
+      "tokensDeprecated" :[
+         {
           "symbol": "TSLAr",
           "mintKey": "ts1aDtA2pHaFrMRDcy5YsK6giEbrABDfv1PkQK21Kga",
           "decimals": 9,
@@ -5010,8 +5017,10 @@
           "lazerId": 7,
           "pythTicker": "Crypto.USDC/USD",
           "pythPriceId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
-        },
-        {
+        }
+      ],
+      "custodiesDeprecated" :[
+         {
           "custodyId": 1,
           "custodyAccount": "4BtySgvArhrkCJntUSMmpjUK4ueNkocMkzJErmfL87At",
           "tokenAccount": "J1fupKEMtyVzAk6ciMkfpgEeXfKQB6M5rgZYD2Ag3FVe",
@@ -5097,7 +5106,8 @@
           "pythPriceId": "0x19e09bb805456ada3979a7d1cbb4b6d63babc3a0f8e8a9509f68afa5c4c11cd5"
         }
       ],
-      "markets": [
+      "markets": [],
+      "marketsDeprecated": [
         {
           "marketId": 0,
           "marketAccount": "H1E3Z2GoxPiyNVMyuqVP33aRGpBJFqBt3FD8p5yb5AD6",

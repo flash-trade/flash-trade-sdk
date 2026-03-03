@@ -865,10 +865,10 @@ file-uri-to-path@1.0.0:
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
   integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
 
-flash-sdk@^15.1.6:
-  version "15.1.6"
-  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-15.1.6.tgz#8567a0ece99236f78c268f8e5c49873e534279fb"
-  integrity sha512-g0/MrlIw4Ya+5qGokXyDvzMg5YHZbapJKkokJcoHfbpDoh5NUPain5NRK4lRk9orcqJ6Ko2dkphY6BPAvz8FVA==
+flash-sdk@^15.4.4:
+  version "15.4.4"
+  resolved "https://registry.yarnpkg.com/flash-sdk/-/flash-sdk-15.4.4.tgz#d4a5ccfde45e3afb48520fa900b58fcf4102445b"
+  integrity sha512-sxNEqNlNVvsnQTwnXaNxka8ChSrGqDmQkZBApDgs60fcEkuDtTI8J6RmDad+ji4RZ1ME8IibCrRsNL+h98jRlw==
   dependencies:
     "@coral-xyz/anchor" "^0.32.1"
     "@pythnetwork/price-service-client" "^1.8.2"

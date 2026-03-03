@@ -98,6 +98,8 @@ export class PoolConfig {
 
     public custodies: CustodyConfig[],
 
+    public custodiesDeprecated: CustodyConfig[],
+
     public markets: MarketConfig[],
 
     public marketsDeprecated: MarketConfig[],
@@ -327,7 +329,30 @@ export class PoolConfig {
       console.log("ERROR: buildPoolconfigFromJson  unable to load custodies ")
     }
 
-   
+    let custodiesDeprecated: CustodyConfig[]
+    try {
+      if (!poolConfig['custodiesDeprecated']) {
+        custodiesDeprecated = []
+      } else {
+        custodiesDeprecated = poolConfig['custodiesDeprecated'].map((i) => {
+          return {
+            ...i,
+            custodyId: i.custodyId,
+            custodyAccount: new PublicKey(i.custodyAccount),
+            tokenAccount: new PublicKey(i.tokenAccount),
+            mintKey: new PublicKey(i.mintKey),
+            intOracleAccount: new PublicKey(i.intOracleAddress),
+            extOracleAccount: new PublicKey(i.extOracleAddress),
+            usdPrecision : i.usdPrecision,
+            tokenPrecision : i.tokenPrecision,
+          }
+        })
+      }
+    } catch (error) {
+      console.log("ERROR: buildPoolconfigFromJson  unable to load custodiesDeprecated ")
+    }
+
+
     let addressLookupTableAddresses: PublicKey[]
     try {
       addressLookupTableAddresses  = poolConfig['addressLookupTableAddresses'].map(i => {
@@ -432,6 +457,7 @@ export class PoolConfig {
       tokens,
       tokensDeprecated,
       custodies,
+      custodiesDeprecated,
       markets,
       marketsDeprecated
     );
