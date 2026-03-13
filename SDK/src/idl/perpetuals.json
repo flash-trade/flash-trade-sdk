@@ -12680,9 +12680,30 @@
       ],
       "accounts": [
         {
-          "name": "fee_payer",
+          "name": "admin",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "old_order",
@@ -12742,6 +12763,36 @@
           }
         },
         {
+          "name": "new_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_order.owner",
+                "account": "Order"
+              },
+              {
+                "kind": "account",
+                "path": "new_market"
+              }
+            ]
+          }
+        },
+        {
           "name": "new_market"
         },
         {
@@ -12783,9 +12834,30 @@
       ],
       "accounts": [
         {
-          "name": "fee_payer",
+          "name": "admin",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "perpetuals",
@@ -27715,6 +27787,26 @@
                 }
               }
             }
+          },
+          {
+            "name": "take_profit_price",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "OraclePrice"
+                }
+              }
+            }
+          },
+          {
+            "name": "stop_loss_price",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "OraclePrice"
+                }
+              }
+            }
           }
         ]
       }
@@ -29570,6 +29662,22 @@
             "type": {
               "defined": {
                 "name": "OraclePrice"
+              }
+            }
+          },
+          {
+            "name": "take_profit_quote",
+            "type": {
+              "defined": {
+                "name": "TriggerQuote"
+              }
+            }
+          },
+          {
+            "name": "stop_loss_quote",
+            "type": {
+              "defined": {
+                "name": "TriggerQuote"
               }
             }
           }
@@ -33429,6 +33537,42 @@
           {
             "name": "receive_custody_uid",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TriggerQuote",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "exit_price",
+            "type": {
+              "defined": {
+                "name": "OraclePrice"
+              }
+            }
+          },
+          {
+            "name": "profit_usd",
+            "type": "u64"
+          },
+          {
+            "name": "loss_usd",
+            "type": "u64"
+          },
+          {
+            "name": "exit_fee_usd",
+            "type": "u64"
+          },
+          {
+            "name": "receive_usd",
+            "type": "u64"
+          },
+          {
+            "name": "is_solvent",
+            "type": "bool"
           }
         ]
       }

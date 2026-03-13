@@ -52,11 +52,10 @@ export class ViewHelper {
         userPublicKey: PublicKey | undefined = undefined
     ): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
         transaction.feePayer = userPublicKey ?? this.perpetualsClient.provider.publicKey;
-        let latestBlockhash = await this.perpetualsClient.provider.connection.getLatestBlockhash('confirmed');
 
         const messageV0 = new TransactionMessage({
             payerKey: this.perpetualsClient.provider.publicKey,
-            recentBlockhash: latestBlockhash.blockhash,
+            recentBlockhash: PublicKey.default.toBase58(),
             instructions: transaction.instructions,
         }).compileToV0Message(addressLookupTableAccounts);
 

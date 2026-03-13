@@ -1186,6 +1186,8 @@ export interface GetOpenPositionQuoteParams {
   privilege: Privilege;
   discountIndex: number | null;
   limitPrice: ContractOraclePrice | null;
+  takeProfitPrice: ContractOraclePrice | null;
+  stopLossPrice: ContractOraclePrice | null;
 }
 
 export interface GetOraclePriceParams {
@@ -1660,6 +1662,8 @@ export interface OpenPositionQuoteData {
   finalLeverage: BN;
   finalEntryPrice: ContractOraclePrice;
   finalLiquidationPrice: ContractOraclePrice;
+  takeProfitQuote: TriggerQuote;
+  stopLossQuote: TriggerQuote;
 }
 
 export interface OracleParams {
@@ -2626,6 +2630,15 @@ export interface TriggerOrder {
   triggerPrice: ContractOraclePrice;
   triggerSize: BN;
   receiveCustodyUid: number;
+}
+
+export interface TriggerQuote {
+  exitPrice: ContractOraclePrice;
+  profitUsd: BN;
+  lossUsd: BN;
+  exitFeeUsd: BN;
+  receiveUsd: BN;
+  isSolvent: boolean;
 }
 
 export interface UnstakeInstantLog {

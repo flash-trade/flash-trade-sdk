@@ -12686,9 +12686,30 @@ export type Perpetuals = {
       ],
       "accounts": [
         {
-          "name": "feePayer",
+          "name": "admin",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "oldOrder",
@@ -12748,6 +12769,36 @@ export type Perpetuals = {
           }
         },
         {
+          "name": "newPosition",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "old_order.owner",
+                "account": "order"
+              },
+              {
+                "kind": "account",
+                "path": "newMarket"
+              }
+            ]
+          }
+        },
+        {
           "name": "newMarket"
         },
         {
@@ -12789,9 +12840,30 @@ export type Perpetuals = {
       ],
       "accounts": [
         {
-          "name": "feePayer",
+          "name": "admin",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "perpetuals",
@@ -27721,6 +27793,26 @@ export type Perpetuals = {
                 }
               }
             }
+          },
+          {
+            "name": "takeProfitPrice",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "oraclePrice"
+                }
+              }
+            }
+          },
+          {
+            "name": "stopLossPrice",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "oraclePrice"
+                }
+              }
+            }
           }
         ]
       }
@@ -29576,6 +29668,22 @@ export type Perpetuals = {
             "type": {
               "defined": {
                 "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "takeProfitQuote",
+            "type": {
+              "defined": {
+                "name": "triggerQuote"
+              }
+            }
+          },
+          {
+            "name": "stopLossQuote",
+            "type": {
+              "defined": {
+                "name": "triggerQuote"
               }
             }
           }
@@ -33435,6 +33543,42 @@ export type Perpetuals = {
           {
             "name": "receiveCustodyUid",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "triggerQuote",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "exitPrice",
+            "type": {
+              "defined": {
+                "name": "oraclePrice"
+              }
+            }
+          },
+          {
+            "name": "profitUsd",
+            "type": "u64"
+          },
+          {
+            "name": "lossUsd",
+            "type": "u64"
+          },
+          {
+            "name": "exitFeeUsd",
+            "type": "u64"
+          },
+          {
+            "name": "receiveUsd",
+            "type": "u64"
+          },
+          {
+            "name": "isSolvent",
+            "type": "bool"
           }
         ]
       }
