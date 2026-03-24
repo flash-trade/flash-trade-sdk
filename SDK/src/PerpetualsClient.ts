@@ -8903,7 +8903,8 @@ export class PerpetualsClient {
               payerPubkey,
               userReceivingTokenAccount,
               owner,
-              poolConfig.getTokenFromSymbol(receivingSymbol).mintKey
+              poolConfig.getTokenFromSymbol(receivingSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(receivingSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID 
             )
           );
         }
@@ -8921,7 +8922,8 @@ export class PerpetualsClient {
               payerPubkey,
               userReceivingTokenAccountCollateral,
               owner,
-              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey
+              poolConfig.getTokenFromSymbol(collateralSymbol).mintKey,
+              poolConfig.getTokenFromSymbol(collateralSymbol).isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
             )
           );
         }

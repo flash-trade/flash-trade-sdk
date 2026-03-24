@@ -17178,6 +17178,137 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "setCustodyTokenMultiplier",
+      "discriminator": [
+        104,
+        211,
+        183,
+        198,
+        207,
+        194,
+        221,
+        190
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "custody.mint",
+                "account": "custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custodyTokenMint"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "setCustodyTokenMultiplierParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "setCustomOraclePrice",
       "discriminator": [
         180,
@@ -21714,6 +21845,19 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "cancelUnstakeTokenRequestLogV2",
+      "discriminator": [
+        167,
+        19,
+        205,
+        60,
+        241,
+        212,
+        98,
+        118
+      ]
+    },
+    {
       "name": "closeAndSwapLog",
       "discriminator": [
         45,
@@ -21815,6 +21959,19 @@ export type Perpetuals = {
         185,
         139,
         238
+      ]
+    },
+    {
+      "name": "collectRevenueLogV2",
+      "discriminator": [
+        179,
+        199,
+        52,
+        29,
+        91,
+        172,
+        38,
+        122
       ]
     },
     {
@@ -21945,6 +22102,19 @@ export type Perpetuals = {
         100,
         21,
         226
+      ]
+    },
+    {
+      "name": "depositTokenStakeLogV2",
+      "discriminator": [
+        110,
+        58,
+        233,
+        238,
+        250,
+        221,
+        121,
+        203
       ]
     },
     {
@@ -22494,6 +22664,19 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "refreshTokenStakeUserLogV2",
+      "discriminator": [
+        243,
+        51,
+        219,
+        233,
+        138,
+        155,
+        101,
+        166
+      ]
+    },
+    {
       "name": "removeCollateralAndSwapLog",
       "discriminator": [
         19,
@@ -22819,6 +23002,19 @@ export type Perpetuals = {
       ]
     },
     {
+      "name": "unstakeTokenRequestLogV2",
+      "discriminator": [
+        63,
+        191,
+        214,
+        167,
+        84,
+        39,
+        36,
+        163
+      ]
+    },
+    {
       "name": "voltagePointsLog",
       "discriminator": [
         40,
@@ -22855,6 +23051,19 @@ export type Perpetuals = {
         13,
         160,
         187
+      ]
+    },
+    {
+      "name": "withdrawTokenLogV2",
+      "discriminator": [
+        236,
+        140,
+        1,
+        24,
+        101,
+        104,
+        29,
+        2
       ]
     }
   ],
@@ -23626,7 +23835,7 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "rewardThreshold",
+            "name": "tokenAmountMultiplier",
             "type": "u64"
           },
           {
@@ -24240,6 +24449,46 @@ export type Perpetuals = {
           },
           {
             "name": "activeStakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cancelUnstakeTokenRequestLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenStake",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "currentTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "levelEligibleAmount",
             "type": "u64"
           }
         ]
@@ -25014,6 +25263,46 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "collectRevenueLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenStake",
+            "type": "pubkey"
+          },
+          {
+            "name": "revenueAmount",
+            "type": "u64"
+          },
+          {
+            "name": "currentTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "levelEligibleAmount",
+            "type": "u64"
+          },
+          {
+            "name": "lastEpochCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "collectRevenueParams",
       "type": {
         "kind": "struct",
@@ -25317,7 +25606,7 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "rewardThreshold",
+            "name": "tokenAmountMultiplier",
             "type": "u64"
           },
           {
@@ -25833,6 +26122,46 @@ export type Perpetuals = {
           },
           {
             "name": "activeStakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "depositTokenStakeLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenStake",
+            "type": "pubkey"
+          },
+          {
+            "name": "depositAmount",
+            "type": "u64"
+          },
+          {
+            "name": "currentTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "levelEligibleAmount",
             "type": "u64"
           }
         ]
@@ -31101,6 +31430,50 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "refreshTokenStakeUserLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenStake",
+            "type": "pubkey"
+          },
+          {
+            "name": "revenueAmount",
+            "type": "u64"
+          },
+          {
+            "name": "newlyUnlockedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "currentTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "levelEligibleAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "reimburseParams",
       "type": {
         "kind": "struct",
@@ -31846,10 +32219,6 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "rewardThreshold",
-            "type": "u64"
-          },
-          {
             "name": "minReserveUsd",
             "type": "u64"
           },
@@ -31862,6 +32231,13 @@ export type Perpetuals = {
             "type": "bool"
           }
         ]
+      }
+    },
+    {
+      "name": "setCustodyTokenMultiplierParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -33688,6 +34064,46 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "unstakeTokenRequestLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenStake",
+            "type": "pubkey"
+          },
+          {
+            "name": "unstakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "currentTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "levelEligibleAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "unstakeTokenRequestParams",
       "type": {
         "kind": "struct",
@@ -33910,6 +34326,46 @@ export type Perpetuals = {
           },
           {
             "name": "activeStakeAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "withdrawTokenLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenStake",
+            "type": "pubkey"
+          },
+          {
+            "name": "withdrawAmount",
+            "type": "u64"
+          },
+          {
+            "name": "currentTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "lastUpdatedTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "activeStakeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "levelEligibleAmount",
             "type": "u64"
           }
         ]

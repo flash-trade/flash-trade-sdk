@@ -24,7 +24,7 @@ export class CustodyAccount implements Custody {
       permissions: Permissions;
       fees: Fees;
       borrowRate: BorrowRateParams;
-      rewardThreshold: BN;
+      tokenAmountMultiplier: BN;
 
       assets: Assets;
       feesStats: FeesStats;

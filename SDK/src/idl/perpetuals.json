@@ -17172,6 +17172,137 @@
       "returns": "u8"
     },
     {
+      "name": "set_custody_token_multiplier",
+      "discriminator": [
+        104,
+        211,
+        183,
+        198,
+        207,
+        194,
+        221,
+        190
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.name",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  100,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "custody.mint",
+                "account": "Custody"
+              }
+            ]
+          }
+        },
+        {
+          "name": "custody_token_mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "SetCustodyTokenMultiplierParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "set_custom_oracle_price",
       "discriminator": [
         180,
@@ -21708,6 +21839,19 @@
       ]
     },
     {
+      "name": "CancelUnstakeTokenRequestLogV2",
+      "discriminator": [
+        167,
+        19,
+        205,
+        60,
+        241,
+        212,
+        98,
+        118
+      ]
+    },
+    {
       "name": "CloseAndSwapLog",
       "discriminator": [
         45,
@@ -21809,6 +21953,19 @@
         185,
         139,
         238
+      ]
+    },
+    {
+      "name": "CollectRevenueLogV2",
+      "discriminator": [
+        179,
+        199,
+        52,
+        29,
+        91,
+        172,
+        38,
+        122
       ]
     },
     {
@@ -21939,6 +22096,19 @@
         100,
         21,
         226
+      ]
+    },
+    {
+      "name": "DepositTokenStakeLogV2",
+      "discriminator": [
+        110,
+        58,
+        233,
+        238,
+        250,
+        221,
+        121,
+        203
       ]
     },
     {
@@ -22488,6 +22658,19 @@
       ]
     },
     {
+      "name": "RefreshTokenStakeUserLogV2",
+      "discriminator": [
+        243,
+        51,
+        219,
+        233,
+        138,
+        155,
+        101,
+        166
+      ]
+    },
+    {
       "name": "RemoveCollateralAndSwapLog",
       "discriminator": [
         19,
@@ -22813,6 +22996,19 @@
       ]
     },
     {
+      "name": "UnstakeTokenRequestLogV2",
+      "discriminator": [
+        63,
+        191,
+        214,
+        167,
+        84,
+        39,
+        36,
+        163
+      ]
+    },
+    {
       "name": "VoltagePointsLog",
       "discriminator": [
         40,
@@ -22849,6 +23045,19 @@
         13,
         160,
         187
+      ]
+    },
+    {
+      "name": "WithdrawTokenLogV2",
+      "discriminator": [
+        236,
+        140,
+        1,
+        24,
+        101,
+        104,
+        29,
+        2
       ]
     }
   ],
@@ -23620,7 +23829,7 @@
             }
           },
           {
-            "name": "reward_threshold",
+            "name": "token_amount_multiplier",
             "type": "u64"
           },
           {
@@ -24234,6 +24443,46 @@
           },
           {
             "name": "active_stake_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CancelUnstakeTokenRequestLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "active_stake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "level_eligible_amount",
             "type": "u64"
           }
         ]
@@ -25008,6 +25257,46 @@
       }
     },
     {
+      "name": "CollectRevenueLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "revenue_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "active_stake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "level_eligible_amount",
+            "type": "u64"
+          },
+          {
+            "name": "last_epoch_count",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "CollectRevenueParams",
       "type": {
         "kind": "struct",
@@ -25311,7 +25600,7 @@
             }
           },
           {
-            "name": "reward_threshold",
+            "name": "token_amount_multiplier",
             "type": "u64"
           },
           {
@@ -25827,6 +26116,46 @@
           },
           {
             "name": "active_stake_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DepositTokenStakeLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "active_stake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "level_eligible_amount",
             "type": "u64"
           }
         ]
@@ -31095,6 +31424,50 @@
       }
     },
     {
+      "name": "RefreshTokenStakeUserLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "revenue_amount",
+            "type": "u64"
+          },
+          {
+            "name": "newly_unlocked_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "active_stake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "level_eligible_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ReimburseParams",
       "type": {
         "kind": "struct",
@@ -31840,10 +32213,6 @@
             }
           },
           {
-            "name": "reward_threshold",
-            "type": "u64"
-          },
-          {
             "name": "min_reserve_usd",
             "type": "u64"
           },
@@ -31856,6 +32225,13 @@
             "type": "bool"
           }
         ]
+      }
+    },
+    {
+      "name": "SetCustodyTokenMultiplierParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     },
     {
@@ -33682,6 +34058,46 @@
       }
     },
     {
+      "name": "UnstakeTokenRequestLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "unstake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "active_stake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "level_eligible_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "UnstakeTokenRequestParams",
       "type": {
         "kind": "struct",
@@ -33904,6 +34320,46 @@
           },
           {
             "name": "active_stake_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawTokenLogV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_stake",
+            "type": "pubkey"
+          },
+          {
+            "name": "withdraw_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_updated_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "level",
+            "type": "u8"
+          },
+          {
+            "name": "active_stake_amount",
+            "type": "u64"
+          },
+          {
+            "name": "level_eligible_amount",
             "type": "u64"
           }
         ]

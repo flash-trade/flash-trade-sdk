@@ -114,7 +114,7 @@ export interface AddCustodyParams {
   fees: Fees;
   borrowRate: BorrowRateParams;
   ratios: TokenRatios[];
-  rewardThreshold: BN;
+  tokenAmountMultiplier: BN;
   minReserveUsd: BN;
   limitPriceBufferBps: BN;
 }
@@ -284,6 +284,17 @@ export interface CancelUnstakeTokenRequestLog {
   last_updated_timestamp: BN;
   level: number;
   active_stake_amount: BN;
+}
+
+export interface CancelUnstakeTokenRequestLogV2 {
+  owner: PublicKey;
+  token_stake: PublicKey;
+  amount: BN;
+  current_timestamp: BN;
+  last_updated_timestamp: BN;
+  level: number;
+  active_stake_amount: BN;
+  level_eligible_amount: BN;
 }
 
 export interface CancelUnstakeTokenRequestParams {
@@ -477,6 +488,17 @@ export interface CollectRevenueLog {
   padding: BN[];
 }
 
+export interface CollectRevenueLogV2 {
+  owner: PublicKey;
+  token_stake: PublicKey;
+  revenue_amount: BN;
+  current_timestamp: BN;
+  last_updated_timestamp: BN;
+  active_stake_amount: BN;
+  level_eligible_amount: BN;
+  last_epoch_count: number;
+}
+
 export interface CollectRevenueParams {
 }
 
@@ -559,7 +581,7 @@ export interface Custody {
   permissions: Permissions;
   fees: Fees;
   borrowRate: BorrowRateParams;
-  rewardThreshold: BN;
+  tokenAmountMultiplier: BN;
   assets: Assets;
   feesStats: FeesStats;
   borrowRateState: BorrowRateState;
@@ -689,6 +711,17 @@ export interface DepositTokenStakeLog {
   last_updated_timestamp: BN;
   level: number;
   active_stake_amount: BN;
+}
+
+export interface DepositTokenStakeLogV2 {
+  owner: PublicKey;
+  token_stake: PublicKey;
+  deposit_amount: BN;
+  current_timestamp: BN;
+  last_updated_timestamp: BN;
+  level: number;
+  active_stake_amount: BN;
+  level_eligible_amount: BN;
 }
 
 export interface DepositTokenStakeParams {
@@ -2004,6 +2037,18 @@ export interface RefreshTokenStakeUserLog {
   newly_unlocked_amount: BN;
 }
 
+export interface RefreshTokenStakeUserLogV2 {
+  owner: PublicKey;
+  token_stake: PublicKey;
+  revenue_amount: BN;
+  newly_unlocked_amount: BN;
+  current_timestamp: BN;
+  last_updated_timestamp: BN;
+  level: number;
+  active_stake_amount: BN;
+  level_eligible_amount: BN;
+}
+
 export interface ReimburseParams {
   amountIn: BN;
 }
@@ -2199,10 +2244,12 @@ export interface SetCustodyConfigParams {
   fees: Fees;
   borrowRate: BorrowRateParams;
   ratios: TokenRatios[];
-  rewardThreshold: BN;
   minReserveUsd: BN;
   limitPriceBufferBps: BN;
   token22: boolean;
+}
+
+export interface SetCustodyTokenMultiplierParams {
 }
 
 export interface SetCustomOraclePriceParams {
@@ -2672,6 +2719,17 @@ export interface UnstakeTokenRequestLog {
   active_stake_amount: BN;
 }
 
+export interface UnstakeTokenRequestLogV2 {
+  owner: PublicKey;
+  token_stake: PublicKey;
+  unstake_amount: BN;
+  current_timestamp: BN;
+  last_updated_timestamp: BN;
+  level: number;
+  active_stake_amount: BN;
+  level_eligible_amount: BN;
+}
+
 export interface UnstakeTokenRequestParams {
   unstakeAmount: BN;
 }
@@ -2736,6 +2794,17 @@ export interface WithdrawTokenLog {
   last_updated_timestamp: BN;
   level: number;
   active_stake_amount: BN;
+}
+
+export interface WithdrawTokenLogV2 {
+  owner: PublicKey;
+  token_stake: PublicKey;
+  withdraw_amount: BN;
+  current_timestamp: BN;
+  last_updated_timestamp: BN;
+  level: number;
+  active_stake_amount: BN;
+  level_eligible_amount: BN;
 }
 
 export interface WithdrawTokenParams {
