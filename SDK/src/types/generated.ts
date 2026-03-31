@@ -1999,6 +1999,7 @@ export interface ReferralRebateLog {
   rebate_usd: BN;
   volume_usd: BN;
   voltage_points_type: number;
+  blocked_rebate_usd: BN;
   padding: BN[];
 }
 
@@ -2230,6 +2231,9 @@ export interface ResizeInternalOracleParams {
   lazerFeedId: number;
 }
 
+export interface ResizeTokenStakeParams {
+}
+
 export interface SetAdminSignersParams {
   minSignatures: number;
 }
@@ -2346,7 +2350,8 @@ export interface SetTokenRewardParams {
 
 export interface SetTokenStakeLevelParams {
   level: number;
-  init: boolean;
+  rebateRate: BN;
+  maxRebateUsd: BN;
 }
 
 export interface SetTokenVaultConfigParams {
@@ -2626,7 +2631,7 @@ export interface TokenStake {
   level: number;
   withdrawRequestCount: number;
   withdrawRequest: WithdrawRequest[];
-  buffer: number[];
+  rebateRate: BN;
   activeStakeAmount: BN;
   updateTimestamp: BN;
   tradeTimestamp: BN;
@@ -2636,6 +2641,10 @@ export interface TokenStake {
   unclaimedRevenueAmount: BN;
   revenueSnapshot: BN;
   claimableRebateUsd: BN;
+  rebateUsdSnapshot: BN;
+  rebateDayTimestamp: BN;
+  maxRebateUsd: BN;
+  padding: BN[];
 }
 
 export interface TokenStakeStats {
@@ -2745,7 +2754,8 @@ export interface VoltagePointsLog {
   voltage_points: BN;
   rebate_usd: BN;
   voltage_points_type: number;
-  padding: BN[];
+  benefits_status: number;
+  padding: number[];
 }
 
 export interface Whitelist {

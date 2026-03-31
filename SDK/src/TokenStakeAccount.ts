@@ -19,7 +19,7 @@ export class TokenStakeAccount implements TokenStake {
     level: number
     withdrawRequestCount: number
     withdrawRequest: WithdrawRequest[]
-    buffer: number[]
+    rebateRate: BN
     activeStakeAmount: BN
     updateTimestamp: BN
     tradeTimestamp: BN
@@ -29,6 +29,12 @@ export class TokenStakeAccount implements TokenStake {
     unclaimedRevenueAmount: BN
     revenueSnapshot: BN
     claimableRebateUsd: BN
+    rebateUsdSnapshot: BN
+    rebateDayTimestamp: BN
+    maxRebateUsd: BN
+
+    padding: BN[];
+
 
     constructor(data: {
         owner: PublicKey
@@ -37,7 +43,7 @@ export class TokenStakeAccount implements TokenStake {
         level: number
         withdrawRequestCount: number
         withdrawRequest: WithdrawRequest[]
-        buffer: number[]
+        rebateRate: BN
         activeStakeAmount: BN
         updateTimestamp: BN
         tradeTimestamp: BN
@@ -47,6 +53,10 @@ export class TokenStakeAccount implements TokenStake {
         unclaimedRevenueAmount: BN
         revenueSnapshot: BN
         claimableRebateUsd: BN
+        rebateUsdSnapshot: BN
+        rebateDayTimestamp: BN
+        maxRebateUsd: BN
+    
     }) {
         this.owner = data.owner
         this.isInitialized = data.isInitialized
@@ -54,7 +64,7 @@ export class TokenStakeAccount implements TokenStake {
         this.level = data.level
         this.withdrawRequestCount = data.withdrawRequestCount
         this.withdrawRequest = data.withdrawRequest
-        this.buffer = data.buffer
+        this.rebateRate = data.rebateRate
         this.activeStakeAmount = data.activeStakeAmount
         this.updateTimestamp = data.updateTimestamp
         this.tradeTimestamp = data.tradeTimestamp
@@ -64,6 +74,9 @@ export class TokenStakeAccount implements TokenStake {
         this.unclaimedRevenueAmount = data.unclaimedRevenueAmount
         this.revenueSnapshot = data.revenueSnapshot
         this.claimableRebateUsd = data.claimableRebateUsd
+        this.rebateUsdSnapshot = data.rebateUsdSnapshot
+        this.rebateDayTimestamp = data.rebateDayTimestamp
+        this.maxRebateUsd = data.maxRebateUsd
     }
 
     static from(decodedData: any): TokenStakeAccount {
@@ -74,7 +87,7 @@ export class TokenStakeAccount implements TokenStake {
             level: decodedData.level,
             withdrawRequestCount: decodedData.withdrawRequestCount,
             withdrawRequest: decodedData.withdrawRequest,
-            buffer: decodedData.buffer,
+            rebateRate: new BN(decodedData.rebateRate),
             activeStakeAmount: new BN(decodedData.activeStakeAmount),
             updateTimestamp: new BN(decodedData.updateTimestamp),
             tradeTimestamp: new BN(decodedData.tradeTimestamp),
@@ -84,6 +97,9 @@ export class TokenStakeAccount implements TokenStake {
             unclaimedRevenueAmount: decodedData.unclaimedRevenueAmount,
             revenueSnapshot: decodedData.revenueSnapshot,
             claimableRebateUsd: decodedData.claimableRebateUsd,
+            rebateUsdSnapshot: new BN(decodedData.rebateUsdSnapshot),
+            rebateDayTimestamp: new BN(decodedData.rebateDayTimestamp),
+            maxRebateUsd: new BN(decodedData.maxRebateUsd),
         })
     }
 

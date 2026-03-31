@@ -2323,6 +2323,28 @@ export type Perpetuals = {
           }
         },
         {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "tokenStakeAccount",
           "writable": true,
           "pda": {
@@ -16991,6 +17013,84 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
+      "name": "resizeTokenStake",
+      "discriminator": [
+        169,
+        172,
+        154,
+        161,
+        204,
+        201,
+        0,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "resizeTokenStakeParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "setAdminSigners",
       "discriminator": [
         240,
@@ -18439,6 +18539,54 @@ export type Perpetuals = {
           }
         },
         {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenVault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner"
+        },
+        {
           "name": "tokenStakeAccount",
           "writable": true,
           "pda": {
@@ -18461,11 +18609,14 @@ export type Perpetuals = {
               },
               {
                 "kind": "account",
-                "path": "token_stake_account.owner",
-                "account": "tokenStake"
+                "path": "owner"
               }
             ]
           }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -20364,6 +20515,28 @@ export type Perpetuals = {
                   117,
                   108,
                   116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
                 ]
               }
             ]
@@ -31314,11 +31487,15 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
+            "name": "blockedRebateUsd",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                4
+                3
               ]
             }
           }
@@ -32140,6 +32317,13 @@ export type Perpetuals = {
       }
     },
     {
+      "name": "resizeTokenStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "setAdminSignersParams",
       "type": {
         "kind": "struct",
@@ -32606,8 +32790,12 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
-            "name": "init",
-            "type": "bool"
+            "name": "rebateRate",
+            "type": "u64"
+          },
+          {
+            "name": "maxRebateUsd",
+            "type": "u64"
           }
         ]
       }
@@ -33697,13 +33885,8 @@ export type Perpetuals = {
             }
           },
           {
-            "name": "buffer",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
-            }
+            "name": "rebateRate",
+            "type": "u64"
           },
           {
             "name": "activeStakeAmount",
@@ -33740,6 +33923,27 @@ export type Perpetuals = {
           {
             "name": "claimableRebateUsd",
             "type": "u64"
+          },
+          {
+            "name": "rebateUsdSnapshot",
+            "type": "u64"
+          },
+          {
+            "name": "rebateDayTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "maxRebateUsd",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
           }
         ]
       }
@@ -34157,11 +34361,15 @@ export type Perpetuals = {
             "type": "u8"
           },
           {
+            "name": "benefitsStatus",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
-                "u64",
-                4
+                "u8",
+                31
               ]
             }
           }

@@ -609,6 +609,19 @@
           "pythTicker": "FX.USD/CNH",
           "pythPriceId": "0xeef52e09c878ad41f6a81803e3640fe04dceea727de894edd4ea117e2e332e66",
           "isToken2022": false
+        },
+        {
+          "symbol": "NATGAS",
+          "mintKey": "NGD4kUBd9m12xdiFw123TKfvqmjCQeAXKQ6WP1fzgWR",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "lazerId": 3006,
+          "pythTicker": "Commodities.NGDK6/USD",
+          "pythPriceId": "0xcbbe4de47ffd7681b33db9ebdf22eeb899046cbe566be06e875bf088324787ce",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -764,6 +777,23 @@
           "lazerId": 1508,
           "pythTicker": "FX.USD/CNH",
           "pythPriceId": "0xeef52e09c878ad41f6a81803e3640fe04dceea727de894edd4ea117e2e332e66"
+        },
+        {
+          "custodyId": 10,
+          "custodyAccount": "F8Nb7MnUyPEN3LrRGnVXYS142eVscJq6dsX6Mqcw6wGH",
+          "tokenAccount": "14tjBe3d7R8VPsYf1vmAkggPrBfqXVkhuWqXEQHXGHXp",
+          "symbol": "NATGAS",
+          "mintKey": "NGD4kUBd9m12xdiFw123TKfvqmjCQeAXKQ6WP1fzgWR",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "intOracleAddress": "CmCvoQ59Mfa4CPxe5Ld26dse91Kh32jMtSiiyfDGfHbW",
+          "extOracleAddress": "HHVsaZgWRG5ZD96zeeejqDqkkBmYAPaWhRGyhxxPmZSx",
+          "lazerId": 3006,
+          "pythTicker": "Commodities.NGDK6/USD",
+          "pythPriceId": "0xcbbe4de47ffd7681b33db9ebdf22eeb899046cbe566be06e875bf088324787ce"
         }
       ],
       "markets": [
@@ -989,6 +1019,38 @@
           "targetCustodyId": 9,
           "collateralCustodyId": 0,
           "targetMint": "CNHShWxrWXp6V5M2mjLXuupZc3bmW9VezTfcVt1Zhcjr",
+          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "marketId": 18,
+          "marketAccount": "AwTN75kaLvhBpmtrfrQ6L7Hd47eMgoUZkBBP9daQ3ZpY",
+          "marketCorrelation": false,
+          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
+          "targetCustody": "F8Nb7MnUyPEN3LrRGnVXYS142eVscJq6dsX6Mqcw6wGH",
+          "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
+          "side": "long",
+          "maxLev": 10,
+          "degenMinLev": 1,
+          "degenMaxLev": 10,
+          "targetCustodyId": 10,
+          "collateralCustodyId": 0,
+          "targetMint": "NGD4kUBd9m12xdiFw123TKfvqmjCQeAXKQ6WP1fzgWR",
+          "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "marketId": 19,
+          "marketAccount": "BDZJnR5wLoofVRiD9pjLeSbqtKcbrz4XvA2DFVxJM6X",
+          "marketCorrelation": false,
+          "pool": "KwhpybQPe9xuZFmAfcjLHj3ukownWex1ratyascAC1X",
+          "targetCustody": "F8Nb7MnUyPEN3LrRGnVXYS142eVscJq6dsX6Mqcw6wGH",
+          "collateralCustody": "9yANuRkTRxb9jjxnG1h3xcUz2kM8fJgDbdYJV4PfZ7dy",
+          "side": "short",
+          "maxLev": 10,
+          "degenMinLev": 1,
+          "degenMaxLev": 10,
+          "targetCustodyId": 10,
+          "collateralCustodyId": 0,
+          "targetMint": "NGD4kUBd9m12xdiFw123TKfvqmjCQeAXKQ6WP1fzgWR",
           "collateralMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         }
       ],
@@ -3762,6 +3824,19 @@
           "pythTicker": "FX.USD/CNH",
           "pythPriceId": "0xeef52e09c878ad41f6a81803e3640fe04dceea727de894edd4ea117e2e332e66",
           "isToken2022": false
+        },
+        {
+          "symbol": "NATGAS",
+          "mintKey": "ngd6MgQu9J9eUyytMpy5ajwf4gdsP4xwyycQapWAVcK",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "lazerId": 3006,
+          "pythTicker": "Commodities.NGDK6/USD",
+          "pythPriceId": "0xcbbe4de47ffd7681b33db9ebdf22eeb899046cbe566be06e875bf088324787ce",
+          "isToken2022": false
         }
       ],
       "custodies": [
@@ -3917,6 +3992,23 @@
           "lazerId": 1508,
           "pythTicker": "FX.USD/CNH",
           "pythPriceId": "0xeef52e09c878ad41f6a81803e3640fe04dceea727de894edd4ea117e2e332e66"
+        },
+        {
+          "custodyId": 10,
+          "custodyAccount": "BBtEQMTvX3LFWiWeyHPmprfjYoW6QdUiozWHTXKSSLC3",
+          "tokenAccount": "3wLBoVYqE9DqNyTPWodzYNF9ADVNTSJd3ARZChcsf1Cj",
+          "symbol": "NATGAS",
+          "mintKey": "ngd6MgQu9J9eUyytMpy5ajwf4gdsP4xwyycQapWAVcK",
+          "decimals": 6,
+          "usdPrecision": 4,
+          "tokenPrecision": 4,
+          "isStable": false,
+          "isVirtual": true,
+          "intOracleAddress": "2GVk1ytWUcGdm5ad4CgcPEg8SGrTick4QGLGmtbSoFYv",
+          "extOracleAddress": "HHVsaZgWRG5ZD96zeeejqDqkkBmYAPaWhRGyhxxPmZSx",
+          "lazerId": 3006,
+          "pythTicker": "Commodities.NGDK6/USD",
+          "pythPriceId": "0xcbbe4de47ffd7681b33db9ebdf22eeb899046cbe566be06e875bf088324787ce"
         }
       ],
       "markets": [
@@ -4142,6 +4234,38 @@
           "targetCustodyId": 9,
           "collateralCustodyId": 0,
           "targetMint": "cnh6N23RChjE9tsvW32Deuc1m1eqdq3zj7AQEUJUTYA",
+          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+        },
+        {
+          "marketId": 18,
+          "marketAccount": "8VQsgVad93yR5ZWQfB5MhdGa67QoNaKugmBkGYKNhCTh",
+          "marketCorrelation": false,
+          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
+          "targetCustody": "BBtEQMTvX3LFWiWeyHPmprfjYoW6QdUiozWHTXKSSLC3",
+          "collateralCustody": "4nkiPSMJb4hpLhpaXbebkYF73Ub5vjeked8mWkPafMBm",
+          "side": "long",
+          "maxLev": 10,
+          "degenMinLev": 1,
+          "degenMaxLev": 10,
+          "targetCustodyId": 10,
+          "collateralCustodyId": 0,
+          "targetMint": "ngd6MgQu9J9eUyytMpy5ajwf4gdsP4xwyycQapWAVcK",
+          "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+        },
+        {
+          "marketId": 19,
+          "marketAccount": "AdZ1DAy9R6RCroLKeRH1hQvVNaYW4xRcGdveFkjBbTFu",
+          "marketCorrelation": false,
+          "pool": "Ar7yp9PJkRpvXasLB4NYdbDHnuvAZ1gDA8ALnkPKivbb",
+          "targetCustody": "BBtEQMTvX3LFWiWeyHPmprfjYoW6QdUiozWHTXKSSLC3",
+          "collateralCustody": "4nkiPSMJb4hpLhpaXbebkYF73Ub5vjeked8mWkPafMBm",
+          "side": "short",
+          "maxLev": 10,
+          "degenMinLev": 1,
+          "degenMaxLev": 10,
+          "targetCustodyId": 10,
+          "collateralCustodyId": 0,
+          "targetMint": "ngd6MgQu9J9eUyytMpy5ajwf4gdsP4xwyycQapWAVcK",
           "collateralMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
         }
       ],

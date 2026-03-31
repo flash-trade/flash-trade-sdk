@@ -7749,6 +7749,7 @@ export class PerpetualsClient {
         })
         .accountsPartial({
           owner: owner,
+          perpetuals: this.perpetuals.publicKey,
           tokenVault: poolConfig.tokenVault,
           tokenStakeAccount: tokenStakeAccount,
           program: this.programId
@@ -7858,9 +7859,9 @@ export class PerpetualsClient {
         })
         .accountsPartial({
           owner: owner,
+          perpetuals: this.perpetuals.publicKey,
           tokenVault: poolConfig.tokenVault,
           tokenStakeAccount: tokenStakeAccount,
-
           program: this.programId
         })
         .instruction();

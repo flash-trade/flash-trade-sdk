@@ -2317,6 +2317,28 @@
           }
         },
         {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "token_stake_account",
           "writable": true,
           "pda": {
@@ -16985,6 +17007,84 @@
       "returns": "u8"
     },
     {
+      "name": "resize_token_stake",
+      "discriminator": [
+        169,
+        172,
+        154,
+        161,
+        204,
+        201,
+        0,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "multisig",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  117,
+                  108,
+                  116,
+                  105,
+                  115,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "ResizeTokenStakeParams"
+            }
+          }
+        }
+      ],
+      "returns": "u8"
+    },
+    {
       "name": "set_admin_signers",
       "discriminator": [
         240,
@@ -18433,6 +18533,54 @@
           }
         },
         {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner"
+        },
+        {
           "name": "token_stake_account",
           "writable": true,
           "pda": {
@@ -18455,11 +18603,14 @@
               },
               {
                 "kind": "account",
-                "path": "token_stake_account.owner",
-                "account": "TokenStake"
+                "path": "owner"
               }
             ]
           }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -20358,6 +20509,28 @@
                   117,
                   108,
                   116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "perpetuals",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  112,
+                  101,
+                  116,
+                  117,
+                  97,
+                  108,
+                  115
                 ]
               }
             ]
@@ -31308,11 +31481,15 @@
             "type": "u8"
           },
           {
+            "name": "blocked_rebate_usd",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                4
+                3
               ]
             }
           }
@@ -32134,6 +32311,13 @@
       }
     },
     {
+      "name": "ResizeTokenStakeParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
       "name": "SetAdminSignersParams",
       "type": {
         "kind": "struct",
@@ -32600,8 +32784,12 @@
             "type": "u8"
           },
           {
-            "name": "init",
-            "type": "bool"
+            "name": "rebate_rate",
+            "type": "u64"
+          },
+          {
+            "name": "max_rebate_usd",
+            "type": "u64"
           }
         ]
       }
@@ -33691,13 +33879,8 @@
             }
           },
           {
-            "name": "buffer",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
-            }
+            "name": "rebate_rate",
+            "type": "u64"
           },
           {
             "name": "active_stake_amount",
@@ -33734,6 +33917,27 @@
           {
             "name": "claimable_rebate_usd",
             "type": "u64"
+          },
+          {
+            "name": "rebate_usd_snapshot",
+            "type": "u64"
+          },
+          {
+            "name": "rebate_day_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "max_rebate_usd",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
           }
         ]
       }
@@ -34151,11 +34355,15 @@
             "type": "u8"
           },
           {
+            "name": "benefits_status",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
-                "u64",
-                4
+                "u8",
+                31
               ]
             }
           }
