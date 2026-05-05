@@ -5078,7 +5078,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -7298,7 +7297,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -7599,7 +7597,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -12708,7 +12705,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -12862,7 +12858,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -14547,108 +14542,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "refresh_orders_status",
-      "discriminator": [
-        40,
-        88,
-        107,
-        182,
-        177,
-        57,
-        247,
-        55
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "signer": true
-        },
-        {
-          "name": "multisig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  117,
-                  108,
-                  116,
-                  105,
-                  115,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "RefreshOrdersStatusParams"
-            }
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "refresh_positions_status",
-      "discriminator": [
-        128,
-        146,
-        70,
-        109,
-        88,
-        250,
-        26,
-        53
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "signer": true
-        },
-        {
-          "name": "multisig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  117,
-                  108,
-                  116,
-                  105,
-                  115,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "RefreshPositionsStatusParams"
-            }
-          }
-        }
-      ],
-      "returns": "u8"
     },
     {
       "name": "refresh_stake",
@@ -17007,84 +16900,6 @@
       "returns": "u8"
     },
     {
-      "name": "resize_token_stake",
-      "discriminator": [
-        169,
-        172,
-        154,
-        161,
-        204,
-        201,
-        0,
-        197
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "multisig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  117,
-                  108,
-                  116,
-                  105,
-                  115,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "perpetuals",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  101,
-                  114,
-                  112,
-                  101,
-                  116,
-                  117,
-                  97,
-                  108,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "ResizeTokenStakeParams"
-            }
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
       "name": "set_admin_signers",
       "discriminator": [
         240,
@@ -17291,7 +17106,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -17584,7 +17398,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -18375,7 +18188,6 @@
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -24887,11 +24699,15 @@
             "type": "u64"
           },
           {
+            "name": "locked_amount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -25064,11 +24880,15 @@
             "type": "u64"
           },
           {
+            "name": "locked_amount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -26039,11 +25859,15 @@
             "type": "u64"
           },
           {
+            "name": "delta_locked_amount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -27429,11 +27253,15 @@
             "type": "u64"
           },
           {
+            "name": "delta_locked_amount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -27710,11 +27538,15 @@
             "type": "u64"
           },
           {
+            "name": "delta_locked_amount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -28057,11 +27889,15 @@
             "type": "u64"
           },
           {
+            "name": "locked_amount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -31497,20 +31333,6 @@
       }
     },
     {
-      "name": "RefreshOrdersStatusParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "RefreshPositionsStatusParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "RefreshStakeLog",
       "type": {
         "kind": "struct",
@@ -32308,13 +32130,6 @@
             "type": "u32"
           }
         ]
-      }
-    },
-    {
-      "name": "ResizeTokenStakeParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
       }
     },
     {

@@ -587,7 +587,7 @@ export class PerpetualsClient {
       const minMaxPrice = this.getMinAndMaxOraclePriceSync(inputTokenPrice, inputTokenEmaPrice, inputTokenCustodyAccount)
       const fee = this.getFeeHelper(FeesAction.AddLiquidity, amountIn, BN_ZERO, inputTokenCustodyAccount, minMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
 
-      const tokenAmountUsd = minMaxPrice.min.getAssetAmountUsd((amountIn.sub(fee)), inputTokenCustodyAccount.decimals)
+      const tokenAmountUsd = minMaxPrice.min.getAssetAmountUsd((amountIn.sub(fee)), inputTokenCustodyAccount.decimals, inputTokenCustodyAccount.tokenAmountMultiplier)
       let lpTokenOut
       if (poolAumUsdMax.isZero()) {
         lpTokenOut = tokenAmountUsd
@@ -635,9 +635,9 @@ export class PerpetualsClient {
     let removeAmount
     const oneOracle = OraclePrice.from({price: new BN(10**8), exponent: new BN(-8), confidence: BN_ZERO, timestamp: BN_ZERO })
     if(outputTokenCustodyAccount.isStable && minMaxPrice.min != minMaxPrice.max && minMaxPrice.max.price.lt(oneOracle.price) ) {
-      removeAmount = oneOracle.getTokenAmount(removeAmountUsd, outputTokenCustodyAccount.decimals)
+      removeAmount = oneOracle.getTokenAmount(removeAmountUsd, outputTokenCustodyAccount.decimals, outputTokenCustodyAccount.tokenAmountMultiplier)
     } else {
-      removeAmount = minMaxPrice.max.getTokenAmount(removeAmountUsd, outputTokenCustodyAccount.decimals)
+      removeAmount = minMaxPrice.max.getTokenAmount(removeAmountUsd, outputTokenCustodyAccount.decimals, outputTokenCustodyAccount.tokenAmountMultiplier)
     }
 
     const fee = this.getFeeHelper(FeesAction.RemoveLiquidity, BN_ZERO, removeAmount, outputTokenCustodyAccount, minMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount
@@ -658,7 +658,7 @@ export class PerpetualsClient {
     let newRatio = BN_ZERO;
 
     // maxPriceOracle is in PriceDecimals
-    let tokenAumUsd = maxPriceOracle.getAssetAmountUsd(custodyAccount.assets.owned, custodyAccount.decimals)
+    let tokenAumUsd = maxPriceOracle.getAssetAmountUsd(custodyAccount.assets.owned, custodyAccount.decimals, custodyAccount.tokenAmountMultiplier)
     // console.log("tokenAumUsd: ", tokenAumUsd.toString())
     // console.log("poolAmountUsd: ", poolAumUsdMax.toString())
 
@@ -667,10 +667,10 @@ export class PerpetualsClient {
     } else if (amountAdd.isZero() && amountRemove.isZero()){
       newRatio = (tokenAumUsd.mul(new BN(BPS_POWER))).div(poolAumUsdMax)
     } else if (amountAdd.gt(BN_ZERO)) {
-      let amountUsd = maxPriceOracle.getAssetAmountUsd(amountAdd, custodyAccount.decimals)
+      let amountUsd = maxPriceOracle.getAssetAmountUsd(amountAdd, custodyAccount.decimals, custodyAccount.tokenAmountMultiplier)
       newRatio = ((tokenAumUsd.add(amountUsd)).mul(new BN(BPS_POWER))).div(poolAumUsdMax.add(amountUsd))
     } else {
-      let amountUsd = maxPriceOracle.getAssetAmountUsd(amountRemove, custodyAccount.decimals)
+      let amountUsd = maxPriceOracle.getAssetAmountUsd(amountRemove, custodyAccount.decimals, custodyAccount.tokenAmountMultiplier)
       if (amountUsd.gte(poolAumUsdMax) || amountRemove.gte(custodyAccount.assets.owned)) {
         newRatio = BN_ZERO
       } else {
@@ -1058,7 +1058,7 @@ export class PerpetualsClient {
     ).min
 
     // const collateralAmount = positionAccount.collateralAmount.add(finalCollateralAmount)
-    const finalCollateralUsd = collateralMinOraclePrice.getAssetAmountUsd(finalCollateralAmount, collateralTokenCustodyAccount.decimals).add(positionAccount.collateralUsd);
+    const finalCollateralUsd = collateralMinOraclePrice.getAssetAmountUsd(finalCollateralAmount, collateralTokenCustodyAccount.decimals, collateralTokenCustodyAccount.tokenAmountMultiplier).add(positionAccount.collateralUsd);
 
     // called currentMarginUsd
     const currentCollateralUsdIncludingPnl = finalCollateralUsd.add(pnlUsd).sub(openFeeUsd)
@@ -1163,7 +1163,7 @@ export class PerpetualsClient {
 
     const collateralMinMaxPrice = this.getMinAndMaxOraclePriceSync(collateralPrice, collateralEmaPrice, collateralCustodyAccount);
 
-    let collateralDeltaUsd = collateralMinMaxPrice.min.getAssetAmountUsd(collateralDeltaAmount, collateralCustodyAccount.decimals);
+    let collateralDeltaUsd = collateralMinMaxPrice.min.getAssetAmountUsd(collateralDeltaAmount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier);
     positionAccount.collateralUsd = positionAccount.collateralUsd.add(collateralDeltaUsd);
     positionAccount.sizeAmount = positionAccount.sizeAmount.add(sizeDeltaAmount);
 
@@ -1188,12 +1188,20 @@ export class PerpetualsClient {
       // no fee when adding collateral
     } else {
       feeUsd = sizeAmountUsd.mul(targetCustodyAccount.fees.openPosition).div(new BN(RATE_POWER));
-      feeAmount = feeUsd.mul(new BN(10 ** collateralCustodyAccount.decimals)).div(collateralMinMaxPrice.min.price);
+      feeAmount = collateralMinMaxPrice.min.getTokenAmount(
+        feeUsd,
+        collateralCustodyAccount.decimals,
+        collateralCustodyAccount.tokenAmountMultiplier,
+      );
 
       if (discountBps.gt(BN_ZERO)) {
         feeUsdAfterDiscount = feeUsd.mul(discountBps).div(new BN(BPS_POWER));
         feeUsdAfterDiscount = feeUsd.sub(feeUsdAfterDiscount);
-        feeAmountAfterDiscount = feeUsdAfterDiscount.mul(new BN(10 ** collateralCustodyAccount.decimals)).div(collateralMinMaxPrice.min.price);
+        feeAmountAfterDiscount = collateralMinMaxPrice.min.getTokenAmount(
+          feeUsdAfterDiscount,
+          collateralCustodyAccount.decimals,
+          collateralCustodyAccount.tokenAmountMultiplier,
+        );
       } else {
         feeUsdAfterDiscount = feeUsd
         feeAmountAfterDiscount = feeAmount
@@ -1317,7 +1325,7 @@ export class PerpetualsClient {
 
     const exitFeeUsd = positionAccount.sizeUsd.mul(closePositionFeeRate).div(new BN(RATE_POWER));// this should be in PRICE DECIMALS
     const { min: collateralTokenMinOraclePrice } = this.getMinAndMaxOraclePriceSync(collateralPrice, collateralEmaPrice, collateralCustodyAccount);
-    const exitFeeAmount = collateralTokenMinOraclePrice.getTokenAmount(exitFeeUsd, collateralCustodyAccount.decimals)
+    const exitFeeAmount = collateralTokenMinOraclePrice.getTokenAmount(exitFeeUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
     return {
       exitFeeAmount,
       exitFeeUsd
@@ -1364,18 +1372,18 @@ export class PerpetualsClient {
     )
     let collateralMinMaxPrice = this.getMinAndMaxOraclePriceSync(collateralPrice, collateralEmaPrice, collateralCustodyAccount);
 
-    let collateralDeltaUsd = collateralMinMaxPrice.min.getAssetAmountUsd(collateralDeltaAmount, collateralCustodyAccount.decimals)
+    let collateralDeltaUsd = collateralMinMaxPrice.min.getAssetAmountUsd(collateralDeltaAmount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
     resultingPositionAccount.collateralUsd = resultingPositionAccount.collateralUsd.sub(collateralDeltaUsd);
     resultingPositionAccount.sizeAmount = resultingPositionAccount.sizeAmount.sub(sizeDeltaAmount);
 
     const lockAndUnsettledFeeUsd = this.getLockFeeAndUnsettledUsdForPosition(resultingPositionAccount, collateralCustodyAccount, currentTimestamp)
-    const lockAndUnsettledFee = collateralMinMaxPrice.min.getTokenAmount(lockAndUnsettledFeeUsd, collateralCustodyAccount.decimals);
+    const lockAndUnsettledFee = collateralMinMaxPrice.min.getTokenAmount(lockAndUnsettledFeeUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier);
 
     const sizeAmountUsd = exitOraclePrice.getAssetAmountUsd(sizeDeltaAmount, targetCustodyAccount.decimals);
 
     // exitFee
     const exitFeeUsd = sizeAmountUsd.mul(targetCustodyAccount.fees.closePosition).div(new BN(RATE_POWER));
-    const exitFeeAmount = collateralMinMaxPrice.max.getTokenAmount(exitFeeUsd, collateralCustodyAccount.decimals)
+    const exitFeeAmount = collateralMinMaxPrice.max.getTokenAmount(exitFeeUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
 
     let exitFeeUsdAfterDiscount = BN_ZERO;
     let exitFeeAmountAfterDiscount = BN_ZERO;
@@ -1383,7 +1391,7 @@ export class PerpetualsClient {
     if (discountBps.gt(BN_ZERO)) {
       exitFeeUsdAfterDiscount = exitFeeUsd.mul(discountBps).div(new BN(BPS_POWER));
       exitFeeUsdAfterDiscount = exitFeeUsd.sub(exitFeeUsdAfterDiscount);
-      exitFeeAmountAfterDiscount = collateralMinMaxPrice.max.getTokenAmount(exitFeeUsdAfterDiscount, collateralCustodyAccount.decimals)
+      exitFeeAmountAfterDiscount = collateralMinMaxPrice.max.getTokenAmount(exitFeeUsdAfterDiscount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
     } else {
       exitFeeUsdAfterDiscount = exitFeeUsd
       exitFeeAmountAfterDiscount = exitFeeAmount
@@ -1463,14 +1471,17 @@ export class PerpetualsClient {
     discountBps = BN_ZERO
   ): BN => {
 
-    const collateralTokenMinPrice = this.getMinAndMaxPriceSync(
+    const collateralTokenMinPrice = this.getMinAndMaxOraclePriceSync(
       collateralPrice,
       collateralEmaPrice,
       collateralCustodyAccount
     ).min
-    const collateralTokenMinPriceUi = new BigNumber(collateralTokenMinPrice.toString()).dividedBy(10 ** USD_DECIMALS);
-
-    const collateralAmtMinUsdUi = new BigNumber(collateralAmtWithFee.toString()).dividedBy(10 ** collateralToken.decimals).multipliedBy(collateralTokenMinPriceUi);
+    const collateralAmtMinUsd = collateralTokenMinPrice.getAssetAmountUsd(
+      collateralAmtWithFee,
+      collateralCustodyAccount.decimals,
+      collateralCustodyAccount.tokenAmountMultiplier,
+    );
+    const collateralAmtMinUsdUi = new BigNumber(nativeToUiDecimals(collateralAmtMinUsd, USD_DECIMALS, USD_DECIMALS));
 
     let openPosFeeRateUi = new BigNumber(targetCustodyAccount.fees.openPosition.toString()).dividedBy(10 ** RATE_DECIMALS)
 
@@ -1528,15 +1539,17 @@ export class PerpetualsClient {
         inputTokenCustodyAccount, swapOutTokenPrice, swapOutTokenEmaPrice, swapOutTokenCustodyAccount, swapPoolAumUsdMax, poolConfig).minAmountOut
       finalCollateralAmount = swapAmountOut
     }
-    const collateralTokenMinPrice = this.getMinAndMaxPriceSync(
+    const collateralTokenMinPrice = this.getMinAndMaxOraclePriceSync(
       collateralTokenPrice,
       collateralTokenEmaPrice,
       collateralTokenCustodyAccount
     ).min
-    const collateralTokenMinPriceUi = new BigNumber(collateralTokenMinPrice.toString()).dividedBy(10 ** USD_DECIMALS);
-
-    const collateralAmtMinUsdUi = new BigNumber(finalCollateralAmount.toString()).dividedBy(10 ** collateralTokenCustodyAccount.decimals)
-      .multipliedBy(collateralTokenMinPriceUi);
+    const collateralAmtMinUsd = collateralTokenMinPrice.getAssetAmountUsd(
+      finalCollateralAmount,
+      collateralTokenCustodyAccount.decimals,
+      collateralTokenCustodyAccount.tokenAmountMultiplier,
+    );
+    const collateralAmtMinUsdUi = new BigNumber(nativeToUiDecimals(collateralAmtMinUsd, USD_DECIMALS, USD_DECIMALS));
 
     let openPosFeeRateUi = new BigNumber(targetTokenCustodyAccount.fees.openPosition.toString()).dividedBy(10 ** RATE_DECIMALS)
 
@@ -1580,12 +1593,11 @@ export class PerpetualsClient {
     discountBps = BN_ZERO
   ): BN => {
 
-    const collateralTokenMinPrice = this.getMinAndMaxPriceSync(
+    const collateralTokenMinPrice = this.getMinAndMaxOraclePriceSync(
       collateralPrice,
       collateralEmaPrice,
       collateralCustodyAccount
     ).min
-    const collateralTokenMinPriceUi = new BigNumber(collateralTokenMinPrice.toString()).dividedBy(10 ** USD_DECIMALS);
 
     // NOTE : initially we take the sizeUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
     const sizeUsd = targetPrice.getAssetAmountUsd(sizeAmount, targetCustodyAccount.decimals)
@@ -1615,9 +1627,13 @@ export class PerpetualsClient {
       new BigNumber(1).plus((new BigNumber(2).multipliedBy(openPosFeeRateUi)).multipliedBy(leverage))
     ).dividedBy(leverage)
 
-    const collateralAmtWithFeeUi = collateralWithFeeUsdUi.dividedBy(collateralTokenMinPriceUi)
+    const collateralWithFeeUsd = uiDecimalsToNative(collateralWithFeeUsdUi.toFixed(USD_DECIMALS, BigNumber.ROUND_DOWN), USD_DECIMALS)
 
-    return uiDecimalsToNative(collateralAmtWithFeeUi.toFixed(collateralToken.decimals, BigNumber.ROUND_DOWN), collateralToken.decimals)
+    return collateralTokenMinPrice.getTokenAmount(
+      collateralWithFeeUsd,
+      collateralCustodyAccount.decimals,
+      collateralCustodyAccount.tokenAmountMultiplier,
+    )
   }
 
   getCollateralAmountWithSwapSync = (
@@ -1641,12 +1657,11 @@ export class PerpetualsClient {
     poolConfig: PoolConfig,
   ): BN => {
 
-    const collateralTokenMinPrice = this.getMinAndMaxPriceSync(
+    const collateralTokenMinPrice = this.getMinAndMaxOraclePriceSync(
       collateralTokenPrice,
       collateralTokenEmaPrice,
       collateralTokenCustodyAccount
     ).min
-    const collateralTokenMinPriceUi = new BigNumber(collateralTokenMinPrice.toString()).dividedBy(10 ** USD_DECIMALS);
 
     // NOTE : initially we take the sizeUsd based on the current Price then we use the getEntryPriceUsdSync() to calculate the final entry price after spread
     const sizeUsd = targetTokenPrice.getAssetAmountUsd(sizeAmount, targetTokenCustodyAccount.decimals)
@@ -1670,8 +1685,12 @@ export class PerpetualsClient {
       new BigNumber(1).plus((new BigNumber(2).multipliedBy(openPosFeeRateUi)).multipliedBy(leverage))
     ).dividedBy(leverage)
 
-    const collateralAmtWithFeeUi = collateralWithFeeUsdUi.dividedBy(collateralTokenMinPriceUi)
-    const collateralAmountWithFee = uiDecimalsToNative(collateralAmtWithFeeUi.toFixed(collateralTokenCustodyAccount.decimals, BigNumber.ROUND_DOWN), collateralTokenCustodyAccount.decimals)
+    const collateralWithFeeUsd = uiDecimalsToNative(collateralWithFeeUsdUi.toFixed(USD_DECIMALS, BigNumber.ROUND_DOWN), USD_DECIMALS)
+    const collateralAmountWithFee = collateralTokenMinPrice.getTokenAmount(
+      collateralWithFeeUsd,
+      collateralTokenCustodyAccount.decimals,
+      collateralTokenCustodyAccount.tokenAmountMultiplier,
+    )
 
     let collateralInInputToken: BN
     if (inputTokenCustodyAccount.publicKey.equals(collateralTokenCustodyAccount.publicKey)) {
@@ -1756,7 +1775,7 @@ export class PerpetualsClient {
     const liabilityUsd = lossLiabilityUsd.add(totalFeesUsd)
     const assetsUsd = BN.min(
       newPnl.profitUsd.add(currentCollateralUsd),
-      collateralMinMaxPrice.max.getAssetAmountUsd(positionDelta.lockedAmount, collateralCustodyAccount.decimals)
+      collateralMinMaxPrice.max.getAssetAmountUsd(positionDelta.lockedAmount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
     )
 
     if (debugLogs) {
@@ -1772,10 +1791,10 @@ export class PerpetualsClient {
       feesAmountUsd = assetsUsd.sub(newPnl.lossUsd)
     }
 
-    let closeAmount = collateralMinMaxPrice.max.getTokenAmount(closeAmountUsd, collateralCustodyAccount.decimals)
+    let closeAmount = collateralMinMaxPrice.max.getTokenAmount(closeAmountUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
     // let feeAmount = collateralMinMaxPrice.max.getTokenAmount(feesAmountUsd, collateralCustodyAccount.decimals)
 
-    let newLockAmount = collateralMinMaxPrice.max.getTokenAmount(this.getLockedUsd(BN_ZERO, closeAmountUsd, side, marketCorrelation, maxPayOffBps), collateralCustodyAccount.decimals)
+    let newLockAmount = collateralMinMaxPrice.max.getTokenAmount(this.getLockedUsd(BN_ZERO, closeAmountUsd, side, marketCorrelation, maxPayOffBps), collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
     if (newLockAmount.gt(positionDelta.lockedAmount)) {
       positionDelta.lockedAmount = BN_ZERO
     } else {
@@ -1954,11 +1973,11 @@ export class PerpetualsClient {
         return { maxWithdrawableAmount: BN_ZERO, maxWithdrawableAmountUsd: BN_ZERO, diffUsd: BN_ZERO };
       }
       else {
-        maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(updatedMaxRemovableCollateralUsd, collateralCustodyAccount.decimals)
+        maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(updatedMaxRemovableCollateralUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
         maxWithdrawableAmountUsd = updatedMaxRemovableCollateralUsd
       }
     } else {
-      maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(maxRemovableCollateralUsd, collateralCustodyAccount.decimals)
+      maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(maxRemovableCollateralUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
       maxWithdrawableAmountUsd = maxRemovableCollateralUsd
     }
     return { maxWithdrawableAmount, maxWithdrawableAmountUsd, diffUsd }
@@ -1987,7 +2006,7 @@ export class PerpetualsClient {
 
     // includes exit fee, borrow fee and unsettled fee
     // Compute collateral amount from collateral USD since collateralAmount field was removed
-    const collateralAmount = collateralPrice.getTokenAmount(positionAccount.collateralUsd, collateralCustodyAccount.decimals);
+    const collateralAmount = collateralPrice.getTokenAmount(positionAccount.collateralUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier);
     const exitPriceAndFee: ExitPriceAndFee = this.getExitPriceAndFeeSync(
       positionAccount,
       marketCorrelation,
@@ -2007,7 +2026,7 @@ export class PerpetualsClient {
     // adding priceImpactUsd to fees as well
     const lossLiabilityUsd = newPnl.lossUsd.add(positionAccount.priceImpactUsd)
     const liabilityUsd = lossLiabilityUsd.add(totalFeesUsd)
-    const assetsUsd = BN.min(newPnl.profitUsd.add(positionAccount.collateralUsd), collateralMinMaxPrice.max.getAssetAmountUsd(positionAccount.lockedAmount, collateralCustodyAccount.decimals))
+    const assetsUsd = BN.min(newPnl.profitUsd.add(positionAccount.collateralUsd), collateralMinMaxPrice.max.getAssetAmountUsd(positionAccount.lockedAmount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier))
 
     let closeAmountUsd: BN, feesAmountUsd: BN
     if (assetsUsd.gt(liabilityUsd)) {
@@ -2063,6 +2082,7 @@ export class PerpetualsClient {
     const maxAddableAmount = collateralMinMaxPrice.min.getTokenAmount(
       maxAddableCollateralUsd,
       collateralCustodyAccount.decimals,
+      collateralCustodyAccount.tokenAmountMultiplier,
     );
 
     return {
@@ -2148,10 +2168,10 @@ export class PerpetualsClient {
     let maxWithdrawableAmount: BN
     let maxWithdrawableAmountUsd: BN = BN_ZERO
     if (maxRemoveableCollateralUsdAfterMinRequired.lt(maxRemovableCollateralUsd)) {
-      maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(maxRemoveableCollateralUsdAfterMinRequired, collateralCustodyAccount.decimals)
+      maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(maxRemoveableCollateralUsdAfterMinRequired, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
       maxWithdrawableAmountUsd = maxRemoveableCollateralUsdAfterMinRequired
     } else {
-      maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(maxRemovableCollateralUsd, collateralCustodyAccount.decimals)
+      maxWithdrawableAmount = collateralMinMaxPrice.max.getTokenAmount(maxRemovableCollateralUsd, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier)
       maxWithdrawableAmountUsd = maxRemovableCollateralUsd
     }
 
@@ -2425,6 +2445,7 @@ export class PerpetualsClient {
     collateralPrice: OraclePrice,
     collateralDecimals: number,
     positionAccount: PositionAccount,
+    collateralMultiplier: BN = BN_ZERO,
   ) : OraclePrice => { //returns the maxProfitPrice in OraclePrice
     const zeroOraclePrice = OraclePrice.from({
       price: BN_ZERO,
@@ -2436,8 +2457,14 @@ export class PerpetualsClient {
         return zeroOraclePrice;
     }
 
+    const lockedUsd = collateralPrice.getAssetAmountUsd(positionAccount.lockedAmount, collateralDecimals, collateralMultiplier);
+    const maxProfitUsd = lockedUsd.sub(positionAccount.collateralUsd);
+    if(maxProfitUsd.isNeg() || maxProfitUsd.isZero()) {
+      return zeroOraclePrice;
+    }
+
     const priceDiffProfit = OraclePrice.from({
-      price: (collateralPrice.getAssetAmountUsd(positionAccount.lockedAmount, collateralDecimals)).mul(new BN(10).pow(new BN(positionAccount.sizeDecimals+3)))
+      price: maxProfitUsd.mul(new BN(10).pow(new BN(positionAccount.sizeDecimals+3)))
         .div(positionAccount.sizeAmount),
       exponent: new BN(-1*RATE_DECIMALS),
       confidence: BN_ZERO,
@@ -2539,13 +2566,14 @@ export class PerpetualsClient {
     positionAccount.sizeAmount = positionAccount.sizeAmount.add(sizeDeltaAmount);
     positionAccount.market = marketAccountPk;
 
-    let collateralDeltaUsd = collateralPrice.getAssetAmountUsd(collateralDeltaAmount, collateralCustodyAccount.decimals);
+    let collateralDeltaUsd = collateralPrice.getAssetAmountUsd(collateralDeltaAmount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier);
     positionAccount.collateralUsd = positionAccount.collateralUsd.add(collateralDeltaUsd)
 
     positionAccount.lockedAmount = positionAccount.lockedAmount.add(
       collateralPrice.getTokenAmount(
         this.getLockedUsd(sizeDeltaUsd, collateralDeltaUsd, side, marketCorrelation, maxPayOffBps),
-        collateralCustodyAccount.decimals
+        collateralCustodyAccount.decimals,
+        collateralCustodyAccount.tokenAmountMultiplier,
       )
     )
 
@@ -2700,7 +2728,7 @@ export class PerpetualsClient {
     delay: BN,
     poolConfig: PoolConfig
   ): {
-    profitUsd: BN,        // Gross profit (before price impact)
+    profitUsd: BN,        // Profit capped to max payoff (before price impact)
     lossUsd: BN,
     priceImpactUsd: BN,   // Price impact deducted from profit (direct USD amount, capped to profit)
   } => {
@@ -2711,6 +2739,9 @@ export class PerpetualsClient {
         priceImpactUsd: BN_ZERO,
       }
     }
+
+    const lockedUsd = collateralPrice.getAssetAmountUsd(positionAccount.lockedAmount, collateralCustodyAccount.decimals, collateralCustodyAccount.tokenAmountMultiplier);
+    const maxProfitUsd = BN.max(lockedUsd.sub(positionAccount.collateralUsd), BN_ZERO);
 
     const { side } = poolConfig.getMarketConfigByPk(positionAccount.market)
 
@@ -2791,7 +2822,7 @@ export class PerpetualsClient {
 
 
       return {
-        profitUsd: grossProfitUsd,
+        profitUsd: BN.min(grossProfitUsd, maxProfitUsd),
         lossUsd: BN_ZERO,
         priceImpactUsd: positionAccount.priceImpactUsd,
       }
@@ -3061,6 +3092,14 @@ export class PerpetualsClient {
 
     const inputMinMaxPrice = this.getMinAndMaxOraclePriceSync(newInputTokenPrice, newInputTokenEmaPrice, inputTokenCustodyAccount);
     const outputMinMaxPrice = this.getMinAndMaxOraclePriceSync(newOutputTokenPrice, newOutputTokenEmaPrice, outputTokenCustodyAccount);
+    const effectiveInputMinMaxPrice = {
+      min: inputMinMaxPrice.min.withMultiplier(inputTokenCustodyAccount.tokenAmountMultiplier),
+      max: inputMinMaxPrice.max.withMultiplier(inputTokenCustodyAccount.tokenAmountMultiplier),
+    };
+    const effectiveOutputMinMaxPrice = {
+      min: outputMinMaxPrice.min.withMultiplier(outputTokenCustodyAccount.tokenAmountMultiplier),
+      max: outputMinMaxPrice.max.withMultiplier(outputTokenCustodyAccount.tokenAmountMultiplier),
+    };
 
     let pairPrice;
     // check if stable coin 
@@ -3080,14 +3119,16 @@ export class PerpetualsClient {
       ) {
         // in this senario the MAX price = 1 so to get pair price we div it by 1 
         // pairPrice = inputMinMaxPrice.min.price.mul( new BN(10).pow(inputMinMaxPrice.min.exponent) ).div( new BN(10).pow(inputMinMaxPrice.min.exponent) )
-        pairPrice = outputMinMaxPrice.min.price;
+        pairPrice = effectiveOutputMinMaxPrice.min.price;
       } else {
-        pairPrice = outputMinMaxPrice.min.price.mul(new BN(10).pow(outputMinMaxPrice.min.exponent)).div(inputMinMaxPrice.max.price)
+        pairPrice = effectiveOutputMinMaxPrice.min.price
+          .mul(new BN(10).pow(effectiveOutputMinMaxPrice.min.exponent.abs()))
+          .div(effectiveInputMinMaxPrice.max.price)
       }
       const swapPrice = pairPrice.sub(pairPrice.mul(outputTokenCustodyAccount.pricing.swapSpread).div(new BN(BPS_POWER)))
       //  console.log("NEWW swapPrice", swapPrice.toString())
 
-      inputTokenAmount = checkedDecimalMul(amountOut, new BN(-1 * outputTokenCustodyAccount.decimals), swapPrice, inputMinMaxPrice.min.exponent, new BN(-1 * inputTokenCustodyAccount.decimals))
+      inputTokenAmount = checkedDecimalMul(amountOut, new BN(-1 * outputTokenCustodyAccount.decimals), swapPrice, effectiveInputMinMaxPrice.min.exponent, new BN(-1 * inputTokenCustodyAccount.decimals))
       // console.log(" OUT => IN inputTokenAmount :", inputTokenAmount.toString())
 
       //todo: check for stable swap
@@ -3096,7 +3137,7 @@ export class PerpetualsClient {
       feeOut =  isWhitelistedUser ?  BN_ZERO
        : this.getFeeHelper(FeesAction.SwapOut, BN_ZERO, amountOut, outputTokenCustodyAccount, outputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
 
-      let swapAmount = checkedDecimalMul(amountOut.add(feeOut), new BN(-1 * outputTokenCustodyAccount.decimals), swapPrice, inputMinMaxPrice.min.exponent, new BN(-1 * inputTokenCustodyAccount.decimals)).add(feeIn)
+      let swapAmount = checkedDecimalMul(amountOut.add(feeOut), new BN(-1 * outputTokenCustodyAccount.decimals), swapPrice, effectiveInputMinMaxPrice.min.exponent, new BN(-1 * inputTokenCustodyAccount.decimals)).add(feeIn)
       // console.log(" OUT => IN swapAmount :", swapAmount.toString())
 
 
@@ -3116,14 +3157,16 @@ export class PerpetualsClient {
       ) {
         // in this senario the MAX price = 1 so to get pair price we div it by 1 
         // pairPrice = inputMinMaxPrice.min.price.mul( new BN(10).pow(inputMinMaxPrice.min.exponent) ).div( new BN(10).pow(inputMinMaxPrice.min.exponent) )
-        pairPrice = inputMinMaxPrice.min.price;
+        pairPrice = effectiveInputMinMaxPrice.min.price;
       } else {
-        pairPrice = inputMinMaxPrice.min.price.mul(new BN(10).pow(inputMinMaxPrice.min.exponent)).div(outputMinMaxPrice.max.price)
+        pairPrice = effectiveInputMinMaxPrice.min.price
+          .mul(new BN(10).pow(effectiveInputMinMaxPrice.min.exponent.abs()))
+          .div(effectiveOutputMinMaxPrice.max.price)
       }
       const swapPrice = pairPrice.sub(pairPrice.mul(inputTokenCustodyAccount.pricing.swapSpread).div(new BN(BPS_POWER)))
       // console.log("NEWW swapPrice", swapPrice.toString())
 
-      outputTokenAmount = checkedDecimalMul(amountIn, new BN(-1 * inputTokenCustodyAccount.decimals), swapPrice, inputMinMaxPrice.min.exponent, new BN(-1 * outputTokenCustodyAccount.decimals))
+      outputTokenAmount = checkedDecimalMul(amountIn, new BN(-1 * inputTokenCustodyAccount.decimals), swapPrice, effectiveInputMinMaxPrice.min.exponent, new BN(-1 * outputTokenCustodyAccount.decimals))
 
       // console.log("  IN => OUT outputTokenAmount :", outputTokenAmount.toString())
 
@@ -3133,7 +3176,7 @@ export class PerpetualsClient {
       feeOut = isWhitelistedUser ?  BN_ZERO
       : this.getFeeHelper(FeesAction.SwapOut, BN_ZERO, outputTokenAmount, outputTokenCustodyAccount, outputMinMaxPrice.max, poolAumUsdMax, poolAccount, poolConfig).feeAmount;
 
-      let swapAmount = checkedDecimalMul(amountIn.sub(feeIn), new BN(-1 * inputTokenCustodyAccount.decimals), swapPrice, inputMinMaxPrice.min.exponent, new BN(-1 * outputTokenCustodyAccount.decimals)).sub(feeOut)
+      let swapAmount = checkedDecimalMul(amountIn.sub(feeIn), new BN(-1 * inputTokenCustodyAccount.decimals), swapPrice, effectiveInputMinMaxPrice.min.exponent, new BN(-1 * outputTokenCustodyAccount.decimals)).sub(feeOut)
       // console.log("  IN => OUT swapAmount :", swapAmount.toString())
 
       return {
@@ -3190,7 +3233,7 @@ export class PerpetualsClient {
 
       const tokenMinMaxPrice = this.getMinAndMaxOraclePriceSync(tokenPrices[index], tokenEmaPrices[index], custodies[index])
 
-      let token_amount_usd: BN = tokenMinMaxPrice.max.getAssetAmountUsd(custodies[index].assets.owned, custodies[index].decimals)
+      let token_amount_usd: BN = tokenMinMaxPrice.max.getAssetAmountUsd(custodies[index].assets.owned, custodies[index].decimals, custodies[index].tokenAmountMultiplier)
       poolAmountUsd = poolAmountUsd.add(token_amount_usd);
     }
 
@@ -3226,7 +3269,7 @@ export class PerpetualsClient {
         let collectiveLossUsd = BN.min(collectivePnl.lossUsd, position.collateralUsd)
         let collectiveProfitUsd = BN.min(
           collectivePnl.profitUsd,
-          collateralMinMaxPrice.max.getAssetAmountUsd(position.lockedAmount, custodies[collateralCustodyId].decimals).sub(position.collateralUsd) // using collateral decimals as locked and collateral are same asset
+          collateralMinMaxPrice.max.getAssetAmountUsd(position.lockedAmount, custodies[collateralCustodyId].decimals, custodies[collateralCustodyId].tokenAmountMultiplier).sub(position.collateralUsd) // using collateral decimals as locked and collateral are same asset
         )
 
         poolEquityUsd = (poolEquityUsd.add(collectiveLossUsd)).sub(collectiveProfitUsd)
@@ -9163,7 +9206,7 @@ export class PerpetualsClient {
       },
     );
   }
-
+   
 
   
 };

@@ -5084,7 +5084,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -7304,7 +7303,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -7605,7 +7603,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -12714,7 +12711,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -12868,7 +12864,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -14553,108 +14548,6 @@ export type Perpetuals = {
           }
         }
       ]
-    },
-    {
-      "name": "refreshOrdersStatus",
-      "discriminator": [
-        40,
-        88,
-        107,
-        182,
-        177,
-        57,
-        247,
-        55
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "signer": true
-        },
-        {
-          "name": "multisig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  117,
-                  108,
-                  116,
-                  105,
-                  115,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "refreshOrdersStatusParams"
-            }
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
-      "name": "refreshPositionsStatus",
-      "discriminator": [
-        128,
-        146,
-        70,
-        109,
-        88,
-        250,
-        26,
-        53
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "signer": true
-        },
-        {
-          "name": "multisig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  117,
-                  108,
-                  116,
-                  105,
-                  115,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "refreshPositionsStatusParams"
-            }
-          }
-        }
-      ],
-      "returns": "u8"
     },
     {
       "name": "refreshStake",
@@ -17013,84 +16906,6 @@ export type Perpetuals = {
       "returns": "u8"
     },
     {
-      "name": "resizeTokenStake",
-      "discriminator": [
-        169,
-        172,
-        154,
-        161,
-        204,
-        201,
-        0,
-        197
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "multisig",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  117,
-                  108,
-                  116,
-                  105,
-                  115,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "perpetuals",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  101,
-                  114,
-                  112,
-                  101,
-                  116,
-                  117,
-                  97,
-                  108,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "resizeTokenStakeParams"
-            }
-          }
-        }
-      ],
-      "returns": "u8"
-    },
-    {
       "name": "setAdminSigners",
       "discriminator": [
         240,
@@ -17297,7 +17112,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -17590,7 +17404,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -18381,7 +18194,6 @@ export type Perpetuals = {
         },
         {
           "name": "multisig",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -24893,11 +24705,15 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -25070,11 +24886,15 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -26045,11 +25865,15 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "deltaLockedAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -27435,11 +27259,15 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "deltaLockedAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -27716,11 +27544,15 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "deltaLockedAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -28063,11 +27895,15 @@ export type Perpetuals = {
             "type": "u64"
           },
           {
+            "name": "lockedAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           }
@@ -31503,20 +31339,6 @@ export type Perpetuals = {
       }
     },
     {
-      "name": "refreshOrdersStatusParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
-      "name": "refreshPositionsStatusParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "refreshStakeLog",
       "type": {
         "kind": "struct",
@@ -32314,13 +32136,6 @@ export type Perpetuals = {
             "type": "u32"
           }
         ]
-      }
-    },
-    {
-      "name": "resizeTokenStakeParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
       }
     },
     {

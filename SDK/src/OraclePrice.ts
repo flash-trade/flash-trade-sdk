@@ -1,7 +1,9 @@
 import { BN } from "@coral-xyz/anchor";
-import { BN_ZERO, BPS_DECIMALS, USD_DECIMALS } from "./constants";
+import { BN_ZERO, BPS_DECIMALS, RATE_DECIMALS, USD_DECIMALS } from "./constants";
 import { checkedDecimalDiv, checkedDecimalMul, nativeToUiDecimals } from "./utils";
 import { ContractOraclePrice } from "./types";
+
+const NEG_RATE_EXPONENT = new BN(-1 * RATE_DECIMALS);
 
 export class OraclePrice {
 
@@ -108,29 +110,53 @@ export class OraclePrice {
         }
      }
 
+     private applyRateMultiplier(multiplier: BN): BN {
+        if (multiplier.isZero()) {
+            return this.price;
+        }
+        return checkedDecimalMul(
+            this.price,
+            this.exponent,
+            multiplier,
+            NEG_RATE_EXPONENT,
+            this.exponent,
+        )
+     }
+
+     withMultiplier(multiplier: BN): OraclePrice {
+        return new OraclePrice({
+            price: this.applyRateMultiplier(multiplier),
+            exponent: this.exponent,
+            confidence: this.confidence,
+            timestamp: this.timestamp,
+        })
+     }
+
      // Converts USD amount with implied USD_DECIMALS decimals to token amount
-     getTokenAmount( asset_amount_usd: BN, token_decimals: number) : BN {
+     getTokenAmount( asset_amount_usd: BN, token_decimals: number, multiplier: BN = BN_ZERO) : BN {
         if (asset_amount_usd.isZero() || this.price.isZero()) {
             return BN_ZERO;
         }
+        const effectivePrice = this.applyRateMultiplier(multiplier);
         return checkedDecimalDiv(
             asset_amount_usd,
             new BN(-1* USD_DECIMALS),
-            this.price,
+            effectivePrice,
             this.exponent,
             new BN(-1 * token_decimals),
         )
      }
 
     // Converts token amount to USD with implied USD_DECIMALS decimals using oracle price
-    getAssetAmountUsd( token_amount: BN, token_decimals: number) : BN {
+    getAssetAmountUsd( token_amount: BN, token_decimals: number, multiplier: BN = BN_ZERO) : BN {
         if (token_amount.isZero() || this.price.isZero())  {
             return BN_ZERO;
         }
+        const effectivePrice = this.applyRateMultiplier(multiplier);
         return checkedDecimalMul(
             token_amount,
             new BN(-1 * token_decimals),
-            this.price,
+            effectivePrice,
             this.exponent,
             new BN(-1 * USD_DECIMALS),
         )

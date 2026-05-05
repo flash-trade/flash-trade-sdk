@@ -355,6 +355,7 @@ export interface CloseAndSwapLogUSDv1 {
   oracle_account_price: BN;
   oracle_account_price_exponent: number;
   price_impact_usd: BN;
+  locked_amount: BN;
   padding: BN[];
 }
 
@@ -399,6 +400,7 @@ export interface ClosePositionLogUSDv1 {
   oracle_account_price: BN;
   oracle_account_price_exponent: number;
   price_impact_usd: BN;
+  locked_amount: BN;
   padding: BN[];
 }
 
@@ -645,6 +647,7 @@ export interface DecreaseSizeLogUSDv1 {
   oracle_account_price: BN;
   oracle_account_price_exponent: number;
   price_impact_usd: BN;
+  delta_locked_amount: BN;
   padding: BN[];
 }
 
@@ -1001,6 +1004,7 @@ export interface ExecuteTriggerOrderLogUSDv1 {
   trigger_price: BN;
   trigger_price_exponent: number;
   price_impact_usd: BN;
+  delta_locked_amount: BN;
   padding: BN[];
 }
 
@@ -1072,6 +1076,7 @@ export interface ExecuteTriggerWithSwapLogUSDv1 {
   trigger_price: BN;
   trigger_price_exponent: number;
   price_impact_usd: BN;
+  delta_locked_amount: BN;
   padding: BN[];
 }
 
@@ -1153,6 +1158,7 @@ export interface ForceSettlePositionLog {
   oracle_account_price: BN;
   oracle_account_price_exponent: number;
   price_impact_usd: BN;
+  locked_amount: BN;
   padding: BN[];
 }
 
@@ -2003,12 +2009,6 @@ export interface ReferralRebateLog {
   padding: BN[];
 }
 
-export interface RefreshOrdersStatusParams {
-}
-
-export interface RefreshPositionsStatusParams {
-}
-
 export interface RefreshStakeLog {
   pool_name: string;
   reward_per_lp_staked: BN;
@@ -2229,9 +2229,6 @@ export interface RenameFlpParams {
 
 export interface ResizeInternalOracleParams {
   lazerFeedId: number;
-}
-
-export interface ResizeTokenStakeParams {
 }
 
 export interface SetAdminSignersParams {

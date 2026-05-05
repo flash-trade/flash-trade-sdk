@@ -106,12 +106,15 @@ export class PoolDataClient {
       if(custodyConfig.isVirtual) continue
       const custodyAccount = this.custodies.find(t => t.mint.toBase58() === custodyConfig.mintKey.toBase58())
       if (custodyAccount) {
-        const priceBnUi = new BigNumber(pricesMap.get(custodyConfig.symbol).price.toUiPrice(8));   // need to take 8 decimals than USD_DECIMALS for bonk
-        const ownedBnUi = new BigNumber(custodyAccount.assets.owned.toString()).dividedBy(10**custodyConfig.decimals); 
-        const ownedUsdBnUi = ownedBnUi.multipliedBy(priceBnUi)
+        const ownedUsd = pricesMap.get(custodyConfig.symbol).price.getAssetAmountUsd(
+          custodyAccount.assets.owned,
+          custodyConfig.decimals,
+          custodyAccount.tokenAmountMultiplier,
+        );
+        const ownedUsdBnUi = new BigNumber(nativeToUiDecimals(ownedUsd, USD_DECIMALS, USD_DECIMALS));
 
         if (custodyAccount.isStable) {
-          stableCoinAmountBni = stableCoinAmountBni.plus(ownedBnUi)
+          stableCoinAmountBni = stableCoinAmountBni.plus(ownedUsdBnUi)
         }
        // TODO: later do MAX price for POOL AUM 
         totalPoolValueUsdBnUi = totalPoolValueUsdBnUi.plus(ownedUsdBnUi)
@@ -154,17 +157,23 @@ export class PoolDataClient {
       const custodyAccount = this.custodies.find(t => t.mint.toBase58() === custodyConfig.mintKey.toBase58())
       if (!custodyAccount) continue;
       // TODO: later do MAX price for POOL AUM  
-      const priceBnUi = new BigNumber(pricesMap.get(custodyConfig.symbol).price.toUiPrice(8));  // need to take 8 decimals than USD_DECIMALS for bonk
+      const effectivePrice = pricesMap.get(custodyConfig.symbol).price.withMultiplier(custodyAccount.tokenAmountMultiplier);
+      const priceBnUi = new BigNumber(effectivePrice.toUiPrice(8));  // need to take 8 decimals than USD_DECIMALS for bonk
 
       const ownedBnUi = new BigNumber(custodyAccount.assets.owned.toString()).dividedBy(10**custodyConfig.decimals); 
-      const ownedUsdBnUi = ownedBnUi.multipliedBy(priceBnUi); 
+      const ownedUsd = pricesMap.get(custodyConfig.symbol).price.getAssetAmountUsd(
+        custodyAccount.assets.owned,
+        custodyConfig.decimals,
+        custodyAccount.tokenAmountMultiplier,
+      );
+      const ownedUsdBnUi = new BigNumber(nativeToUiDecimals(ownedUsd, USD_DECIMALS, USD_DECIMALS)); 
 
       const lockedBnUi = new BigNumber(custodyAccount.assets.locked.toString()).dividedBy(10**custodyConfig.decimals); 
 
       const utilizationBnUi = (custodyAccount.assets.locked.isZero() || custodyAccount.assets.owned.isZero()) ? new BigNumber(0) :
                                   lockedBnUi.dividedBy(ownedBnUi).multipliedBy(100);
 
-      const currentRatioBnUi = totalPoolValueUsd.isZero() ? new BigNumber(0) : ownedBnUi.multipliedBy(priceBnUi).dividedBy(totalPoolValueUsdUi).multipliedBy(100);
+      const currentRatioBnUi = totalPoolValueUsd.isZero() ? new BigNumber(0) : ownedUsdBnUi.dividedBy(totalPoolValueUsdUi).multipliedBy(100);
 
       let minRatioBnUi = tokenRatio.min.isZero() ? new BigNumber(5) : new BigNumber(tokenRatio.min.toString()).div(100);
       let maxRatioBnUi = tokenRatio.max.toString()==='10000' ? new BigNumber(95) : new BigNumber(tokenRatio.max.toString()).div(100); 
@@ -175,18 +184,42 @@ export class PoolDataClient {
       const availableToAddUsdBnUi = currentRatioBnUi.isGreaterThanOrEqualTo(maxRatioBnUi) ?
                                          new BigNumber(0) :
                                         maxRatioBnUi.minus(currentRatioBnUi).multipliedBy(totalPoolValueUsdUi).div(100);
-      const availableToAddAmountBnUi = availableToAddUsdBnUi.dividedBy(priceBnUi)
+      const availableToAddAmountBnUi = new BigNumber(
+        pricesMap.get(custodyConfig.symbol).price.getTokenAmount(
+          uiDecimalsToNative(availableToAddUsdBnUi.toFixed(USD_DECIMALS, BigNumber.ROUND_DOWN), USD_DECIMALS),
+          custodyConfig.decimals,
+          custodyAccount.tokenAmountMultiplier,
+        ).toString()
+      ).dividedBy(10**custodyConfig.decimals)
 
       const availableToRemoveUsdUi = minRatioBnUi.isGreaterThanOrEqualTo(currentRatioBnUi) ?
                                       new BigNumber(0) :
                                       currentRatioBnUi.minus(minRatioBnUi).multipliedBy(totalPoolValueUsdUi).div(100);
-      const availableToRemoveAmountBnUi = availableToRemoveUsdUi.dividedBy(priceBnUi)
+      const availableToRemoveAmountBnUi = new BigNumber(
+        pricesMap.get(custodyConfig.symbol).price.getTokenAmount(
+          uiDecimalsToNative(availableToRemoveUsdUi.toFixed(USD_DECIMALS, BigNumber.ROUND_DOWN), USD_DECIMALS),
+          custodyConfig.decimals,
+          custodyAccount.tokenAmountMultiplier,
+        ).toString()
+      ).dividedBy(10**custodyConfig.decimals)
 
       const minCapacityUsdBnUi = minRatioBnUi.multipliedBy(totalPoolValueUsdUi).div(100);
-      const minCapacityAmountBnUi = minCapacityUsdBnUi.dividedBy(priceBnUi)
+      const minCapacityAmountBnUi = new BigNumber(
+        pricesMap.get(custodyConfig.symbol).price.getTokenAmount(
+          uiDecimalsToNative(minCapacityUsdBnUi.toFixed(USD_DECIMALS, BigNumber.ROUND_DOWN), USD_DECIMALS),
+          custodyConfig.decimals,
+          custodyAccount.tokenAmountMultiplier,
+        ).toString()
+      ).dividedBy(10**custodyConfig.decimals)
 
       const maxCapacityUsdBnUi = maxRatioBnUi.multipliedBy(totalPoolValueUsdUi).div(100);
-      const maxCapacityAmountBnUi = maxCapacityUsdBnUi.dividedBy(priceBnUi)
+      const maxCapacityAmountBnUi = new BigNumber(
+        pricesMap.get(custodyConfig.symbol).price.getTokenAmount(
+          uiDecimalsToNative(maxCapacityUsdBnUi.toFixed(USD_DECIMALS, BigNumber.ROUND_DOWN), USD_DECIMALS),
+          custodyConfig.decimals,
+          custodyAccount.tokenAmountMultiplier,
+        ).toString()
+      ).dividedBy(10**custodyConfig.decimals)
 
       if (custodyAccount && tokenRatio) {
         custodyDetails.push({
