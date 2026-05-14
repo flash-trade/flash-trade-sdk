@@ -9206,7 +9206,6 @@ export class PerpetualsClient {
       },
     );
   }
-   
 
   
 };

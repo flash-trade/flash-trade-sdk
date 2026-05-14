@@ -17,11 +17,10 @@
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
-    "@pythnetwork/client": "^2.22.0",
     "@solana/spl-token": "^0.4.8",
     "@solana/web3.js": "^1.95.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
-    "flash-sdk": "^15.4.4"
+    "flash-sdk": "^15.16.10"
   }
 }
